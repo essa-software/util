@@ -15,7 +15,7 @@ add_library(essautil
 essautil_setup_target(essautil)
 if (ESSAUTIL_ENABLE_SFML)
     find_package(SFML 2.5.1 COMPONENTS system REQUIRED)
-    target_compile_definitions(essautil ESSAUTIL_ENABLE_SFML)
+    target_compile_definitions(essautil PUBLIC ESSAUTIL_ENABLE_SFML)
     target_link_libraries(essautil sfml-system)
 endif()
 install(TARGETS essautil EXPORT EssaUtil DESTINATION lib)
