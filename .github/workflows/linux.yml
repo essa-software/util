@@ -16,7 +16,6 @@ jobs:
     - name: Dependency install
       run: sudo apt install ninja-build
     - name: Build & install
-      working-directory: build
       env:
         CMAKE_OPTIONS: -DESSAUTIL_ENABLE_SFML=1
       run: ./install.sh
