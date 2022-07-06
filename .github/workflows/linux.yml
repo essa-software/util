@@ -17,5 +17,7 @@ jobs:
       run: sudo apt install ninja-build
     - name: Build & install
       working-directory: build
-      run: CMAKE_OPTIONS="-DESSAUTIL_ENABLE_SFML=1" ./install.sh
+      env:
+        CMAKE_OPTIONS: -DESSAUTIL_ENABLE_SFML=1
+      run: ./install.sh
     # TODO: Tests
