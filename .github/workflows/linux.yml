@@ -19,4 +19,5 @@ jobs:
       env:
         CMAKE_OPTIONS: -DESSAUTIL_ENABLE_SFML=1
       run: ./install.sh
-    # TODO: Tests
+    - name: Run tests
+      run: ./run-all-tests.sh
