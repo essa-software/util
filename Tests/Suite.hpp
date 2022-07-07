@@ -1,7 +1,6 @@
 // No #pragma once, this is expected to be included only once per test file
 
 #include <Util/Error.hpp>
-#include <fmt/format.h>
 #include <iostream>
 #include <map>
 #include <sstream>
