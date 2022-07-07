@@ -55,4 +55,5 @@ int main()
         }
     }
     std::cout << "\e[1;32m" << num_passed << "\e[m passed, \e[1;31m" << num_failed << "\e[m failed" << std::endl;
+    return num_failed > 0 ? 1 : 0;
 }
