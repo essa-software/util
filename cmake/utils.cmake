@@ -17,3 +17,10 @@ function(essautil_setup_target targetname)
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 endfunction()
+
+function(essautil_add_test targetname)
+    cmake_parse_arguments(PARSE_ARGV 1 essautil_add_test "" "" "LIBS")
+    add_executable(${targetname} ${targetname}.cpp)
+    target_link_libraries(${targetname} ${essautil_add_test_LIBS})
+    essautil_setup_target(${targetname})
+endfunction()

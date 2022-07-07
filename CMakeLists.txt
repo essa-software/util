@@ -23,3 +23,5 @@ install(TARGETS essautil EXPORT EssaUtil DESTINATION lib)
 install(FILES cmake/EssaUtilConfig.cmake DESTINATION lib/cmake/EssaUtil)
 install(DIRECTORY Util/ DESTINATION include/EssaUtil FILES_MATCHING PATTERN "*.hpp" PATTERN "*.inl")
 install(EXPORT EssaUtil DESTINATION lib/cmake/EssaUtil)
+
+add_subdirectory(Tests)
