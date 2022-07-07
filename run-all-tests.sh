@@ -9,10 +9,10 @@ for test in *; do
         echo -e "——— Testing \e[1m$test\e[m ———"
         ./$test
         if [ $? -eq 1 ]; then
-            echo -e "\033[41m FAIL \033[m $test"
+            echo -e "\033[30;41m FAIL \033[m $test"
             something_failed=1
         else
-            echo -e "\033[42m PASS \033[m $test"
+            echo -e "\033[30;42m PASS \033[m $test"
         fi
     fi
 done
