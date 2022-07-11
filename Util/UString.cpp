@@ -193,20 +193,23 @@ UString::UString(char const* string, Encoding encoding, uint32_t replacement)
     }
 }
 
-std::string UString::to_ascii() const
+std::string UString::encode(Encoding encoding) const
 {
-    std::string str;
-    for (auto cp : span()) {
-        if (cp > 0x7f)
-            continue;
-        str += static_cast<char>(cp);
+    switch (encoding) {
+        case Encoding::ASCII: {
+            std::string str;
+            for (auto cp : span()) {
+                if (cp > 0x7f)
+                    continue;
+                str += static_cast<char>(cp);
+            }
+            return str;
+        }
+        case Encoding::Utf8: {
+            return Utf8::encode(span());
+        }
     }
-    return str;
-}
-
-std::string UString::to_utf8() const
-{
-    return Utf8::encode(span());
+    return "";
 }
 
 uint32_t UString::at(size_t p) const

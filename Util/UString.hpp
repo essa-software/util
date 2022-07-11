@@ -30,11 +30,7 @@ public:
 
     UString(char const* data, Encoding = Encoding::Utf8, uint32_t replacement = 0xfffd);
 
-    // This just skips the non-ASCII characters
-    std::string to_ascii() const;
-
-    // This does fancy modulo math to store bytes >127 in a char
-    std::string to_utf8() const;
+    std::string encode(Encoding = Encoding::Utf8) const;
 
     uint32_t at(size_t) const;
     size_t size() const { return m_size; }

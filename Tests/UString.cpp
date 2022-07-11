@@ -76,7 +76,7 @@ TEST_CASE(utf8)
         EXPECT(std::equal(string.storage(), string.storage() + string.size(), testcase.expected.data()));
 
         // Encoding
-        auto string_in_utf8 = string.to_utf8();
+        auto string_in_utf8 = string.encode();
         EXPECT(std::equal(string_in_utf8.begin(), string_in_utf8.end(), testcase.string));
     }
 
