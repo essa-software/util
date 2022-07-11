@@ -11,7 +11,9 @@
 #pragma once
 
 #include <cassert>
+#include <cerrno>
 #include <optional>
+#include <string_view>
 #include <type_traits>
 #include <variant>
 
@@ -37,10 +39,12 @@ public:
 
     template<typename U>
     ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorType>> && (std::is_convertible_v<U, T> || std::is_convertible_v<U, ErrorType>))
-        : Variant(std::forward<U>(value)) {
+        : Variant(std::forward<U>(value))
+    {
     }
 
-    T& value() {
+    T& value()
+    {
         return std::get<T>(*this);
     }
     T const& value() const { return std::get<T>(*this); }
@@ -52,7 +56,8 @@ public:
     T release_value() { return std::move(value()); }
     ErrorType release_error() { return std::move(error()); }
 
-    T release_value_but_fixme_should_propagate_errors() {
+    T release_value_but_fixme_should_propagate_errors()
+    {
         assert(!is_error());
         return release_value();
     }
@@ -63,7 +68,8 @@ template<typename ErrorType>
 class [[nodiscard]] ErrorOr<void, ErrorType> {
 public:
     ErrorOr(ErrorType error)
-        : m_error(std::move(error)) {
+        : m_error(std::move(error))
+    {
     }
 
     ErrorOr() = default;
@@ -82,5 +88,13 @@ public:
 private:
     std::optional<ErrorType> m_error;
 };
+
+struct OsError {
+    error_t error;
+    std::string_view function;
+};
+
+template<class T>
+using OsErrorOr = ErrorOr<T, OsError>;
 
 }
