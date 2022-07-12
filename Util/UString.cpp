@@ -71,11 +71,11 @@ static int bytes_required_to_store_codepoint(uint32_t codepoint)
 }
 
 template<class Callback>
-static bool decode_impl(uint8_t const* string, uint32_t replacement, Callback callback)
+static bool decode_impl(std::string_view string, uint32_t replacement, Callback callback)
 {
     bool error = false;
-    while (*string) {
-        auto byte = *string;
+    for (size_t s = 0; s < string.size(); s++) {
+        auto byte = std::bit_cast<uint8_t>(string[s]);
         uint32_t codepoint = 0;
         int additional_bytes_to_expect = 0;
         if (byte >= 0b1111'1110) {
@@ -102,13 +102,13 @@ static bool decode_impl(uint8_t const* string, uint32_t replacement, Callback ca
         }
 
         for (int i = 0; i < additional_bytes_to_expect; i++) {
-            string++;
-            if (!*string) {
+            s++;
+            if (s > string.size()) {
                 std::cout << "unfinished utf8 sequence" << std::endl;
                 return false;
             }
             codepoint <<= 6;
-            codepoint |= ((*string) & 0b111111);
+            codepoint |= (string[s] & 0b111111);
         }
 
         // Check if codepoint was stored optimally
@@ -119,19 +119,18 @@ static bool decode_impl(uint8_t const* string, uint32_t replacement, Callback ca
         }
 
         callback(codepoint);
-        string++;
     }
     return !error;
 }
 
-static size_t strlen(uint8_t const* string)
+static size_t strlen(std::string_view string)
 {
     size_t size = 0;
     decode_impl(string, 0x0, [&size](auto) { size++; });
     return size;
 }
 
-static bool decode(std::span<uint32_t> storage, uint8_t const* string, uint32_t replacement)
+static bool decode(std::span<uint32_t> storage, std::string_view string, uint32_t replacement)
 {
     size_t offset = 0;
     return decode_impl(string, replacement, [&offset, &storage](auto cp) {
@@ -179,16 +178,16 @@ static std::string encode(std::span<uint32_t const> storage)
 
 }
 
-UString::UString(char const* string, Encoding encoding, uint32_t replacement)
+UString::UString(std::string_view string, Encoding encoding, uint32_t replacement)
 {
     switch (encoding) {
         case Encoding::ASCII:
-            reallocate(strlen(string));
-            std::copy(string, string + m_size, m_storage);
+            reallocate(string.size());
+            std::copy(string.begin(), string.end(), m_storage);
             break;
         case Encoding::Utf8:
-            reallocate(Utf8::strlen(reinterpret_cast<uint8_t const*>(string)));
-            Utf8::decode({ m_storage, m_size }, reinterpret_cast<uint8_t const*>(string), replacement);
+            reallocate(Utf8::strlen(string));
+            Utf8::decode({ m_storage, m_size }, string, replacement);
             break;
     }
 }

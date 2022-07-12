@@ -28,7 +28,13 @@ public:
         Utf8
     };
 
-    UString(char const* data, Encoding = Encoding::Utf8, uint32_t replacement = 0xfffd);
+    UString(std::string_view, Encoding = Encoding::Utf8, uint32_t replacement = 0xfffd);
+
+    template<size_t S>
+    UString(char const (&string)[S], Encoding encoding = Encoding::Utf8, uint32_t replacement = 0xfffd)
+        : UString({ string, S - 1 }, encoding, replacement)
+    {
+    }
 
     std::string encode(Encoding = Encoding::Utf8) const;
 
