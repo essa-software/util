@@ -49,6 +49,8 @@ public:
     std::strong_ordering operator<=>(UString const& other) const;
     bool operator==(UString const& other) const;
 
+    UString operator+(UString const& other) const;
+
 private:
     void reallocate(size_t);
 

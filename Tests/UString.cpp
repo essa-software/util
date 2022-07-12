@@ -84,3 +84,12 @@ TEST_CASE(utf8)
 
     return {};
 }
+
+TEST_CASE(concatenate)
+{
+    UString str1 { "abc" };
+    UString str2 { "ąęł" };
+    EXPECT_EQ((str1 + str2).encode(), "abcąęł");
+
+    return {};
+}
