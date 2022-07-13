@@ -115,6 +115,9 @@ TEST_CASE(find)
     EXPECT_EQ(haystack.find("abcdefghijklmnopqrstuvwxyz").value(), 0ull);
     EXPECT_EQ(haystack.find("abcdefghijklmnopqrstuvwxyza").has_value(), false);
 
+    // Empty string
+    EXPECT_EQ(UString { "" }.find("a").has_value(), false);
+
     return {};
 }
 

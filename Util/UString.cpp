@@ -233,7 +233,7 @@ UString UString::substring(size_t start, size_t size) const
 
 std::optional<size_t> UString::find(UString needle, size_t start) const
 {
-    assert(start < m_size);
+    assert(start <= m_size);
     for (size_t s = start; s < m_size; s++) {
         if (m_storage[s] == needle.at(0)) {
             bool found = true;
