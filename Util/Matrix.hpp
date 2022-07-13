@@ -54,7 +54,7 @@ requires(Size > 0) struct Matrix {
         Matrix<TT, Size> output;
         for (size_t x = 0; x < Size; x++) {
             for (size_t y = 0; y < Size; y++) {
-                output.m_data[x][y] = static_cast<T>(m_data[x][y]);
+                output.element(x, y) = static_cast<T>(element(x, y));
             }
         }
         return output;
