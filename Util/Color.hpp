@@ -36,11 +36,18 @@ constexpr Color operator*(Color const& left, auto fac)
 
 class Colors {
 public:
+    static constexpr Color transparent { 0, 0, 0, 0 };
+
     static constexpr Color white { 255, 255, 255 };
     static constexpr Color black {};
+
     static constexpr Color red { 255, 0, 0 };
     static constexpr Color green { 0, 255, 0 };
     static constexpr Color blue { 0, 0, 255 };
+
+    static constexpr Color cyan { 0, 255, 255 };
+    static constexpr Color magenta { 255, 0, 255 };
+    static constexpr Color yellow { 255, 255, 0 };
 };
 
 struct Colorf {
