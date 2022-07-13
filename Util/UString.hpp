@@ -21,7 +21,8 @@ public:
     UString& operator=(UString const& other);
     UString(UString&& other);
     UString& operator=(UString&& other);
-    UString(uint32_t codepoint);
+    
+    explicit UString(uint32_t codepoint);
 
     enum class Encoding {
         ASCII,
