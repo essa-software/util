@@ -14,6 +14,24 @@ public:
     T width {};
     T height {};
 
+    Rect() = default;
+
+    Rect(T left_, T top_, T width_, T height_)
+        : left(left_)
+        , top(top_)
+        , width(width_)
+        , height(height_)
+    {
+    }
+
+    Rect(Vector2<T> position, Vector2<T> size)
+        : left(position.x())
+        , top(position.y())
+        , width(size.x())
+        , height(size.y())
+    {
+    }
+
     Vector2<T> position() const { return { left, top }; }
     Vector2<T> size() const { return { width, height }; }
 
