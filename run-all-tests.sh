@@ -1,5 +1,9 @@
 #!/bin/bash
 
+mkdir -p build
+
+set -e
+
 cd build
 ninja
 cd Tests
