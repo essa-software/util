@@ -56,6 +56,7 @@ public:
     UString substring(size_t start, size_t size) const;
     std::optional<size_t> find(UString needle, size_t start = 0) const;
     UString erase(size_t start, size_t size = 1) const;
+    UString insert(UString other, size_t where) const;
 
     std::strong_ordering operator<=>(UString const& other) const;
     bool operator==(UString const& other) const;

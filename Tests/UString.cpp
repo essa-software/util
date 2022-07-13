@@ -131,3 +131,13 @@ TEST_CASE(erase)
 
     return {};
 }
+
+TEST_CASE(insert)
+{
+    UString test { "abcghi" };
+    EXPECT_EQ(test.insert("def", 3).encode(), "abcdefghi");
+    EXPECT_EQ(test.insert("def", 0).encode(), "defabcghi");
+    EXPECT_EQ(test.insert("def", 6).encode(), "abcghidef");
+
+    return {};
+}

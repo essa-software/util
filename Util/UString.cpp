@@ -217,7 +217,6 @@ uint32_t UString::at(size_t p) const
     return m_storage[p];
 }
 
-
 UString UString::substring(size_t start) const
 {
     return substring(start, size() - start);
@@ -262,6 +261,16 @@ UString UString::erase(size_t start, size_t size) const
     result.reallocate(m_size - size);
     std::copy(m_storage, m_storage + start, result.m_storage);
     std::copy(m_storage + start + size, m_storage + m_size, result.m_storage + start);
+    return result;
+}
+
+UString UString::insert(UString other, size_t where) const
+{
+    UString result;
+    result.reallocate(m_size + other.m_size);
+    std::copy(m_storage, m_storage + where, result.m_storage);
+    std::copy(other.m_storage, other.m_storage + other.m_size, result.m_storage + where);
+    std::copy(m_storage + where, m_storage + m_size, result.m_storage + where + other.m_size);
     return result;
 }
 
