@@ -93,3 +93,26 @@ TEST_CASE(concatenate)
 
     return {};
 }
+
+TEST_CASE(substr)
+{
+    UString big_string { "abcdefghijklmnopqrstuvwxyz" };
+    EXPECT_EQ(big_string.substring(0, 3).encode(), "abc");
+    EXPECT_EQ(big_string.substring(3, 6).encode(), "defghi");
+    EXPECT_EQ(big_string.substring(23, 3).encode(), "xyz");
+
+    return {};
+}
+
+TEST_CASE(find)
+{
+    UString haystack { "abcdefghijklmnopqrstuvwxyz" };
+    EXPECT_EQ(haystack.find("abc").value(), 0ull);
+    EXPECT_EQ(haystack.find("def").value(), 3ull);
+    EXPECT_EQ(haystack.find("xyz").value(), 23ull);
+    EXPECT_EQ(haystack.find("zyx").has_value(), false);
+    EXPECT_EQ(haystack.find("abcdefghijklmnopqrstuvwxyz").value(), 0ull);
+    EXPECT_EQ(haystack.find("abcdefghijklmnopqrstuvwxyza").has_value(), false);
+
+    return {};
+}

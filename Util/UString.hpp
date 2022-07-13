@@ -49,6 +49,9 @@ public:
     uint32_t const* storage() const { return m_storage; }
     std::span<uint32_t const> span() const { return { m_storage, m_size }; }
 
+    UString substring(size_t start, size_t size) const;
+    std::optional<size_t> find(UString needle, size_t start = 0) const;
+
     std::strong_ordering operator<=>(UString const& other) const;
     bool operator==(UString const& other) const;
 

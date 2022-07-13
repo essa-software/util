@@ -217,6 +217,39 @@ uint32_t UString::at(size_t p) const
     return m_storage[p];
 }
 
+UString UString::substring(size_t start, size_t size) const
+{
+    assert(start + size <= m_size);
+    UString result;
+    result.reallocate(size);
+    std::copy(m_storage + start, m_storage + start + size, result.m_storage);
+    return result;
+}
+
+std::optional<size_t> UString::find(UString needle, size_t start) const
+{
+    assert(start < m_size);
+    for (size_t s = start; s < m_size; s++) {
+        if (m_storage[s] == needle.at(0)) {
+            bool found = true;
+            for (size_t t = s; t - s < needle.m_size; t++) {
+                if (t == m_size) {
+                    found = false;
+                    break;
+                }
+                if (m_storage[t] != needle.at(t - s)) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) {
+                return s;
+            }
+        }
+    }
+    return {};
+}
+
 void UString::reallocate(size_t size)
 {
     auto old_storage = m_storage;
