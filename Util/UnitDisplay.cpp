@@ -12,7 +12,7 @@
 namespace Util {
 
 struct Unit {
-    std::string string;
+    UString string;
     double multiplier;
 };
 
@@ -55,21 +55,21 @@ static const std::map<Quantity, std::vector<Unit>> s_units {
         } }
 };
 
-std::string to_exponent_string(double value)
+UString to_exponent_string(double value)
 {
     std::ostringstream oss;
     if (value < 10) {
         oss << std::setprecision(2) << value;
-        return oss.str();
+        return std::string_view { oss.str() };
     }
     if (value < 10'000'000) {
         oss << std::fixed << std::setprecision(2) << value;
-        return oss.str();
+        return std::string_view { oss.str() };
     }
     int exponent = (double)std::log10(value);
     double mantissa = value / std::pow(10, exponent);
     oss << std::fixed << std::setprecision(4) << mantissa << " \u00D7 10^" << exponent; // × (MULTIPLICATION SIGN)
-    return oss.str();
+    return std::string_view { oss.str() };
 };
 
 UnitValue unit_display(double value, Quantity quantity)

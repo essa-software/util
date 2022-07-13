@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "UString.hpp"
 
 namespace Util
 {
@@ -18,14 +18,14 @@ enum class Quantity
 
 // All strings here are UTF-8 strings.
 // FIXME: Add some replacement for SFML sf::String which is a *true* unicode string.
-std::string to_exponent_string(double value);
+UString to_exponent_string(double value);
 
 struct UnitValue
 {
-    std::string value {};
-    std::string unit {};
+    UString value {};
+    UString unit {};
 
-    std::string to_string() const { return value + " " + unit; }
+    UString to_string() const { return value + " " + unit; }
 };
 
 UnitValue unit_display(double value, Quantity);
