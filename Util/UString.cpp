@@ -266,6 +266,7 @@ UString UString::erase(size_t start, size_t size) const
 
 UString UString::insert(UString other, size_t where) const
 {
+    assert(where <= m_size);
     UString result;
     result.reallocate(m_size + other.m_size);
     std::copy(m_storage, m_storage + where, result.m_storage);
