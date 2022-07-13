@@ -250,6 +250,15 @@ std::optional<size_t> UString::find(UString needle, size_t start) const
     return {};
 }
 
+UString UString::erase(size_t offset) const
+{
+    UString result;
+    result.reallocate(m_size - 1);
+    std::copy(m_storage, m_storage + offset, result.m_storage);
+    std::copy(m_storage + offset + 1, m_storage + m_size, result.m_storage + offset);
+    return result;
+}
+
 void UString::reallocate(size_t size)
 {
     auto old_storage = m_storage;

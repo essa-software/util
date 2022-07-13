@@ -116,3 +116,13 @@ TEST_CASE(find)
 
     return {};
 }
+
+TEST_CASE(erase)
+{
+    UString test { "abcdefghij" };
+    EXPECT_EQ(test.erase(0).encode(), "bcdefghij");
+    EXPECT_EQ(test.erase(5).encode(), "abcdeghij");
+    EXPECT_EQ(test.erase(9).encode(), "abcdefghi");
+
+    return {};
+}
