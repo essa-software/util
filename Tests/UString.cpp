@@ -100,6 +100,7 @@ TEST_CASE(substr)
     EXPECT_EQ(big_string.substring(0, 3).encode(), "abc");
     EXPECT_EQ(big_string.substring(3, 6).encode(), "defghi");
     EXPECT_EQ(big_string.substring(23, 3).encode(), "xyz");
+    EXPECT_EQ(big_string.substring(5).encode(), "fghijklmnopqrstuvwxyz");
 
     return {};
 }
@@ -123,6 +124,10 @@ TEST_CASE(erase)
     EXPECT_EQ(test.erase(0).encode(), "bcdefghij");
     EXPECT_EQ(test.erase(5).encode(), "abcdeghij");
     EXPECT_EQ(test.erase(9).encode(), "abcdefghi");
+
+    EXPECT_EQ(test.erase(0, 2).encode(), "cdefghij");
+    EXPECT_EQ(test.erase(5, 2).encode(), "abcdehij");
+    EXPECT_EQ(test.erase(8, 2).encode(), "abcdefgh");
 
     return {};
 }

@@ -217,6 +217,12 @@ uint32_t UString::at(size_t p) const
     return m_storage[p];
 }
 
+
+UString UString::substring(size_t start) const
+{
+    return substring(start, size() - start);
+}
+
 UString UString::substring(size_t start, size_t size) const
 {
     assert(start + size <= m_size);
@@ -250,12 +256,12 @@ std::optional<size_t> UString::find(UString needle, size_t start) const
     return {};
 }
 
-UString UString::erase(size_t offset) const
+UString UString::erase(size_t start, size_t size) const
 {
     UString result;
-    result.reallocate(m_size - 1);
-    std::copy(m_storage, m_storage + offset, result.m_storage);
-    std::copy(m_storage + offset + 1, m_storage + m_size, result.m_storage + offset);
+    result.reallocate(m_size - size);
+    std::copy(m_storage, m_storage + start, result.m_storage);
+    std::copy(m_storage + start + size, m_storage + m_size, result.m_storage + start);
     return result;
 }
 
