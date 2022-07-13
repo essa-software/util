@@ -299,12 +299,12 @@ bool UString::operator==(UString const& other) const
     return (*this <=> other) == std::strong_ordering::equal;
 }
 
-UString UString::operator+(UString const& other) const
+UString operator+(UString const& lhs, UString const& rhs)
 {
     UString result;
-    result.reallocate(m_size + other.m_size);
-    std::copy(m_storage, m_storage + m_size, result.m_storage);
-    std::copy(other.m_storage, other.m_storage + other.m_size, result.m_storage + m_size);
+    result.reallocate(lhs.m_size + rhs.m_size);
+    std::copy(lhs.m_storage, lhs.m_storage + lhs.m_size, result.m_storage);
+    std::copy(rhs.m_storage, rhs.m_storage + rhs.m_size, result.m_storage + lhs.m_size);
     return result;
 }
 

@@ -61,9 +61,9 @@ public:
     std::strong_ordering operator<=>(UString const& other) const;
     bool operator==(UString const& other) const;
 
-    UString operator+(UString const& other) const;
-
 private:
+    friend UString operator+(UString const& lhs, UString const& rhs);
+
     void reallocate(size_t);
 
     uint32_t* m_storage {};
