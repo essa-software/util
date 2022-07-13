@@ -20,9 +20,13 @@ if (ESSAUTIL_ENABLE_SFML)
     target_compile_definitions(essautil PUBLIC ESSAUTIL_ENABLE_SFML)
     target_link_libraries(essautil sfml-system)
 endif()
+
+find_package(fmt REQUIRED)
+target_link_libraries(essautil fmt)
+
 install(TARGETS essautil EXPORT EssaUtil DESTINATION lib)
 
-install(FILES cmake/EssaUtilConfig.cmake DESTINATION lib/cmake/EssaUtil)
+install(DIRECTORY cmake/ DESTINATION lib/cmake/EssaUtil)
 install(DIRECTORY Util/ DESTINATION include/EssaUtil FILES_MATCHING PATTERN "*.hpp" PATTERN "*.inl")
 install(EXPORT EssaUtil DESTINATION lib/cmake/EssaUtil)
 
