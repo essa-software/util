@@ -227,7 +227,8 @@ UString UString::substring(size_t start, size_t size) const
     assert(start + size <= m_size);
     UString result;
     result.reallocate(size);
-    std::copy(m_storage + start, m_storage + start + size, result.m_storage);
+    if (m_storage)
+        std::copy(m_storage + start, m_storage + start + size, result.m_storage);
     return result;
 }
 
@@ -257,10 +258,16 @@ std::optional<size_t> UString::find(UString needle, size_t start) const
 
 UString UString::erase(size_t start, size_t size) const
 {
+    if (start + size > m_size) {
+        size = m_size - start;
+    }
+    // std::cout << "erase " << start << " +" << size << " from US[" << m_size << "]" << std::endl;
     UString result;
     result.reallocate(m_size - size);
-    std::copy(m_storage, m_storage + start, result.m_storage);
-    std::copy(m_storage + start + size, m_storage + m_size, result.m_storage + start);
+    if (m_storage) {
+        std::copy(m_storage, m_storage + start, result.m_storage);
+        std::copy(m_storage + start + size, m_storage + m_size, result.m_storage + start);
+    }
     return result;
 }
 
@@ -269,9 +276,13 @@ UString UString::insert(UString other, size_t where) const
     assert(where <= m_size);
     UString result;
     result.reallocate(m_size + other.m_size);
-    std::copy(m_storage, m_storage + where, result.m_storage);
-    std::copy(other.m_storage, other.m_storage + other.m_size, result.m_storage + where);
-    std::copy(m_storage + where, m_storage + m_size, result.m_storage + where + other.m_size);
+    if (m_storage) {
+        std::copy(m_storage, m_storage + where, result.m_storage);
+        std::copy(m_storage + where, m_storage + m_size, result.m_storage + where + other.m_size);
+    }
+    if (other.m_storage) {
+        std::copy(other.m_storage, other.m_storage + other.m_size, result.m_storage + where);
+    }
     return result;
 }
 
