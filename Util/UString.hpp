@@ -42,6 +42,9 @@ public:
     size_t size() const { return m_size; }
     bool is_empty() const { return m_size == 0; }
 
+    auto begin() const { return span().begin(); }
+    auto end() const { return span().end(); }
+
     // If you really want... there is a footgun for you.
     uint32_t const* storage() const { return m_storage; }
     std::span<uint32_t const> span() const { return { m_storage, m_size }; }
