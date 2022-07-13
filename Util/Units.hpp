@@ -57,56 +57,6 @@ constexpr Length operator""_perc(long double v)
     return Length(v, Length::Percent);
 }
 
-// FIXME: Move this out of EssaGUI.
-class Angle
-{
-public:
-    enum Unit
-    {
-        Rad,
-        Deg
-    };
-
-    constexpr Angle() = default;
-
-    constexpr Angle(float v, Unit unit)
-        : m_value_in_radians(unit == Deg ? v / 180 * M_PI : v)
-        , m_unit(unit)
-    {
-    }
-
-    constexpr float deg() const { return m_value_in_radians * 180 / M_PI; }
-    constexpr float rad() const { return m_value_in_radians; }
-
-    constexpr Angle operator-() const
-    {
-        return Angle(-m_value_in_radians, m_unit);
-    }
-
-    friend std::ostream& operator<<(std::ostream& out, Angle alfa)
-    {
-        if (alfa.m_unit == Rad)
-            return out << alfa.rad() << " [rad]";
-        else
-            return out << alfa.rad() << " [deg]";
-    }
-
-private:
-    float m_value_in_radians = 0;
-    Unit m_unit = Rad;
-};
-
-constexpr Angle operator""_deg(long double v)
-{
-    return Angle(v, Angle::Deg);
-}
-
-constexpr Angle operator""_rad(long double v)
-{
-    return Angle(v, Angle::Rad);
-}
-
-// FIXME: Move this out of EssaGUI.
 class Distance
 {
 public:
