@@ -37,27 +37,27 @@ public:
     {
     }
 
-    std::string encode(Encoding = Encoding::Utf8) const;
+    [[nodiscard]] std::string encode(Encoding = Encoding::Utf8) const;
 
-    uint32_t at(size_t) const;
-    size_t size() const { return m_size; }
-    bool is_empty() const { return m_size == 0; }
+    [[nodiscard]] uint32_t at(size_t) const;
+    [[nodiscard]] size_t size() const { return m_size; }
+    [[nodiscard]] bool is_empty() const { return m_size == 0; }
 
-    auto begin() const { return span().begin(); }
-    auto end() const { return span().end(); }
+    [[nodiscard]] auto begin() const { return span().begin(); }
+    [[nodiscard]] auto end() const { return span().end(); }
 
     // If you really want... there is a footgun for you.
-    uint32_t const* storage() const { return m_storage; }
+    [[nodiscard]] uint32_t const* storage() const { return m_storage; }
 
-    std::span<uint32_t const> span() const { return { m_storage, m_size }; }
+    [[nodiscard]] std::span<uint32_t const> span() const { return { m_storage, m_size }; }
 
     // Substring from `start` to end of string
-    UString substring(size_t start) const;
+    [[nodiscard]] UString substring(size_t start) const;
 
-    UString substring(size_t start, size_t size) const;
-    std::optional<size_t> find(UString needle, size_t start = 0) const;
-    UString erase(size_t start, size_t size = 1) const;
-    UString insert(UString other, size_t where) const;
+    [[nodiscard]] UString substring(size_t start, size_t size) const;
+    [[nodiscard]] std::optional<size_t> find(UString needle, size_t start = 0) const;
+    [[nodiscard]] UString erase(size_t start, size_t size = 1) const;
+    [[nodiscard]] UString insert(UString other, size_t where) const;
 
     std::strong_ordering operator<=>(UString const& other) const;
     bool operator==(UString const& other) const;
