@@ -53,6 +53,14 @@ TEST_CASE(move)
     EXPECT(str2 == "ghijkl");
     EXPECT(str3.is_empty());
 
+    // Move assignment (double-free on move-assigning empty string)
+    {
+        UString str1 { "abc" };
+        str1 = ""; // str1 should be null here
+        str1 = "def"; // it was double-freed because we didn't clear the pointer to "abc"
+        EXPECT_EQ(str1.encode(), "def");
+    }
+
     return {};
 }
 
@@ -131,6 +139,9 @@ TEST_CASE(erase)
     EXPECT_EQ(test.erase(0, 2).encode(), "cdefghij");
     EXPECT_EQ(test.erase(5, 2).encode(), "abcdehij");
     EXPECT_EQ(test.erase(8, 2).encode(), "abcdefgh");
+
+    // Out of bounds
+    EXPECT_EQ(test.erase(8, 20).encode(), "abcdefgh");
 
     return {};
 }

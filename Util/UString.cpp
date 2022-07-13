@@ -305,6 +305,8 @@ void UString::reallocate(size_t size)
         if (old_storage) {
             std::copy(old_storage, old_storage + old_size, m_storage);
         }
+    } else {
+        m_storage = nullptr;
     }
     delete[] old_storage;
     m_size = size;
