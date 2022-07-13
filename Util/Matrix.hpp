@@ -1,24 +1,46 @@
 #pragma once
 
 #include "Vector3.hpp"
+#include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <initializer_list>
 #include <iostream>
+
+namespace Util {
 
 template<class T, size_t Size>
 requires(Size > 0) struct Matrix {
-    T data[Size][Size] {};
+
+    constexpr Matrix()
+    {
+        for (size_t s = 0; s < Size; s++)
+            m_data[s][s] = 1;
+    }
+
+    constexpr Matrix(std::initializer_list<T> data)
+    {
+        assert(data.size() == Size * Size);
+        for (size_t row = 0; row < Size; row++) {
+            for (size_t column = 0; column < Size; column++) {
+                m_data[row][column] = data.begin()[row * Size + column];
+            }
+        }
+    }
+
+    template<class... T2>
+    constexpr Matrix(T2... data) requires(sizeof...(data) == Size * Size)
+        : Matrix { std::initializer_list<T> { data... } }
+    {
+    }
 
     static constexpr Matrix identity()
     {
-        Matrix output;
-        for (size_t s = 0; s < Size; s++)
-            output.data[s][s] = 1;
-        return output;
+        return {};
     }
 
-    T& element(size_t row, size_t column) { return data[row][column]; }
-    T const& element(size_t row, size_t column) const { return data[row][column]; }
+    T& element(size_t row, size_t column) { return m_data[row][column]; }
+    T const& element(size_t row, size_t column) const { return m_data[row][column]; }
 
     Matrix transposed() const;
     Matrix inverted() const;
@@ -32,11 +54,20 @@ requires(Size > 0) struct Matrix {
         Matrix<TT, Size> output;
         for (size_t x = 0; x < Size; x++) {
             for (size_t y = 0; y < Size; y++) {
-                output.data[x][y] = static_cast<T>(data[x][y]);
+                output.m_data[x][y] = static_cast<T>(m_data[x][y]);
             }
         }
         return output;
     }
+
+    // This must be transposed to pass this to OpenGL
+    // FIXME: Fix that.
+    T const* raw_data() const { return &m_data[0][0]; }
+
+    constexpr bool operator==(Matrix<T, Size> const&) const = default;
+
+private:
+    T m_data[Size][Size] {};
 };
 
 template<class T, size_t Size>
@@ -45,7 +76,7 @@ std::ostream& operator<<(std::ostream& out, Matrix<T, Size> const& mat)
     out << "[";
     for (size_t y = 0; y < Size; y++) {
         for (size_t x = 0; x < Size; x++) {
-            out << mat.data[x][y];
+            out << mat.element(x, y);
             if (x != Size - 1)
                 out << " ";
         }
@@ -56,6 +87,7 @@ std::ostream& operator<<(std::ostream& out, Matrix<T, Size> const& mat)
     return out;
 }
 
+using Matrix4x4f = Matrix<float, 4>;
 using Matrix4x4d = Matrix<double, 4>;
 
 template<class T, size_t Size>
@@ -84,8 +116,8 @@ Matrix<T, Size> operator*(Matrix<T, Size> const& left, Matrix<T, Size> const& ri
         for (size_t j = 0; j < Size; j++) {
             T sum = 0;
             for (size_t k = 0; k < Size; k++)
-                sum += left.data[i][k] * right.data[k][j];
-            result.data[i][j] = sum;
+                sum += left.element(i, k) * right.element(k, j);
+            result.element(i, j) = sum;
         }
     }
     return result;
@@ -124,9 +156,9 @@ template<class T, size_t Size>
 requires(Size > 0) inline T Matrix<T, Size>::determinant() const
 {
     if constexpr (Size == 1)
-        return data[0][0];
+        return m_data[0][0];
     if constexpr (Size == 2)
-        return data[0][0] * data[1][1] - data[0][1] * data[1][0];
+        return m_data[0][0] * m_data[1][1] - m_data[0][1] * m_data[1][0];
 
     if constexpr (Size > 2) {
         // N > 2 - Laplace Expansion
@@ -149,7 +181,7 @@ requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::transposed() const
     Matrix result;
     for (size_t i = 0; i < Size; i++) {
         for (size_t j = 0; j < Size; j++) {
-            result.data[j][i] = data[i][j];
+            result.element(j, i) = element(i, j);
         }
     }
     return result;
@@ -169,7 +201,8 @@ requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::adjoint() const
     return cofactors.transposed();
 }
 
-inline Vector3 operator*(Matrix4x4d const& mat, Vector3 const& vec)
+template<class T>
+inline Vector3 operator*(Matrix<T, 4> const& mat, Vector3 const& vec)
 {
     Vector3 result;
     result.x = vec.x * mat.element(0, 0) + vec.y * mat.element(1, 0) + vec.z * mat.element(2, 0) + vec.w * mat.element(3, 0);
@@ -177,4 +210,6 @@ inline Vector3 operator*(Matrix4x4d const& mat, Vector3 const& vec)
     result.z = vec.x * mat.element(0, 2) + vec.y * mat.element(1, 2) + vec.z * mat.element(2, 2) + vec.w * mat.element(3, 2);
     result.w = vec.x * mat.element(0, 3) + vec.y * mat.element(1, 3) + vec.z * mat.element(2, 3) + vec.w * mat.element(3, 3);
     return result;
+}
+
 }
