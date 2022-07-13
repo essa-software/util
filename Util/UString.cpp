@@ -6,6 +6,7 @@
 #include <compare>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 #include <utility>
 #include <vector>
 
@@ -13,17 +14,20 @@ namespace Util {
 
 UString::UString(UString const& other)
 {
+    // std::cout << __PRETTY_FUNCTION__ << std::endl;
     reallocate(other.m_size);
     std::copy(other.m_storage, other.m_storage + other.m_size, m_storage);
 }
 
 UString::~UString()
 {
+    // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << std::endl;
     delete[] m_storage;
 }
 
 UString& UString::operator=(UString const& other)
 {
+    // std::cout << __PRETTY_FUNCTION__ << std::endl;
     if (this == &other)
         return *this;
     reallocate(other.m_size);
@@ -33,12 +37,14 @@ UString& UString::operator=(UString const& other)
 
 UString::UString(UString&& other)
 {
+    // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << " << " << other.dump() << std::endl;
     m_size = std::exchange(other.m_size, 0);
     m_storage = std::exchange(other.m_storage, nullptr);
 }
 
 UString& UString::operator=(UString&& other)
 {
+    // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << " << " << other.dump() << std::endl;
     if (this == &other)
         return *this;
     delete[] m_storage;
@@ -49,6 +55,7 @@ UString& UString::operator=(UString&& other)
 
 UString::UString(uint32_t codepoint)
 {
+    // std::cout << __PRETTY_FUNCTION__ << std::endl;
     reallocate(1);
     m_storage[0] = codepoint;
 }
@@ -190,6 +197,7 @@ UString::UString(std::string_view string, Encoding encoding, uint32_t replacemen
             Utf8::decode({ m_storage, m_size }, string, replacement);
             break;
     }
+    // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << std::endl;
 }
 
 std::string UString::encode(Encoding encoding) const
@@ -273,6 +281,7 @@ UString UString::erase(size_t start, size_t size) const
 
 UString UString::insert(UString other, size_t where) const
 {
+    // std::cout << "insert US[" << other.m_size << "] at " << where << " into US[" << m_size << "]" << std::endl;
     assert(where <= m_size);
     UString result;
     result.reallocate(m_size + other.m_size);
@@ -299,6 +308,14 @@ void UString::reallocate(size_t size)
     }
     delete[] old_storage;
     m_size = size;
+    // std::cout << __PRETTY_FUNCTION__ << " with size = " << size << " result = " << dump() << std::endl;
+}
+
+std::string UString::dump() const
+{
+    std::ostringstream oss;
+    oss << "US[" << m_storage << " +" << m_size << "]";
+    return oss.str();
 }
 
 std::strong_ordering UString::operator<=>(UString const& other) const

@@ -66,6 +66,7 @@ private:
     friend UString operator+(UString const& lhs, UString const& rhs);
 
     void reallocate(size_t);
+    std::string dump() const;
 
     uint32_t* m_storage {};
     size_t m_size {};
