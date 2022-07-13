@@ -35,10 +35,10 @@ public:
     Vector2<T> position() const { return { left, top }; }
     Vector2<T> size() const { return { width, height }; }
 
-    template<class U>
+    template<class U = T>
     bool contains(Vector2<U> pos) const
     {
-        return pos.x >= left && pos.x <= left + width && pos.y >= top && pos.y <= top + height;
+        return pos.x() >= left && pos.x() <= left + width && pos.y() >= top && pos.y() <= top + height;
     }
 };
 
