@@ -13,27 +13,30 @@ template<size_t C, class T>
 class Vector {
 public:
     static constexpr size_t Components = C;
-
-    constexpr Vector() = default;
-
-    constexpr Vector(std::initializer_list<T>&& c)
+    
+    constexpr Vector()
     {
-        std::copy(std::begin(c), std::end(c), components.begin());
+        if constexpr (Components == 4)
+            components[3] = 1;
     }
 
     template<class... T2>
-    constexpr Vector(T2... packed_c) requires(sizeof...(packed_c) == Components)
+    constexpr Vector(T2... packed_c) requires(sizeof...(packed_c) == Components || (Components == 4 && sizeof...(packed_c) == 3))
     {
         auto c = std::initializer_list<T> { static_cast<T>(packed_c)... };
         std::copy(std::begin(c), std::end(c), components.begin());
+        if constexpr (Components == 4 && sizeof...(packed_c) == 3)
+            components[3] = 1;
     }
 
     template<size_t OtherC, class OtherT, class... MoreT>
-    requires(OtherC + sizeof...(MoreT) == Components) constexpr explicit Vector(Vector<OtherC, OtherT> const& other, MoreT... more)
+    requires(OtherC + sizeof...(MoreT) == Components || (Components == 4 && OtherC + sizeof...(MoreT) == 3)) constexpr explicit Vector(Vector<OtherC, OtherT> const& other, MoreT... more)
     {
         std::copy(other.components.begin(), other.components.end(), components.begin());
         auto c = std::initializer_list<T> { static_cast<T>(more)... };
         std::copy(std::begin(c), std::end(c), components.begin() + OtherC);
+        if constexpr (Components == 4 && OtherC + sizeof...(MoreT) == 3)
+            components[3] = 1;
     }
 
     T& x() requires(Components > 0) { return this->components[0]; };
@@ -207,13 +210,14 @@ public:
     requires(Components == 3) constexpr Vector<3, OtherT> cross(Vector<3, T> const& a) const
     {
         Vector<3, OtherT> result;
-        result.x = this->y * a.z - this->z * a.y;
-        result.y = this->z * a.x - this->x * a.z;
-        result.z = this->x * a.y - this->y * a.x;
+        result.x() = this->y() * a.z() - this->z() * a.y();
+        result.y() = this->z() * a.x() - this->x() * a.z();
+        result.z() = this->x() * a.y() - this->y() * a.x();
         return result;
     }
 
     //// Vector4 ////
+
     template<size_t OtherC, class OtherT>
     requires(Components == 4 && OtherC >= 4) constexpr explicit Vector(Vector<OtherC, OtherT> other)
         : Vector { other.x(), other.y(), other.z(), other.w() }
@@ -262,7 +266,7 @@ using Vector4d = Vector4<double>;
 template<size_t S, class T>
 inline double get_distance(Detail::Vector<S, T> const& a, Detail::Vector<S, T> const& b)
 {
-    return length(a - b);
+    return (a - b).length();
 }
 
 template<size_t S, class T>
