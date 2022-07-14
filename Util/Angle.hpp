@@ -54,14 +54,14 @@ private:
     Unit m_unit = Rad;
 };
 
-constexpr Angle operator""_deg(long double v)
-{
-    return Angle(v, Angle::Deg);
 }
 
-constexpr Angle operator""_rad(long double v)
+constexpr Util::Angle operator""_deg(long double v)
 {
-    return Angle(v, Angle::Rad);
+    return Util::Angle(v, Util::Angle::Deg);
 }
 
+constexpr Util::Angle operator""_rad(long double v)
+{
+    return Util::Angle(v, Util::Angle::Rad);
 }
