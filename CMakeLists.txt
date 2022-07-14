@@ -21,9 +21,6 @@ if (ESSAUTIL_ENABLE_SFML)
     target_link_libraries(essautil sfml-system)
 endif()
 
-find_package(fmt REQUIRED)
-target_link_libraries(essautil fmt)
-
 install(TARGETS essautil EXPORT EssaUtil DESTINATION lib)
 
 install(DIRECTORY cmake/ DESTINATION lib/cmake/EssaUtil)
