@@ -16,9 +16,7 @@ public:
 
     constexpr Vector() = default;
 
-    template<class Container>
-    requires requires(Container c) { std::size(c); }
-    constexpr Vector(Container&& c)
+    constexpr Vector(std::initializer_list<T>&& c)
     {
         std::copy(std::begin(c), std::end(c), components.begin());
     }
