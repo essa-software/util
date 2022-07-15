@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <iostream>
 
 namespace Util {
 
@@ -22,6 +23,11 @@ public:
         return { static_cast<uint8_t>(std::clamp(r - right.r, 0, 255)),
             static_cast<uint8_t>(std::clamp(g - right.g, 0, 255)),
             static_cast<uint8_t>(std::clamp(b - right.b, 0, 255)) };
+    }
+
+    friend std::ostream& operator<<(std::ostream& out, Color const& color)
+    {
+        return out << "rgba(" << static_cast<int>(color.r) << ", " << static_cast<int>(color.g) << ", " << static_cast<int>(color.b) << ", " << static_cast<int>(color.a) << ")";
     }
 };
 
