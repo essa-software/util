@@ -163,25 +163,35 @@ TEST_CASE(for_each_line)
     bool failed = false;
     size_t index = 0;
     test1.for_each_line([&](std::span<uint32_t const> span) {
-        if (index == 0 && UString{span} != "line")
+        if (index == 0 && UString { span } != "line")
             failed = true;
-        if (index == 1 && UString{span} != "long")
+        if (index == 1 && UString { span } != "long")
             failed = true;
         index++;
     });
-    EXPECT(!failed);
+    EXPECT(!failed && index == 2);
 
     UString test2 { "line\nlong" };
 
     index = 0;
     test2.for_each_line([&](std::span<uint32_t const> span) {
-        if (index == 0 && UString{span} != "line")
+        if (index == 0 && UString { span } != "line")
             failed = true;
-        if (index == 1 && UString{span} != "long")
+        if (index == 1 && UString { span } != "long")
             failed = true;
         index++;
     });
-    EXPECT(!failed);
+    EXPECT(!failed && index == 2);
+
+    UString test3 { "1" };
+
+    index = 0;
+    test3.for_each_line([&](std::span<uint32_t const> span) {
+        if (index == 0 && UString { span } != "1")
+            failed = true;
+        index++;
+    });
+    EXPECT(!failed && index == 1);
 
     return {};
 }

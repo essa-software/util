@@ -79,7 +79,7 @@ public:
             if (!next_newline.has_value()) {
                 next_newline = size();
             }
-            if (index >= size() - 1)
+            if (index > size() - 1)
                 break;
             callback({ m_storage + index, *next_newline - index });
             if (next_newline == size())
