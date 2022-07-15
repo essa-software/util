@@ -64,6 +64,7 @@ public:
 };
 
 using Recti = Rect<int>;
+using Rectu = Rect<unsigned>;
 using Rectf = Rect<float>;
 using Rectd = Rect<double>;
 
