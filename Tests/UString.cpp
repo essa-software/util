@@ -56,7 +56,7 @@ TEST_CASE(move)
     // Move assignment (double-free on move-assigning empty string)
     {
         UString str1 { "abc" };
-        str1 = ""; // str1 should be null here
+        str1 = "";    // str1 should be null here
         str1 = "def"; // it was double-freed because we didn't clear the pointer to "abc"
         EXPECT_EQ(str1.encode(), "def");
     }
@@ -152,6 +152,36 @@ TEST_CASE(insert)
     EXPECT_EQ(test.insert("def", 3).encode(), "abcdefghi");
     EXPECT_EQ(test.insert("def", 0).encode(), "defabcghi");
     EXPECT_EQ(test.insert("def", 6).encode(), "abcghidef");
+
+    return {};
+}
+
+TEST_CASE(for_each_line)
+{
+    UString test1 { "line\nlong\n" };
+
+    bool failed = false;
+    size_t index = 0;
+    test1.for_each_line([&](std::span<uint32_t const> span) {
+        if (index == 0 && UString{span} != "line")
+            failed = true;
+        if (index == 1 && UString{span} != "long")
+            failed = true;
+        index++;
+    });
+    EXPECT(!failed);
+
+    UString test2 { "line\nlong" };
+
+    index = 0;
+    test2.for_each_line([&](std::span<uint32_t const> span) {
+        if (index == 0 && UString{span} != "line")
+            failed = true;
+        if (index == 1 && UString{span} != "long")
+            failed = true;
+        index++;
+    });
+    EXPECT(!failed);
 
     return {};
 }

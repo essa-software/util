@@ -23,6 +23,7 @@ public:
     UString& operator=(UString&& other);
 
     explicit UString(uint32_t codepoint);
+    explicit UString(std::span<uint32_t const>);
 
     UString(char ch)
         : UString(static_cast<uint32_t>(ch))
@@ -68,6 +69,24 @@ public:
     [[nodiscard]] std::optional<size_t> find(UString needle, size_t start = 0) const;
     [[nodiscard]] UString erase(size_t start, size_t size = 1) const;
     [[nodiscard]] UString insert(UString other, size_t where) const;
+
+    template<class Callback>
+    void for_each_line(Callback&& callback) const
+    {
+        size_t index = 0;
+        while (true) {
+            auto next_newline = find("\n", index);
+            if (!next_newline.has_value()) {
+                next_newline = size();
+            }
+            if (index >= size() - 1)
+                break;
+            callback({ m_storage + index, *next_newline - index });
+            if (next_newline == size())
+                break;
+            index = *next_newline + 1;
+        }
+    }
 
     std::strong_ordering operator<=>(UString const& other) const;
     bool operator==(UString const& other) const;

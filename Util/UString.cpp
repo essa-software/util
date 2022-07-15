@@ -19,6 +19,12 @@ UString::UString(UString const& other)
     std::copy(other.m_storage, other.m_storage + other.m_size, m_storage);
 }
 
+UString::UString(std::span<uint32_t const> codepoints)
+{
+    reallocate(codepoints.size());
+    std::copy(codepoints.begin(), codepoints.end(), m_storage);
+}
+
 UString::~UString()
 {
     // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << std::endl;
