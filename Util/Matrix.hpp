@@ -205,10 +205,10 @@ template<class T>
 inline Vector4<T> operator*(Matrix<T, 4> const& mat, Vector4<T> const& vec)
 {
     Vector4<T> result;
-    result.x() = vec.x() * mat.element(0, 0) + vec.y() * mat.element(1, 0) + vec.z() * mat.element(2, 0) + vec.w() * mat.element(3, 0);
-    result.y() = vec.x() * mat.element(0, 1) + vec.y() * mat.element(1, 1) + vec.z() * mat.element(2, 1) + vec.w() * mat.element(3, 1);
-    result.z() = vec.x() * mat.element(0, 2) + vec.y() * mat.element(1, 2) + vec.z() * mat.element(2, 2) + vec.w() * mat.element(3, 2);
-    result.w() = vec.x() * mat.element(0, 3) + vec.y() * mat.element(1, 3) + vec.z() * mat.element(2, 3) + vec.w() * mat.element(3, 3);
+    result.x() = vec.x() * mat.element(0, 0) + vec.y() * mat.element(0, 1) + vec.z() * mat.element(0, 2) + vec.w() * mat.element(0, 3);
+    result.y() = vec.x() * mat.element(1, 0) + vec.y() * mat.element(1, 1) + vec.z() * mat.element(1, 2) + vec.w() * mat.element(1, 3);
+    result.z() = vec.x() * mat.element(2, 0) + vec.y() * mat.element(2, 1) + vec.z() * mat.element(2, 2) + vec.w() * mat.element(2, 3);
+    result.w() = vec.x() * mat.element(3, 0) + vec.y() * mat.element(3, 1) + vec.z() * mat.element(3, 2) + vec.w() * mat.element(3, 3);
     return result;
 }
 
