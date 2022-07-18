@@ -10,14 +10,14 @@
 
 #pragma once
 
+#include "Config.hpp"
+
 #include <cassert>
 #include <cerrno>
 #include <optional>
 #include <string_view>
 #include <type_traits>
 #include <variant>
-
-#define ALWAYS_INLINE [[gnu::always_inline]]
 
 namespace Util {
 
@@ -38,7 +38,7 @@ public:
     using Variant = std::variant<T, ErrorType>;
 
     template<typename U>
-    ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorType>> && (std::is_convertible_v<U, T> || std::is_convertible_v<U, ErrorType>))
+    ESSA_ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorType>> && (std::is_convertible_v<U, T> || std::is_convertible_v<U, ErrorType>))
         : Variant(std::forward<U>(value))
     {
     }
