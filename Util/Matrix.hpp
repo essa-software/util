@@ -74,13 +74,13 @@ template<class T, size_t Size>
 std::ostream& operator<<(std::ostream& out, Matrix<T, Size> const& mat)
 {
     out << "[";
-    for (size_t y = 0; y < Size; y++) {
-        for (size_t x = 0; x < Size; x++) {
+    for (size_t x = 0; x < Size; x++) {
+        for (size_t y = 0; y < Size; y++) {
             out << mat.element(x, y);
-            if (x != Size - 1)
+            if (y != Size - 1)
                 out << " ";
         }
-        if (y != Size - 1)
+        if (x != Size - 1)
             out << "; ";
     }
     out << "]";
