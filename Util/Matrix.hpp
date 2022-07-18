@@ -194,7 +194,7 @@ requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::adjoint() const
 
     for (size_t i = 0; i < Size; i++) {
         for (size_t j = 0; j < Size; j++) {
-            cofactors.element(i, j) = ((i + j) % 2 == 0 ? -1 : 1) * minor(i, j).determinant();
+            cofactors.element(i, j) = ((i + j) % 2 == 0 ? 1 : -1) * minor(i, j).determinant();
         }
     }
 
