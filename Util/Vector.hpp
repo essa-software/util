@@ -13,7 +13,7 @@ template<size_t C, class T>
 class Vector {
 public:
     static constexpr size_t Components = C;
-    
+
     constexpr Vector()
     {
         if constexpr (Components == 4)
@@ -81,7 +81,7 @@ public:
     double dot(Vector const& a) const
     {
         double result = 0;
-        for (size_t s = 0; s < Components; s++)
+        for (size_t s = 0; s < std::min<size_t>(Components, 3); s++)
             result += components[s] * a.components[s];
         return result;
     }
