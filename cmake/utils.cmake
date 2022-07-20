@@ -6,6 +6,8 @@ function(essautil_setup_target targetname)
         -Wno-error=format                           # FIXME: We don't use formatting anyway except SimulationClock but this breaks mingw build
     )
 
+    set_property(TARGET ${targetname} PROPERTY CXX_STANDARD 20)
+
     if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
         target_compile_options(${targetname} PUBLIC -fsanitize=undefined,address)
         target_link_options(${targetname} PUBLIC -fsanitize=undefined,address)
