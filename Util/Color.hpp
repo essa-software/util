@@ -7,9 +7,23 @@
 
 namespace Util {
 
+struct Colorf;
+
 class Color {
 public:
     uint8_t r {}, g {}, b {}, a { 255 };
+
+    constexpr Color() = default;
+
+    constexpr Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
+        : r(r)
+        , g(g)
+        , b(b)
+        , a(a)
+    {
+    }
+
+    constexpr Color(Colorf const&);
 
     constexpr Color operator+(Color const& right) const
     {
@@ -76,5 +90,13 @@ struct Colorf {
 
     float r, g, b, a;
 };
+
+constexpr Color::Color(Colorf const& color)
+    : r(color.r * 255)
+    , g(color.g * 255)
+    , b(color.b * 255)
+    , a(color.a * 255)
+{
+}
 
 }
