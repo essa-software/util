@@ -5,6 +5,7 @@
 #include <optional>
 #include <span>
 #include <string>
+#include <vector>
 
 namespace Util {
 
@@ -100,5 +101,18 @@ private:
     uint32_t* m_storage {};
     size_t m_size {};
 };
+
+template<typename T>
+UString to_ustring(const T& to_convert){
+    std::string str = std::to_string(to_convert);
+    
+    std::vector<uint32_t> vec;
+
+    for(const auto& c : str){
+        vec.push_back(c);
+    }
+
+    return UString(std::span{vec.data(), vec.size()});
+}
 
 }
