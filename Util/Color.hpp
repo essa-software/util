@@ -30,16 +30,18 @@ public:
 
     constexpr Color operator+(Color const& right) const
     {
-        return { static_cast<uint8_t>(std::clamp(r + right.r, 0, 255)),
-            static_cast<uint8_t>(std::clamp(g + right.g, 0, 255)),
-            static_cast<uint8_t>(std::clamp(b + right.b, 0, 255)) };
+        return { static_cast<uint8_t>(std::clamp(static_cast<int>(r) + static_cast<int>(right.r), 0, 255)),
+            static_cast<uint8_t>(std::clamp(static_cast<int>(g) + static_cast<int>(right.g), 0, 255)),
+            static_cast<uint8_t>(std::clamp(static_cast<int>(b) + static_cast<int>(right.b), 0, 255)),
+            static_cast<uint8_t>(std::clamp(static_cast<int>(a) + static_cast<int>(right.a), 0, 255)) };
     }
 
     constexpr Color operator-(Color const& right) const
     {
-        return { static_cast<uint8_t>(std::clamp(r - right.r, 0, 255)),
-            static_cast<uint8_t>(std::clamp(g - right.g, 0, 255)),
-            static_cast<uint8_t>(std::clamp(b - right.b, 0, 255)) };
+        return { static_cast<uint8_t>(std::clamp(static_cast<int>(r) - static_cast<int>(right.r), 0, 255)),
+            static_cast<uint8_t>(std::clamp(static_cast<int>(g) - static_cast<int>(right.g), 0, 255)),
+            static_cast<uint8_t>(std::clamp(static_cast<int>(b) - static_cast<int>(right.b), 0, 255)),
+            static_cast<uint8_t>(std::clamp(static_cast<int>(a) - static_cast<int>(right.a), 0, 255)) };
     }
 
     constexpr HSV to_hsv() const;
