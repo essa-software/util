@@ -11,6 +11,7 @@ class Length
 public:
     enum Unit
     {
+        Initial,
         Auto,
         Px,
         PxOtherSide,
