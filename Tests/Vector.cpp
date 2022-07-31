@@ -22,10 +22,10 @@ TEST_CASE(arithmetic)
 TEST_CASE(magnitude)
 {
     Vector3f test { 3, 4, 5 };
-    EXPECT_EQ(test.length_squaRed(), 50);
+    EXPECT_EQ(test.length_squared(), 50);
 
     Vector3f zero;
-    EXPECT_EQ(zero.length_squaRed(), 0);
+    EXPECT_EQ(zero.length_squared(), 0);
     EXPECT_EQ(zero.length(), 0);
     EXPECT_EQ(zero.inverted_length(), INFINITY);
 
