@@ -4,8 +4,7 @@
 #include <algorithm>
 #include <vector>
 
-TEST_CASE(construction)
-{
+TEST_CASE(construction) {
     // Default constructor
     UString str1;
     EXPECT(str1.size() == 0);
@@ -24,8 +23,7 @@ TEST_CASE(construction)
     return {};
 }
 
-TEST_CASE(copy)
-{
+TEST_CASE(copy) {
     // Copy constructor
     UString str1 { "abcdef" };
     auto str2 = str1;
@@ -39,8 +37,7 @@ TEST_CASE(copy)
     return {};
 }
 
-TEST_CASE(move)
-{
+TEST_CASE(move) {
     // Move constructor
     UString str1 { "abcdef" };
     auto str2 = std::move(str1);
@@ -64,8 +61,7 @@ TEST_CASE(move)
     return {};
 }
 
-TEST_CASE(utf8)
-{
+TEST_CASE(utf8) {
     struct Testcase {
         char const* string;
         std::vector<uint32_t> expected;
@@ -93,8 +89,7 @@ TEST_CASE(utf8)
     return {};
 }
 
-TEST_CASE(concatenate)
-{
+TEST_CASE(concatenate) {
     UString str1 { "abc" };
     UString str2 { "ąęł" };
     EXPECT_EQ((str1 + str2).encode(), "abcąęł");
@@ -102,8 +97,7 @@ TEST_CASE(concatenate)
     return {};
 }
 
-TEST_CASE(substr)
-{
+TEST_CASE(substr) {
     UString big_string { "abcdefghijklmnopqrstuvwxyz" };
     EXPECT_EQ(big_string.substring(0, 3).encode(), "abc");
     EXPECT_EQ(big_string.substring(3, 6).encode(), "defghi");
@@ -113,8 +107,7 @@ TEST_CASE(substr)
     return {};
 }
 
-TEST_CASE(find)
-{
+TEST_CASE(find) {
     UString haystack { "abcdefghijklmnopqrstuvwxyz" };
     EXPECT_EQ(haystack.find("abc").value(), 0ull);
     EXPECT_EQ(haystack.find("def").value(), 3ull);
@@ -129,8 +122,7 @@ TEST_CASE(find)
     return {};
 }
 
-TEST_CASE(erase)
-{
+TEST_CASE(erase) {
     UString test { "abcdefghij" };
     EXPECT_EQ(test.erase(0).encode(), "bcdefghij");
     EXPECT_EQ(test.erase(5).encode(), "abcdeghij");
@@ -146,8 +138,7 @@ TEST_CASE(erase)
     return {};
 }
 
-TEST_CASE(insert)
-{
+TEST_CASE(insert) {
     UString test { "abcghi" };
     EXPECT_EQ(test.insert("def", 3).encode(), "abcdefghi");
     EXPECT_EQ(test.insert("def", 0).encode(), "defabcghi");
@@ -156,42 +147,63 @@ TEST_CASE(insert)
     return {};
 }
 
-TEST_CASE(for_each_line)
-{
-    UString test1 { "line\nlong\n" };
+TEST_CASE(for_each_line) {
 
     bool failed = false;
     size_t index = 0;
-    test1.for_each_line([&](std::span<uint32_t const> span) {
-        if (index == 0 && UString { span } != "line")
-            failed = true;
-        if (index == 1 && UString { span } != "long")
-            failed = true;
-        index++;
-    });
-    EXPECT(!failed && index == 2);
 
-    UString test2 { "line\nlong" };
+    {
+        UString test1 { "line\nlong\n" };
+        test1.for_each_line([&](std::span<uint32_t const> span) {
+            if (index == 0 && UString { span } != "line")
+                failed = true;
+            if (index == 1 && UString { span } != "long")
+                failed = true;
+            index++;
+        });
+        EXPECT(!failed && index == 2);
+    }
 
-    index = 0;
-    test2.for_each_line([&](std::span<uint32_t const> span) {
-        if (index == 0 && UString { span } != "line")
-            failed = true;
-        if (index == 1 && UString { span } != "long")
-            failed = true;
-        index++;
-    });
-    EXPECT(!failed && index == 2);
+    {
+        index = 0;
+        UString test2 { "line\nlong" };
+        test2.for_each_line([&](std::span<uint32_t const> span) {
+            if (index == 0 && UString { span } != "line")
+                failed = true;
+            if (index == 1 && UString { span } != "long")
+                failed = true;
+            index++;
+        });
+        EXPECT(!failed && index == 2);
+    }
 
-    UString test3 { "1" };
+    {
+        index = 0;
+        UString test3 { "1" };
+        test3.for_each_line([&](std::span<uint32_t const> span) {
+            if (index == 0 && UString { span } != "1")
+                failed = true;
+            index++;
+        });
+        EXPECT(!failed && index == 1);
+    }
 
-    index = 0;
-    test3.for_each_line([&](std::span<uint32_t const> span) {
-        if (index == 0 && UString { span } != "1")
-            failed = true;
-        index++;
-    });
-    EXPECT(!failed && index == 1);
+    {
+        index = 0;
+        UString test4 { "siema\n\ntej\ntest" };
+        test4.for_each_line([&](std::span<uint32_t const> span) {
+            if (index == 0 && UString { span } != "siema")
+                failed = true;
+            if (index == 1 && UString { span } != "")
+                failed = true;
+            if (index == 2 && UString { span } != "tej")
+                failed = true;
+            if (index == 3 && UString { span } != "test")
+                failed = true;
+            index++;
+        });
+        EXPECT(!failed && index == 4);
+    }
 
     return {};
 }
