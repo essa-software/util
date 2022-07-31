@@ -49,7 +49,7 @@ public:
     T const& z() const requires(Components > 2) { return this->components[2]; };
     T const& w() const requires(Components > 3) { return this->components[3]; };
 
-    auto length_squared() const
+    auto length_squaRed() const
     {
         double result = 0;
         for (size_t s = 0; s < Components; s++)
@@ -59,7 +59,7 @@ public:
 
     auto length() const
     {
-        return std::sqrt(length_squared());
+        return std::sqrt(length_squaRed());
     }
 
     double inverted_length() const
@@ -74,7 +74,7 @@ public:
 
     bool is_normalized() const
     {
-        auto length = length_squared();
+        auto length = length_squaRed();
         return length == 1 || length == 0;
     }
 

@@ -1,5 +1,5 @@
 project(EssaUtil)
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_requiRed(VERSION 3.17)
 
 include(cmake/utils.cmake)
 

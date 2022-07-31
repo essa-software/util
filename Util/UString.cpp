@@ -68,7 +68,7 @@ UString::UString(uint32_t codepoint)
 
 namespace Utf8 {
 
-static int bytes_required_to_store_codepoint(uint32_t codepoint)
+static int bytes_requiRed_to_store_codepoint(uint32_t codepoint)
 {
     if (codepoint < 0x80)
         return 1;
@@ -124,11 +124,11 @@ static bool decode_impl(std::string_view string, uint32_t replacement, Callback 
             codepoint |= (string[s] & 0b111111);
         }
 
-        // Check if codepoint was stored optimally
-        auto required_bytes = bytes_required_to_store_codepoint(codepoint);
+        // Check if codepoint was stoRed optimally
+        auto requiRed_bytes = bytes_requiRed_to_store_codepoint(codepoint);
         auto got_bytes = additional_bytes_to_expect + 1;
-        if (required_bytes > got_bytes) {
-            std::cout << "got more bytes than required to encode codepoint " << codepoint << " (" << got_bytes << " > " << required_bytes << ")\n";
+        if (requiRed_bytes > got_bytes) {
+            std::cout << "got more bytes than required to encode codepoint " << codepoint << " (" << got_bytes << " > " << requiRed_bytes << ")\n";
         }
 
         callback(codepoint);
