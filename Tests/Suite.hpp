@@ -5,6 +5,7 @@
 #include <map>
 #include <sstream>
 #include <string_view>
+#include <unistd.h>
 
 using namespace Util;
 
@@ -16,15 +17,13 @@ struct TestError {
     int line;
 };
 
-ErrorOr<void, TestError> expect(bool condition, std::string_view expression, std::string_view file, int line)
-{
+ErrorOr<void, TestError> expect(bool condition, std::string_view expression, std::string_view file, int line) {
     if (!condition)
         return TestError { std::string { expression }, file, line };
     return {};
 }
 
-ErrorOr<void, TestError> expect_equal(auto v1, auto v2, std::string_view expr1, std::string_view expr2, std::string_view file, int line)
-{
+ErrorOr<void, TestError> expect_equal(auto v1, auto v2, std::string_view expr1, std::string_view expr2, std::string_view file, int line) {
     if (v1 != v2) {
         std::ostringstream oss;
         oss << expr1 << " == " << expr2 << " (lhs = " << v1 << ", rhs = " << v2 << ")";
@@ -34,8 +33,7 @@ ErrorOr<void, TestError> expect_equal(auto v1, auto v2, std::string_view expr1, 
 }
 
 template<class T, class E>
-ErrorOr<void, TestError> expect_no_error(ErrorOr<T, E> value, std::string_view expr, std::string_view file, int line)
-{
+ErrorOr<void, TestError> expect_no_error(ErrorOr<T, E> value, std::string_view expr, std::string_view file, int line) {
     if (value.is_error()) {
         std::ostringstream oss;
         oss << expr << " is error";
@@ -65,21 +63,17 @@ constexpr bool Fail = false;
     } __test_##name##_adder;                                                            \
     ErrorOr<void, __TestSuite::TestError> __test_##name##_func()
 
-int main()
-{
-    std::cout << "Running \e[1m" << __TestSuite::tests.size() << "\e[m test(s)" << std::endl;
-    int num_passed = 0;
-    int num_failed = 0;
+int main(int, char** argv) {
+    bool failed = false;
     for (auto const& test : __TestSuite::tests) {
+        std::string test_name = (std::string_view { argv[0] }.starts_with("./") ? std::string { argv[0] }.substr(2) : argv[0]) + "/" + std::string { test.first };
+        std::cout << "\r\e[2K\e[33m . \e[m" << test_name << std::flush;
         auto result = test.second();
         if (result.is_error()) {
-            std::cout << "\e[31m ✗ \e[m" << test.first << ": expected \e[1m" << result.error().expression << "\e[m at \e[36m" << result.error().file << ":" << result.error().line << "\e[m\n";
-            num_failed++;
-        } else {
-            std::cout << "\e[32m ✓ \e[m" << test.first << "\n";
-            num_passed++;
+            std::cout << "\r\e[2K\e[31m ✗ \e[m" << test_name << ": expected \e[1m" << result.error().expression << "\e[m at \e[36m" << result.error().file << ":" << result.error().line << "\e[m\n";
+            failed = true;
         }
     }
-    std::cout << "\e[1;32m" << num_passed << "\e[m passed, \e[1;31m" << num_failed << "\e[m failed" << std::endl;
-    return num_failed > 0 ? 1 : 0;
+    std::cout << "\r\e[2K";
+    return failed ? 1 : 0;
 }
