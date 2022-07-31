@@ -28,13 +28,11 @@ public:
     explicit UString(std::span<uint32_t const>);
 
     UString(char ch)
-        : UString(static_cast<uint32_t>(ch))
-    {
+        : UString(static_cast<uint32_t>(ch)) {
     }
 
     UString(wchar_t ch)
-        : UString(static_cast<uint32_t>(ch))
-    {
+        : UString(static_cast<uint32_t>(ch)) {
     }
 
     enum class Encoding {
@@ -46,8 +44,7 @@ public:
 
     template<size_t S>
     UString(char const (&string)[S], Encoding encoding = Encoding::Utf8, uint32_t replacement = 0xfffd)
-        : UString({ string, S - 1 }, encoding, replacement)
-    {
+        : UString({ string, S - 1 }, encoding, replacement) {
     }
 
     [[nodiscard]] std::string encode(Encoding = Encoding::Utf8) const;
@@ -73,8 +70,7 @@ public:
     [[nodiscard]] UString insert(UString other, size_t where) const;
 
     template<class Callback>
-    void for_each_line(Callback&& callback) const
-    {
+    void for_each_line(Callback&& callback) const {
         size_t index = 0;
         while (true) {
             auto next_newline = find("\n", index);
@@ -93,8 +89,8 @@ public:
     std::strong_ordering operator<=>(UString const& other) const;
     bool operator==(UString const& other) const;
 
-    friend std::ostream& operator<<(std::ostream& out, UString str){
-        for(size_t i = 0; i < str.m_size; i++){
+    friend std::ostream& operator<<(std::ostream& out, UString str) {
+        for (size_t i = 0; i < str.m_size; i++) {
             out << (char)str.m_storage[i];
         }
         return out;
@@ -111,16 +107,8 @@ private:
 };
 
 template<typename T>
-UString to_ustring(const T& to_convert){
-    std::string str = std::to_string(to_convert);
-    
-    std::vector<uint32_t> vec;
-
-    for(const auto& c : str){
-        vec.push_back(c);
-    }
-
-    return UString(std::span{vec.data(), vec.size()});
+UString to_ustring(const T& to_convert) {
+    return UString { std::to_string(to_convert) };
 }
 
 }
