@@ -89,11 +89,8 @@ public:
     std::strong_ordering operator<=>(UString const& other) const;
     bool operator==(UString const& other) const;
 
-    friend std::ostream& operator<<(std::ostream& out, UString str) {
-        for (size_t i = 0; i < str.m_size; i++) {
-            out << (char)str.m_storage[i];
-        }
-        return out;
+    friend std::ostream& operator<<(std::ostream& out, UString const& str) {
+        return out << str.encode();
     }
 
 private:
