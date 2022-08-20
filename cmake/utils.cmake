@@ -1,6 +1,7 @@
 function(essautil_setup_target targetname)
-    target_compile_options(${targetname} PRIVATE -Wall -Wextra -Werror)
-    target_compile_options(${targetname} PRIVATE
+target_compile_options(${targetname} PRIVATE
+        -fdiagnostics-color=always
+        -Wall -Wextra -Werror
         -Wnon-virtual-dtor
         -Wno-error=missing-field-initializers       # FIXME: This is buggy (?) for *DrawOptions
         -Wno-error=format                           # FIXME: We don't use formatting anyway except SimulationClock but this breaks mingw build
