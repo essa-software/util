@@ -1,5 +1,6 @@
 #pragma once
 #include "Config.hpp"
+#include "UString.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -67,6 +68,8 @@ public:
                    << static_cast<int>(color.g) << ", " << static_cast<int>(color.b)
                    << ", " << static_cast<int>(color.a) << ")";
     }
+
+    Util::UString to_html_string() const;
 };
 
 struct HSV {

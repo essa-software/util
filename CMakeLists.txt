@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 option(ESSAUTIL_ENABLE_SFML "Enable SFML integration (e.g vector converting)" OFF)
 
 add_library(essautil
+    Util/Color.cpp
     Util/SimulationClock.cpp
     Util/Stream.cpp
     Util/UnitDisplay.cpp
