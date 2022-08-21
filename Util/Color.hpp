@@ -309,6 +309,8 @@ constexpr HSV Color::to_hsv() const
             return 60 * ((p.b - p.g) / delta + 4);
         ESSA_UNREACHABLE;
     }();
+    if (hsv.hue < 0)
+        hsv.hue += 360;
     hsv.saturation = cmax == 0 ? 0 : delta / cmax;
     hsv.value = cmax;
     return hsv;
