@@ -294,7 +294,7 @@ constexpr HSV Color::to_hsv() const {
         if (cmax == p.g)
             return 60 * ((p.b - p.r) / delta + 2);
         if (cmax == p.b)
-            return 60 * ((p.b - p.g) / delta + 4);
+            return 60 * ((p.r - p.g) / delta + 4);
         ESSA_UNREACHABLE;
     }();
     if (hsv.hue < 0)
