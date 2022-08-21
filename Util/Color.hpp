@@ -262,7 +262,7 @@ struct Colorf {
 constexpr Color HSV::to_rgb() const
 {
     auto c = value * saturation;
-    auto x = c * (1 - std::abs((hue / 60) % 2 - 1));
+    auto x = c * (1 - std::abs(std::fmod(hue / 60.f, 2.f) - 1));
     auto m = value - c;
     Colorf color = [&]() -> Colorf {
         if (hue < 60)
