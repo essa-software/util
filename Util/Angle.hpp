@@ -8,13 +8,11 @@ namespace Util {
 template<class T>
 constexpr T degrees_in_radian = 180 / M_PI;
 
-constexpr auto rad_to_deg(auto radians)
-{
+constexpr auto rad_to_deg(auto radians) {
     return radians * degrees_in_radian<decltype(radians)>;
 }
 
-constexpr auto deg_to_rad(auto degrees)
-{
+constexpr auto deg_to_rad(auto degrees) {
     return degrees / degrees_in_radian<decltype(degrees)>;
 }
 
@@ -31,6 +29,21 @@ public:
     constexpr Angle operator-() const {
         return Angle(-m_value_in_radians);
     }
+
+    constexpr Angle operator+(Angle const& other) const {
+        return Angle { m_value_in_radians + other.m_value_in_radians };
+    }
+
+    constexpr Angle operator-(Angle const& other) const {
+        return Angle { m_value_in_radians - other.m_value_in_radians };
+    }
+
+    constexpr Angle& operator+=(Angle const& other) {
+        return *this = *this + other;
+    }
+
+    constexpr Angle& operator-=(Angle const& other) {
+        return *this = *this - other;
     }
 
     friend std::ostream& operator<<(std::ostream& out, Angle alfa) {
