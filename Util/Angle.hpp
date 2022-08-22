@@ -20,48 +20,36 @@ constexpr auto deg_to_rad(auto degrees)
 
 class Angle {
 public:
-    enum Unit {
-        Rad,
-        Deg
-    };
-
     constexpr Angle() = default;
 
-    constexpr Angle(float v, Unit unit)
-        : m_value_in_radians(unit == Deg ? deg_to_rad(v) : v)
-        , m_unit(unit)
-    {
-    }
+    constexpr static Angle degrees(float d) { return Angle { deg_to_rad(d) }; }
+    constexpr static Angle radians(float r) { return Angle { r }; }
 
     constexpr float deg() const { return rad_to_deg(m_value_in_radians); }
     constexpr float rad() const { return m_value_in_radians; }
 
-    constexpr Angle operator-() const
-    {
-        return Angle(-m_value_in_radians, m_unit);
+    constexpr Angle operator-() const {
+        return Angle(-m_value_in_radians);
+    }
     }
 
-    friend std::ostream& operator<<(std::ostream& out, Angle alfa)
-    {
-        if (alfa.m_unit == Rad)
-            return out << alfa.rad() << " [rad]";
-        else
-            return out << alfa.rad() << " [deg]";
+    friend std::ostream& operator<<(std::ostream& out, Angle alfa) {
+        return out << alfa.rad() << " [rad]";
     }
 
 private:
+    constexpr Angle(float rads)
+        : m_value_in_radians(rads) { }
+
     float m_value_in_radians = 0;
-    Unit m_unit = Rad;
 };
 
 }
 
-constexpr Util::Angle operator""_deg(long double v)
-{
-    return Util::Angle(v, Util::Angle::Deg);
+constexpr Util::Angle operator""_deg(long double v) {
+    return Util::Angle::degrees(v);
 }
 
-constexpr Util::Angle operator""_rad(long double v)
-{
-    return Util::Angle(v, Util::Angle::Rad);
+constexpr Util::Angle operator""_rad(long double v) {
+    return Util::Angle::radians(v);
 }
