@@ -47,8 +47,7 @@ class Reader {
 public:
     explicit Reader(Stream& stream, UString::Encoding encoding = UString::Encoding::Utf8)
         : m_stream(stream)
-        , m_encoding(encoding)
-    {
+        , m_encoding(encoding) {
     }
 
     Stream& stream() const { return m_stream; }
@@ -65,8 +64,7 @@ class Writer {
 public:
     explicit Writer(Stream& stream, UString::Encoding encoding = UString::Encoding::Utf8)
         : m_stream(stream)
-        , m_encoding(encoding)
-    {
+        , m_encoding(encoding) {
     }
 
     Stream& stream() const { return m_stream; }
@@ -80,8 +78,8 @@ private:
     UString::Encoding m_encoding {};
 };
 
-Reader std_in(UString::Encoding = UString::Encoding::Utf8);
-Writer std_out(UString::Encoding = UString::Encoding::Utf8);
-Writer std_err(UString::Encoding = UString::Encoding::Utf8);
+FileStream& std_in();
+FileStream& std_out();
+FileStream& std_err();
 
 }
