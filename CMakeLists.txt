@@ -5,6 +5,7 @@ include(cmake/utils.cmake)
 
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(fmt REQUIRED)
 
 add_library(essautil
     Util/Color.cpp
@@ -19,6 +20,7 @@ add_library(essautil
 )
 
 essautil_setup_target(essautil)
+target_link_libraries(essautil fmt)
 
 install(TARGETS essautil EXPORT EssaUtil DESTINATION lib)
 

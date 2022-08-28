@@ -22,6 +22,14 @@ TEST_CASE(writable_memory_stream) {
     return {};
 }
 
+TEST_CASE(writer_fmt_integration) {
+    Util::WritableMemoryStream out;
+    Writer writer { out };
+    writer.writeff("{}", 12.25);
+    TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { '1', '2', '.', '2', '5' } }));
+    return {};
+}
+
 TEST_CASE(readable_memory_stream) {
     return {};
 
