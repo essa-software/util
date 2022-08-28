@@ -10,7 +10,10 @@ option(ESSAUTIL_ENABLE_SFML "Enable SFML integration (e.g vector converting)" OF
 add_library(essautil
     Util/Color.cpp
     Util/SimulationClock.cpp
-    Util/Stream.cpp
+    Util/Stream/File.cpp
+    Util/Stream/Reader.cpp
+    Util/Stream/StandardStreams.cpp
+    Util/Stream/Writer.cpp
     Util/UnitDisplay.cpp
     Util/UString.cpp
 )

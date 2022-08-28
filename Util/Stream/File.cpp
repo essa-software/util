@@ -1,4 +1,4 @@
-#include "Stream.hpp"
+#include "File.hpp"
 
 #include <unistd.h>
 
@@ -48,53 +48,6 @@ OsErrorOr<size_t> WritableFileStream::write(std::span<uint8_t const> data) {
 
 bool ReadableFileStream::is_eof() const {
     return m_eof;
-}
-
-OsErrorOr<size_t> Reader::read(std::span<uint8_t> data) {
-    return m_stream.read(data);
-}
-
-OsErrorOr<bool> Reader::read_all(std::span<uint8_t> data) {
-    size_t bytes_read = 0;
-    while (bytes_read < data.size()) {
-        auto bytes = TRY(read(data.subspan(bytes_read)));
-        if (bytes == 0)
-            return false;
-        bytes_read += bytes;
-    }
-    return true;
-}
-
-OsErrorOr<size_t> Writer::write(std::span<uint8_t const> data) {
-    return m_stream.write(data);
-}
-
-OsErrorOr<void> Writer::write_all(std::span<uint8_t const> data) {
-    size_t bytes_written = 0;
-    while (bytes_written < data.size()) {
-        bytes_written += TRY(write(data.subspan(bytes_written)));
-    }
-    return {};
-}
-
-OsErrorOr<void> Writer::write(UString const& string) {
-    auto encoded = string.encode(m_encoding);
-    return write_all({ reinterpret_cast<uint8_t const*>(encoded.data()), encoded.size() });
-}
-
-ReadableFileStream& std_in() {
-    static ReadableFileStream stream = ReadableFileStream::borrow_fd(0);
-    return stream;
-}
-
-WritableFileStream& std_out() {
-    static WritableFileStream stream = WritableFileStream::borrow_fd(1);
-    return stream;
-}
-
-WritableFileStream& std_err() {
-    static WritableFileStream stream = WritableFileStream::borrow_fd(2);
-    return stream;
 }
 
 }
