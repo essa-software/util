@@ -27,7 +27,7 @@ public:
     }
     OsErrorOr<T> read_little_endian() {
         T value;
-        auto bytes_read = TRY(read({ reinterpret_cast<uint8_t*>(&value), sizeof(T) }));
+        auto bytes_read = TRY(read_all({ reinterpret_cast<uint8_t*>(&value), sizeof(T) }));
         if (bytes_read != sizeof(T))
             return OsError { 0, "EOF in read_little_endian" };
         return convert_from_little_to_host_endian(value);
@@ -39,7 +39,7 @@ public:
     }
     OsErrorOr<T> read_big_endian() {
         T value;
-        auto bytes_read = TRY(read({ reinterpret_cast<uint8_t*>(&value), sizeof(T) }));
+        auto bytes_read = TRY(read_all({ reinterpret_cast<uint8_t*>(&value), sizeof(T) }));
         if (bytes_read != sizeof(T))
             return OsError { 0, "EOF in read_big_endian" };
         return convert_from_big_to_host_endian(value);
