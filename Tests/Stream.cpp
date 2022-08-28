@@ -93,3 +93,57 @@ TEST_CASE(reader_get_peek) {
 
     return {};
 }
+
+TEST_CASE(reader_big_endian) {
+    uint8_t buffer[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+
+    {
+        Util::ReadableMemoryStream in { buffer };
+        Util::Reader reader { in };
+        EXPECT_EQ(reader.read_big_endian<uint8_t>().release_value(), 0x01ull);
+    }
+    {
+        Util::ReadableMemoryStream in { buffer };
+        Util::Reader reader { in };
+        EXPECT_EQ(reader.read_big_endian<uint16_t>().release_value(), 0x0123ull);
+    }
+
+    {
+        Util::ReadableMemoryStream in { buffer };
+        Util::Reader reader { in };
+        EXPECT_EQ(reader.read_big_endian<uint32_t>().release_value(), 0x01234567ull);
+    }
+    {
+        Util::ReadableMemoryStream in { buffer };
+        Util::Reader reader { in };
+        EXPECT_EQ(reader.read_big_endian<uint64_t>().release_value(), 0x0123456789abcdefull);
+    }
+    return {};
+}
+
+TEST_CASE(reader_little_endian) {
+    uint8_t buffer[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+
+    {
+        Util::ReadableMemoryStream in { buffer };
+        Util::Reader reader { in };
+        EXPECT_EQ(reader.read_little_endian<uint8_t>().release_value(), 0x01ull);
+    }
+    {
+        Util::ReadableMemoryStream in { buffer };
+        Util::Reader reader { in };
+        EXPECT_EQ(reader.read_little_endian<uint16_t>().release_value(), 0x2301ll);
+    }
+
+    {
+        Util::ReadableMemoryStream in { buffer };
+        Util::Reader reader { in };
+        EXPECT_EQ(reader.read_little_endian<uint32_t>().release_value(), 0x67452301ll);
+    }
+    {
+        Util::ReadableMemoryStream in { buffer };
+        Util::Reader reader { in };
+        EXPECT_EQ(reader.read_little_endian<uint64_t>().release_value(), 0xefcdab8967452301ll);
+    }
+    return {};
+}
