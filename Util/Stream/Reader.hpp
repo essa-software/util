@@ -16,6 +16,8 @@ public:
 
     OsErrorOr<size_t> read(std::span<uint8_t>);
     OsErrorOr<bool> read_all(std::span<uint8_t>);
+    OsErrorOr<std::optional<uint8_t>> get();
+    OsErrorOr<std::optional<uint8_t>> peek();
 
 private:
     bool buffer_is_empty() const { return m_buffer_offset >= m_buffer.size(); }

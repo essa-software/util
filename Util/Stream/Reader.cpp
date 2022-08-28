@@ -45,4 +45,22 @@ OsErrorOr<bool> Reader::read_all(std::span<uint8_t> data) {
     return true;
 }
 
+OsErrorOr<std::optional<uint8_t>> Reader::get() {
+    uint8_t byte;
+    auto bytes_read = TRY(read({ &byte, 1 }));
+    if (bytes_read == 0)
+        return std::optional<uint8_t> {};
+    return byte;
+}
+
+OsErrorOr<std::optional<uint8_t>> Reader::peek() {
+    if (buffer_is_empty()) {
+        TRY(refill_buffer());
+    }
+    if (!buffer_is_empty()) {
+        return m_buffer[m_buffer_offset];
+    }
+    return std::optional<uint8_t> {};
+}
+
 }

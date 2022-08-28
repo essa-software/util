@@ -75,3 +75,21 @@ TEST_CASE(reader_buffering) {
 
     return {};
 }
+
+TEST_CASE(reader_get_peek) {
+    uint8_t buffer[] { 0x01, 0x02 };
+
+    Util::ReadableMemoryStream in { buffer };
+    Util::Reader reader { in };
+
+    uint8_t read_buffer[1];
+    EXPECT_EQ(reader.peek().release_value().value(), 0x01);
+    EXPECT_NO_ERROR(reader.read(read_buffer));
+    EXPECT_EQ(read_buffer[0], 0x01);
+    EXPECT_EQ(reader.peek().release_value().value(), 0x02);
+    EXPECT_EQ(reader.get().release_value().value(), 0x02);
+    EXPECT(!reader.peek().release_value().has_value());
+    EXPECT(!reader.get().release_value().has_value());
+
+    return {};
+}
