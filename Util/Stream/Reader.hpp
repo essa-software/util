@@ -18,8 +18,15 @@ public:
     OsErrorOr<bool> read_all(std::span<uint8_t>);
 
 private:
+    bool buffer_is_empty() const { return m_buffer_offset >= m_buffer.size(); }
+    [[nodiscard]] size_t read_from_buffer(std::span<uint8_t>);
+    OsErrorOr<size_t> refill_buffer();
+
     ReadableStream& m_stream;
     UString::Encoding m_encoding {};
+
+    std::vector<uint8_t> m_buffer;
+    size_t m_buffer_offset = 0;
 };
 
 }
