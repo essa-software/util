@@ -11,6 +11,7 @@ add_library(essautil
     Util/Color.cpp
     Util/SimulationClock.cpp
     Util/Stream/File.cpp
+    Util/Stream/MemoryStream.cpp
     Util/Stream/Reader.cpp
     Util/Stream/StandardStreams.cpp
     Util/Stream/Writer.cpp
