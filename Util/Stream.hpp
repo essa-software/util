@@ -10,76 +10,107 @@
 
 namespace Util {
 
-class Stream {
+class ReadableStream {
 public:
-    virtual ~Stream() = default;
+    virtual ~ReadableStream() = default;
 
     // Try to read data to buffer. Returns number of bytes read (0 on EOF)
     virtual OsErrorOr<size_t> read(std::span<uint8_t>) = 0;
-
-    // Try to write data to buffer. Returns number of bytes written.
-    virtual OsErrorOr<size_t> write(std::span<uint8_t const>) = 0;
 
     // Return true if data read failed because of end-of-file.
     virtual bool is_eof() const = 0;
 };
 
-class FileStream : public Stream {
+class WritableStream {
 public:
-    static FileStream adopt_fd(int fd);
-    static FileStream borrow_fd(int fd);
+    virtual ~WritableStream() = default;
 
-    virtual ~FileStream() override;
+    // Try to write data to buffer. Returns number of bytes written.
+    virtual OsErrorOr<size_t> write(std::span<uint8_t const>) = 0;
+};
 
-    virtual OsErrorOr<size_t> read(std::span<uint8_t>) override;
-    virtual OsErrorOr<size_t> write(std::span<uint8_t const>) override;
-    virtual bool is_eof() const override;
+class File {
+public:
+    virtual ~File();
 
     int fd() const { return m_fd; }
 
+protected:
+    File(int fd, bool owned)
+        : m_fd(fd)
+        , m_owned(owned) { }
+
 private:
     int m_fd {};
-    bool m_eof = false;
-    bool m_owned = false;
+    bool m_owned { false };
+};
+
+class ReadableFileStream : public ReadableStream
+    , public File {
+public:
+    static ReadableFileStream adopt_fd(int fd);
+    static ReadableFileStream borrow_fd(int fd);
+
+    virtual OsErrorOr<size_t> read(std::span<uint8_t>) override;
+    virtual bool is_eof() const override;
+
+private:
+    ReadableFileStream(int fd, bool owned)
+        : File(fd, owned) { }
+
+    bool m_eof { false };
+};
+
+class WritableFileStream : public WritableStream
+    , public File {
+public:
+    static WritableFileStream adopt_fd(int fd);
+    static WritableFileStream borrow_fd(int fd);
+
+    virtual OsErrorOr<size_t> write(std::span<uint8_t const>) override;
+
+private:
+    WritableFileStream(int fd, bool owned)
+        : File(fd, owned) { }
 };
 
 class Reader {
 public:
-    explicit Reader(Stream& stream, UString::Encoding encoding = UString::Encoding::Utf8)
+    explicit Reader(ReadableStream& stream, UString::Encoding encoding = UString::Encoding::Utf8)
         : m_stream(stream)
         , m_encoding(encoding) {
     }
 
-    Stream& stream() const { return m_stream; }
+    ReadableStream& stream() const { return m_stream; }
 
     OsErrorOr<size_t> read(std::span<uint8_t>);
     OsErrorOr<bool> read_all(std::span<uint8_t>);
 
 private:
-    Stream& m_stream;
+    ReadableStream& m_stream;
     UString::Encoding m_encoding {};
 };
 
 class Writer {
 public:
-    explicit Writer(Stream& stream, UString::Encoding encoding = UString::Encoding::Utf8)
+    explicit Writer(WritableStream& stream, UString::Encoding encoding = UString::Encoding::Utf8)
         : m_stream(stream)
         , m_encoding(encoding) {
     }
 
-    Stream& stream() const { return m_stream; }
+    WritableStream& stream() const { return m_stream; }
 
     OsErrorOr<size_t> write(std::span<uint8_t const>);
     OsErrorOr<void> write_all(std::span<uint8_t const>);
     OsErrorOr<void> write(UString const&);
 
 private:
-    Stream& m_stream;
+    WritableStream& m_stream;
     UString::Encoding m_encoding {};
 };
 
-FileStream& std_in();
-FileStream& std_out();
-FileStream& std_err();
+ReadableFileStream& std_in();
+WritableFileStream& std_out();
+WritableFileStream& std_err();
 
 }

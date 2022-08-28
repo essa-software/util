@@ -4,28 +4,22 @@
 
 namespace Util {
 
-FileStream FileStream::adopt_fd(int fd) {
-    FileStream stream;
-    stream.m_fd = fd;
-    stream.m_owned = true;
-    return stream;
-}
-
-FileStream FileStream::borrow_fd(int fd) {
-    FileStream stream;
-    stream.m_fd = fd;
-    stream.m_owned = false;
-    return stream;
-}
-
-FileStream::~FileStream() {
+File::~File() {
     if (m_owned)
-        close(m_fd);
+        ::close(m_fd);
 }
 
-OsErrorOr<size_t> FileStream::read(std::span<uint8_t> data) {
+ReadableFileStream ReadableFileStream::adopt_fd(int fd) {
+    return ReadableFileStream { fd, true };
+}
+
+ReadableFileStream ReadableFileStream::borrow_fd(int fd) {
+    return ReadableFileStream { fd, false };
+}
+
+OsErrorOr<size_t> ReadableFileStream::read(std::span<uint8_t> data) {
     // TODO: Buffering
-    auto result = ::read(m_fd, data.data(), data.size_bytes());
+    auto result = ::read(fd(), data.data(), data.size_bytes());
     if (result < 0) {
         return OsError { .error = static_cast<error_t>(-result), .function = "FileStream::read_all" };
     }
@@ -35,16 +29,24 @@ OsErrorOr<size_t> FileStream::read(std::span<uint8_t> data) {
     return static_cast<size_t>(result);
 }
 
-OsErrorOr<size_t> FileStream::write(std::span<uint8_t const> data) {
+WritableFileStream WritableFileStream::adopt_fd(int fd) {
+    return WritableFileStream { fd, true };
+}
+
+WritableFileStream WritableFileStream::borrow_fd(int fd) {
+    return WritableFileStream { fd, false };
+}
+
+OsErrorOr<size_t> WritableFileStream::write(std::span<uint8_t const> data) {
     // TODO: Buffering
-    auto result = ::write(m_fd, data.data(), data.size_bytes());
+    auto result = ::write(fd(), data.data(), data.size_bytes());
     if (result < 0) {
         return OsError { .error = static_cast<error_t>(-result), .function = "FileStream::write_all" };
     }
     return static_cast<size_t>(result);
 }
 
-bool FileStream::is_eof() const {
+bool ReadableFileStream::is_eof() const {
     return m_eof;
 }
 
@@ -80,18 +82,18 @@ OsErrorOr<void> Writer::write(UString const& string) {
     return write_all({ reinterpret_cast<uint8_t const*>(encoded.data()), encoded.size() });
 }
 
-FileStream& std_in() {
-    static FileStream stream = FileStream::borrow_fd(0);
+ReadableFileStream& std_in() {
+    static ReadableFileStream stream = ReadableFileStream::borrow_fd(0);
     return stream;
 }
 
-FileStream& std_out() {
-    static FileStream stream = FileStream::borrow_fd(1);
+WritableFileStream& std_out() {
+    static WritableFileStream stream = WritableFileStream::borrow_fd(1);
     return stream;
 }
 
-FileStream& std_err() {
-    static FileStream stream = FileStream::borrow_fd(2);
+WritableFileStream& std_err() {
+    static WritableFileStream stream = WritableFileStream::borrow_fd(2);
     return stream;
 }
 
