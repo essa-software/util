@@ -99,3 +99,23 @@ TEST_CASE(append) {
     EXPECT_EQ(buffer[3], 0x78);
     return {};
 }
+
+TEST_CASE(resize_uninitialized) {
+    // Grow
+    {
+        Buffer buffer { 0x12, 0x34 };
+        buffer.resize_uninitialized(4);
+        EXPECT_EQ(buffer.size(), 4ull);
+        EXPECT_EQ(buffer[0], 0x12);
+        EXPECT_EQ(buffer[1], 0x34);
+    }
+
+    // Shrink
+    {
+        Buffer buffer { 0x12, 0x34, 0x56, 0x78 };
+        buffer.resize_uninitialized(2);
+        Buffer expected { 0x12, 0x34 };
+        EXPECT_EQ(buffer, expected);
+    }
+    return {};
+}
