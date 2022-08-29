@@ -81,7 +81,7 @@ void Buffer::reallocate(size_t size) {
 
         m_data = new uint8_t[size];
         if (old_storage) {
-            std::copy(old_storage, old_storage + old_size, m_data);
+            std::copy(old_storage, old_storage + std::min(size, old_size), m_data);
         }
     }
     else {
