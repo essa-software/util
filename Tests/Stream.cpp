@@ -168,3 +168,13 @@ TEST_CASE(reader_read_until) {
 
     return {};
 }
+
+TEST_CASE(reader_read_line) {
+    Util::ReadableMemoryStream in = Util::ReadableMemoryStream::from_string("test\nhello");
+    Util::Reader reader { in };
+
+    EXPECT_EQ(reader.read_line().release_value().encode(), "test");
+    EXPECT_EQ(reader.read_line().release_value().encode(), "hello");
+
+    return {};
+}

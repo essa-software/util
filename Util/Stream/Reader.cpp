@@ -75,4 +75,9 @@ OsErrorOr<Buffer> Reader::read_until(uint8_t delim) {
     return buffer;
 }
 
+OsErrorOr<UString> Reader::read_line() {
+    auto buffer = TRY(read_until('\n'));
+    return buffer.decode(m_encoding);
+}
+
 }

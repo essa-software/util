@@ -47,6 +47,9 @@ public:
     // This reads `delim` but doesn't include it in the buffer.
     OsErrorOr<Buffer> read_until(uint8_t delim);
 
+    // This reads \n but doesn't include it in the result string.
+    OsErrorOr<UString> read_line();
+
 private:
     bool buffer_is_empty() const { return m_buffer_offset >= m_buffer.size(); }
     [[nodiscard]] size_t read_from_buffer(std::span<uint8_t>);
