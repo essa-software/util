@@ -17,21 +17,23 @@ struct FormatIfFormattable {
     T const& t;
 };
 
+namespace fmt {
 template<class T>
-requires(fmt::is_formattable<T>::value) struct fmt::formatter<FormatIfFormattable<T>> : public fmt::formatter<T> {
+requires(is_formattable<T>::value) struct formatter<FormatIfFormattable<T>> : public formatter<T> {
     template<typename FormatContext>
     constexpr auto format(FormatIfFormattable<T> const& p, FormatContext& ctx) {
-        return fmt::formatter<T>::format(p.t, ctx);
+        return formatter<T>::format(p.t, ctx);
     }
 };
 
 template<class T>
-struct fmt::formatter<FormatIfFormattable<T>> : public fmt::formatter<void*> {
+struct formatter<FormatIfFormattable<T>> : public formatter<void*> {
     template<typename FormatContext>
     constexpr auto format(FormatIfFormattable<T> const& p, FormatContext& ctx) const {
-        return fmt::format_to(ctx.out(), "?{}@{:p}", typeid(p.t).name(), fmt::ptr(&p.t));
+        return format_to(ctx.out(), "?{}@{:p}", typeid(p.t).name(), ptr(&p.t));
     }
 };
+}
 
 namespace __TestSuite {
 
