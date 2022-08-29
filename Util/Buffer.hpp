@@ -23,6 +23,7 @@ public:
     static Buffer uninitialized(size_t size);
     static Buffer filled(size_t size, uint8_t byte = 0);
 
+    std::span<uint8_t> span() { return { m_data, m_size }; }
     std::span<uint8_t const> span() const { return { m_data, m_size }; }
     size_t size() const { return m_size; }
     auto begin() { return m_data; }
