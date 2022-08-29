@@ -10,6 +10,11 @@ class ReadableMemoryStream : public ReadableStream {
 public:
     explicit ReadableMemoryStream(std::span<uint8_t const> data);
 
+    template<size_t S>
+    static ReadableMemoryStream from_string(char const (&data)[S]) {
+        return ReadableMemoryStream{{ reinterpret_cast<uint8_t const*>(data), S - 1 }};
+    }
+
     virtual OsErrorOr<size_t> read(std::span<uint8_t>) override;
     virtual bool is_eof() const override;
 
