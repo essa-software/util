@@ -1,6 +1,9 @@
 // No #pragma once, this is expected to be included only once per test file
 
 #include <Util/Error.hpp>
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -8,6 +11,27 @@
 #include <unistd.h>
 
 using namespace Util;
+
+template<class T>
+struct FormatIfFormattable {
+    T const& t;
+};
+
+template<class T>
+requires(fmt::is_formattable<T>::value) struct fmt::formatter<FormatIfFormattable<T>> : public fmt::formatter<T> {
+    template<typename FormatContext>
+    constexpr auto format(FormatIfFormattable<T> const& p, FormatContext& ctx) {
+        return fmt::formatter<T>::format(p.t, ctx);
+    }
+};
+
+template<class T>
+struct fmt::formatter<FormatIfFormattable<T>> : public fmt::formatter<void*> {
+    template<typename FormatContext>
+    constexpr auto format(FormatIfFormattable<T> const& p, FormatContext& ctx) const {
+        return fmt::format_to(ctx.out(), "?{}@{:p}", typeid(p.t).name(), fmt::ptr(&p.t));
+    }
+};
 
 namespace __TestSuite {
 
@@ -25,9 +49,7 @@ ErrorOr<void, TestError> expect(bool condition, std::string_view expression, std
 
 ErrorOr<void, TestError> expect_equal(auto v1, auto v2, std::string_view expr1, std::string_view expr2, std::string_view file, int line) {
     if (v1 != v2) {
-        std::ostringstream oss;
-        oss << expr1 << " == " << expr2 << " (lhs = " << v1 << ", rhs = " << v2 << ")";
-        return TestError { oss.str(), file, line };
+        return TestError { fmt::format("{} == {} (lhs={}, rhs={})", expr1, expr2, FormatIfFormattable { v1 }, FormatIfFormattable { v2 }), file, line };
     }
     return {};
 }
