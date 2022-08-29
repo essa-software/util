@@ -27,10 +27,10 @@ size_t Reader::read_from_buffer(std::span<uint8_t> data) {
 }
 
 OsErrorOr<size_t> Reader::refill_buffer() {
-    m_buffer.resize(BufferSize);
+    m_buffer.resize_uninitialized(BufferSize);
     m_buffer_offset = 0;
-    auto read = TRY(m_stream.read(m_buffer));
-    m_buffer.resize(read);
+    auto read = TRY(m_stream.read(m_buffer.span()));
+    m_buffer.resize_uninitialized(read);
     return read;
 }
 

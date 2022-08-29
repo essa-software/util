@@ -58,7 +58,7 @@ private:
     ReadableStream& m_stream;
     UString::Encoding m_encoding {};
 
-    std::vector<uint8_t> m_buffer;
+    Buffer m_buffer;
     size_t m_buffer_offset = 0;
 };
 
