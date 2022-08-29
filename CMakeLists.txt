@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(fmt REQUIRED)
 
 add_library(essautil
+    Util/Buffer.cpp
     Util/Color.cpp
     Util/SimulationClock.cpp
     Util/Stream/File.cpp
