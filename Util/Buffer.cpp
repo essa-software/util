@@ -11,7 +11,7 @@ Buffer::~Buffer() {
 }
 
 Buffer::Buffer(Buffer const& other) {
-    reallocate(other.m_size);
+    resize_uninitialized(other.m_size);
     m_size = other.m_size;
     std::copy(other.m_data, other.m_data + other.m_size, m_data);
 }
@@ -19,7 +19,7 @@ Buffer::Buffer(Buffer const& other) {
 Buffer& Buffer::operator=(Buffer const& other) {
     if (this == &other)
         return *this;
-    reallocate(other.m_size);
+    resize_uninitialized(other.m_size);
     m_size = other.m_size;
     std::copy(other.m_data, other.m_data + other.m_size, m_data);
     return *this;
@@ -41,12 +41,12 @@ Buffer& Buffer::operator=(Buffer&& other) {
 }
 
 Buffer::Buffer(std::span<uint8_t const> data) {
-    reallocate(data.size());
+    resize_uninitialized(data.size());
     std::copy(data.begin(), data.end(), m_data);
 }
 
 Buffer::Buffer(std::initializer_list<uint8_t> data) {
-    reallocate(data.size());
+    resize_uninitialized(data.size());
     std::copy(data.begin(), data.end(), m_data);
 }
 
@@ -61,12 +61,12 @@ Buffer Buffer::filled(size_t size, uint8_t byte) {
 }
 
 void Buffer::append(uint8_t byte) {
-    reallocate(m_size + 1);
+    resize_uninitialized(m_size + 1);
     m_data[m_size - 1] = byte;
 }
 
 void Buffer::append(std::span<uint8_t const> data) {
-    reallocate(m_size + data.size());
+    resize_uninitialized(m_size + data.size());
     std::copy(data.begin(), data.end(), &m_data[m_size - data.size()]);
 }
 
@@ -74,7 +74,7 @@ UString Buffer::decode(UString::Encoding encoding) const {
     return UString { std::string_view { reinterpret_cast<char const*>(m_data), m_size }, encoding };
 }
 
-void Buffer::reallocate(size_t size) {
+void Buffer::resize_uninitialized(size_t size) {
     auto old_storage = m_data;
     if (size > 0) {
         auto old_size = m_size;

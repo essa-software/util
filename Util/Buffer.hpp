@@ -35,15 +35,14 @@ public:
 
     void append(uint8_t);
     void append(std::span<uint8_t const>);
+    void resize_uninitialized(size_t);
     UString decode(UString::Encoding = UString::Encoding::Utf8) const;
 
     bool operator==(Buffer const& other) const;
 
 private:
     explicit Buffer(size_t size)
-        : m_size(size) { reallocate(size); }
-
-    void reallocate(size_t);
+        : m_size(size) { resize_uninitialized(size); }
 
     uint8_t* m_data { nullptr };
     size_t m_size { 0 };
