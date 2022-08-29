@@ -2,9 +2,8 @@
 
 namespace Util {
 
-ReadableMemoryStream::ReadableMemoryStream(std::span<uint8_t const> data) {
-    m_data.resize(data.size());
-    std::copy(data.begin(), data.end(), m_data.begin());
+ReadableMemoryStream::ReadableMemoryStream(std::span<uint8_t const> data)
+    : m_data { data } {
 }
 
 OsErrorOr<size_t> ReadableMemoryStream::read(std::span<uint8_t> data) {
@@ -21,7 +20,7 @@ bool ReadableMemoryStream::is_eof() const {
 }
 
 OsErrorOr<size_t> WritableMemoryStream::write(std::span<uint8_t const> data) {
-    m_data.insert(m_data.end(), data.begin(), data.end());
+    m_data.append(data);
     return data.size();
 }
 
