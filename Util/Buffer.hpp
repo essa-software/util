@@ -34,6 +34,7 @@ public:
     uint8_t& operator[](size_t idx) { return m_data[idx]; }
 
     void append(uint8_t);
+    void append(std::span<uint8_t const>);
     UString decode(UString::Encoding = UString::Encoding::Utf8) const;
 
     bool operator==(Buffer const& other) const;

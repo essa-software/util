@@ -65,6 +65,11 @@ void Buffer::append(uint8_t byte) {
     m_data[m_size - 1] = byte;
 }
 
+void Buffer::append(std::span<uint8_t const> data) {
+    reallocate(m_size + data.size());
+    std::copy(data.begin(), data.end(), &m_data[m_size - data.size()]);
+}
+
 UString Buffer::decode(UString::Encoding encoding) const {
     return UString { std::string_view { reinterpret_cast<char const*>(m_data), m_size }, encoding };
 }
