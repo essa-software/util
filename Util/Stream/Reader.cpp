@@ -48,7 +48,7 @@ OsErrorOr<bool> Reader::read_all(std::span<uint8_t> data) {
 OsErrorOr<std::optional<uint8_t>> Reader::get() {
     uint8_t byte;
     auto bytes_read = TRY(read_all({ &byte, 1 }));
-    if (bytes_read == 0)
+    if (!bytes_read)
         return std::optional<uint8_t> {};
     return byte;
 }
