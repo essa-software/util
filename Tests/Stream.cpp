@@ -155,3 +155,16 @@ TEST_CASE(reader_little_endian) {
     }
     return {};
 }
+
+TEST_CASE(reader_read_until) {
+    uint8_t buffer[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+    Util::ReadableMemoryStream in { buffer };
+    Util::Reader reader { in };
+
+    auto data_read = reader.read_until(0x67).release_value();
+    Buffer expected { 0x01, 0x23, 0x45 };
+    EXPECT_EQ(data_read, expected);
+    EXPECT_EQ(reader.peek().release_value().value(), 0x89);
+
+    return {};
+}

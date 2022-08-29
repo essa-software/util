@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Buffer.hpp"
 #include "../Endianness.h"
 #include "../UString.hpp"
 #include "Stream.hpp"
@@ -42,6 +43,9 @@ public:
             return OsError { 0, "EOF in read_big_endian" };
         return convert_from_big_to_host_endian(value);
     }
+
+    // This reads `delim` but doesn't include it in the buffer.
+    OsErrorOr<Buffer> read_until(uint8_t delim);
 
 private:
     bool buffer_is_empty() const { return m_buffer_offset >= m_buffer.size(); }

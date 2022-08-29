@@ -63,4 +63,16 @@ OsErrorOr<std::optional<uint8_t>> Reader::peek() {
     return std::optional<uint8_t> {};
 }
 
+OsErrorOr<Buffer> Reader::read_until(uint8_t delim) {
+    Buffer buffer;
+    while (true) {
+        auto ch = TRY(get());
+        if (!ch || ch == delim) {
+            break;
+        }
+        buffer.append(*ch);
+    }
+    return buffer;
+}
+
 }
