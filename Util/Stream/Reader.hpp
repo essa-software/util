@@ -49,6 +49,18 @@ public:
     // This reads `delim` but doesn't include it in the buffer.
     OsErrorOr<Buffer> read_until(uint8_t delim);
 
+    template<class Callback>
+    OsErrorOr<Buffer> read_while(Callback&& callback) {
+        Buffer result;
+        auto c = TRY(peek());
+        while (c && callback(*c)) {
+            result.append(*c);
+            TRY(get());
+            c = TRY(peek());
+        }
+        return result;
+    }
+
     // This reads \n but doesn't include it in the result string.
     OsErrorOr<UString> read_line();
 
