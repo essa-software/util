@@ -17,6 +17,8 @@ public:
 
     ReadableStream& stream() const { return m_stream; }
 
+    bool is_eof() const;
+
     OsErrorOr<size_t> read(std::span<uint8_t>);
     OsErrorOr<bool> read_all(std::span<uint8_t>);
     OsErrorOr<std::optional<uint8_t>> get();

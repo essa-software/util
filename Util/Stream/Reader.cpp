@@ -4,6 +4,10 @@ namespace Util {
 
 constexpr auto BufferSize = 4096;
 
+bool Reader::is_eof() const {
+    return m_stream.is_eof() && buffer_is_empty();
+}
+
 OsErrorOr<size_t> Reader::read(std::span<uint8_t> data) {
     auto read = read_from_buffer(data);
     if (read < data.size() && !m_stream.is_eof()) {
