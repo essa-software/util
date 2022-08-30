@@ -16,6 +16,14 @@ public:
         return ReadableMemoryStream { { reinterpret_cast<uint8_t const*>(data), S - 1 } };
     }
 
+    static ReadableMemoryStream from_string(std::string_view str) {
+        return ReadableMemoryStream { { reinterpret_cast<uint8_t const*>(str.data()), str.size() } };
+    }
+
+    static ReadableMemoryStream from_string(std::string const& str) {
+        return ReadableMemoryStream { { reinterpret_cast<uint8_t const*>(str.c_str()), str.size() } };
+    }
+
     virtual OsErrorOr<size_t> read(std::span<uint8_t>) override;
     virtual bool is_eof() const override;
 
