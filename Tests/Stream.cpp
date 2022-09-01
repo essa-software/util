@@ -1,6 +1,7 @@
 #include "Suite.hpp"
 
 #include <Util/Stream.hpp>
+#include <Util/Stream/File.hpp>
 #include <Util/UString.hpp>
 #include <vector>
 
@@ -189,5 +190,40 @@ TEST_CASE(reader_read_line) {
     EXPECT_EQ(reader.read_line().release_value().encode(), "test");
     EXPECT_EQ(reader.read_line().release_value().encode(), "hello");
 
+    return {};
+}
+
+TEST_CASE(file_streams) {
+    constexpr char const* FileName = "/tmp/essautil-test";
+    {
+        // Write, Truncate
+        auto writable_stream = Util::WritableFileStream::open(FileName, { .truncate = true }).release_value();
+        uint8_t write_data[] = { 't', 'e', 's', 't' };
+        EXPECT_NO_ERROR(Writer { writable_stream }.write_all(write_data));
+    }
+
+    {
+        // Write, Append
+        auto appending_stream = Util::WritableFileStream::open(FileName, {}).release_value();
+        uint8_t write_data[] = { '1', '2', '3' };
+        EXPECT_NO_ERROR(Writer { appending_stream }.write_all(write_data));
+    }
+
+    {
+        // Write, fail if existing
+        auto appending_stream = Util::WritableFileStream::open(FileName, { .fail_if_exists = true });
+        EXPECT(appending_stream.is_error() && appending_stream.release_error().error == EEXIST);
+    }
+
+    {
+        // Read
+        auto readable_stream = Util::ReadableFileStream::open(FileName).release_value();
+        uint8_t expected_data[] = { 't', 'e', 's', 't', '1', '2', '3' };
+        uint8_t read_data[sizeof(expected_data)];
+        EXPECT_NO_ERROR(Reader { readable_stream }.read_all(read_data));
+        TRY(expect_buffers_equal(expected_data, read_data));
+    }
+
+    remove(FileName);
     return {};
 }

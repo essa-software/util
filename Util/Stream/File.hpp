@@ -3,6 +3,7 @@
 #include "../Error.hpp"
 #include "../NonCopyable.hpp"
 #include "Stream.hpp"
+
 #include <cstddef>
 #include <cstdint>
 #include <span>
@@ -32,6 +33,7 @@ class ReadableFileStream : public ReadableStream
 public:
     static ReadableFileStream adopt_fd(int fd);
     static ReadableFileStream borrow_fd(int fd);
+    static OsErrorOr<ReadableFileStream> open(std::string const& file_name);
 
     virtual OsErrorOr<size_t> read(std::span<uint8_t>) override;
     virtual bool is_eof() const override;
@@ -48,6 +50,11 @@ class WritableFileStream : public WritableStream
 public:
     static WritableFileStream adopt_fd(int fd);
     static WritableFileStream borrow_fd(int fd);
+    struct OpenOptions {
+        bool truncate = false;
+        bool fail_if_exists = false;
+    };
+    static OsErrorOr<WritableFileStream> open(std::string const& file_name, OpenOptions options);
 
     virtual OsErrorOr<size_t> write(std::span<uint8_t const>) override;
 

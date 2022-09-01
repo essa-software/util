@@ -1,6 +1,9 @@
 #include "File.hpp"
 
+#include <fcntl.h>
+#include <string>
 #include <unistd.h>
+#include <utility>
 
 namespace Util {
 
@@ -32,6 +35,11 @@ ReadableFileStream ReadableFileStream::borrow_fd(int fd) {
     return ReadableFileStream { fd, false };
 }
 
+OsErrorOr<ReadableFileStream> ReadableFileStream::open(std::string const& file_name) {
+    auto fd = ::open(file_name.c_str(), O_RDONLY);
+    return adopt_fd(fd);
+}
+
 OsErrorOr<size_t> ReadableFileStream::read(std::span<uint8_t> data) {
     // TODO: Buffering
     auto result = ::read(fd(), data.data(), data.size_bytes());
@@ -50,6 +58,14 @@ WritableFileStream WritableFileStream::adopt_fd(int fd) {
 
 WritableFileStream WritableFileStream::borrow_fd(int fd) {
     return WritableFileStream { fd, false };
+}
+
+OsErrorOr<WritableFileStream> WritableFileStream::open(std::string const& file_name, OpenOptions options) {
+    auto fd = ::open(file_name.c_str(), O_WRONLY | O_CREAT | (options.truncate ? O_TRUNC : O_APPEND) | (options.fail_if_exists ? O_EXCL : 0), 0700);
+    if (fd < 0) {
+        return OsError { errno, "WritableFileStream::open" };
+    }
+    return adopt_fd(fd);
 }
 
 OsErrorOr<size_t> WritableFileStream::write(std::span<uint8_t const> data) {
