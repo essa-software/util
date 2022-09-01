@@ -41,17 +41,18 @@ struct TestError {
     std::string expression;
     std::string_view file;
     int line;
+    std::string cause = "";
 };
 
 ErrorOr<void, TestError> expect(bool condition, std::string_view expression, std::string_view file, int line) {
     if (!condition)
-        return TestError { std::string { expression }, file, line };
+        return TestError { std::string { expression }, file, line, "condition is false" };
     return {};
 }
 
 ErrorOr<void, TestError> expect_equal(auto v1, auto v2, std::string_view expr1, std::string_view expr2, std::string_view file, int line) {
     if (v1 != v2) {
-        return TestError { fmt::format("{} == {} (lhs={}, rhs={})", expr1, expr2, FormatIfFormattable { v1 }, FormatIfFormattable { v2 }), file, line };
+        return TestError { fmt::format("{} == {}", expr1, expr2), file, line, fmt::format("{} != {}", FormatIfFormattable { v1 }, FormatIfFormattable { v2 }) };
     }
     return {};
 }
@@ -59,9 +60,7 @@ ErrorOr<void, TestError> expect_equal(auto v1, auto v2, std::string_view expr1, 
 template<class T, class E>
 ErrorOr<void, TestError> expect_no_error(ErrorOr<T, E> value, std::string_view expr, std::string_view file, int line) {
     if (value.is_error()) {
-        std::ostringstream oss;
-        oss << expr << " is error";
-        return TestError { oss.str(), file, line };
+        return TestError { fmt::format("!({}).is_error()", expr), file, line, fmt::format("got error: {}", FormatIfFormattable { value.release_error() }) };
     }
     return {};
 }
@@ -94,7 +93,12 @@ int main(int, char** argv) {
         std::cout << "\r\e[2K\e[33m . \e[m" << test_name << std::flush;
         auto result = test.second();
         if (result.is_error()) {
-            std::cout << "\r\e[2K\e[31m ✗ \e[m" << test_name << ": expected \e[1m" << result.error().expression << "\e[m at \e[36m" << result.error().file << ":" << result.error().line << "\e[m\n";
+            auto error = result.release_error();
+
+            std::cout << "\r\e[2K\e[31m ✗ \e[m" << test_name << ": expected \e[1m" << error.expression << "\e[m at \e[36m" << error.file << ":" << error.line << "\e[m\n";
+            if (!error.cause.empty()) {
+                std::cout << " └─\e[m failed because \e[1m" << error.cause << "\e[m" << std::endl;
+            }
             failed = true;
         }
     }
