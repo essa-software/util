@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Error.hpp"
+#include "../NonCopyable.hpp"
 #include "Stream.hpp"
 #include <cstddef>
 #include <cstdint>
@@ -8,9 +9,11 @@
 
 namespace Util {
 
-class File {
+class File : public NonCopyable {
 public:
     virtual ~File();
+    File(File&& other);
+    File& operator=(File&& other);
 
     int fd() const { return m_fd; }
 

@@ -9,6 +9,21 @@ File::~File() {
         ::close(m_fd);
 }
 
+File::File(File&& other) {
+    m_fd = std::exchange(other.m_fd, 0);
+    m_owned = std::exchange(other.m_owned, false);
+}
+
+File& File::operator=(File&& other) {
+    if (this == &other)
+        return *this;
+    if (m_owned)
+        ::close(m_fd);
+    m_fd = std::exchange(other.m_fd, 0);
+    m_owned = std::exchange(other.m_owned, false);
+    return *this;
+}
+
 ReadableFileStream ReadableFileStream::adopt_fd(int fd) {
     return ReadableFileStream { fd, true };
 }
