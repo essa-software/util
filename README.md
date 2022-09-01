@@ -10,7 +10,7 @@
 * Utility classes ([`NonCopyable`](./Util/NonCopyable.hpp), [`DelayedInit`](./Util/DelayedInit.hpp))
 * [Unit wrappers](./Util/Units.hpp) ([angle](./Util/Angle.hpp), length, distance etc) and [unit formatting](./Util/UnitDisplay.hpp)
 * [Clock utilities](./Util/SimulationClock.hpp) and formatters (C++-y wrapper for `strftime`)
-* [Endianness](./Util/Endianness.h) conversions
+* [Endianness](./Util/Endianness.hpp) conversions
 * [Character type](./Util/CharacterType.hpp) detection (wrapper for C functions like `isdigit`, `isalpha`)
 * Some things imported from [SerenityOS AK](https://github.com/SerenityOS/serenity/tree/master/AK):
     * [`Is.hpp`](./Util/Is.hpp) (dynamic & static polymorphism)

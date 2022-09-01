@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Buffer.hpp"
-#include "../Endianness.h"
+#include "../Endianness.hpp"
 #include "../UString.hpp"
 #include "Stream.hpp"
 #include <type_traits>
