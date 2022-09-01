@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <cerrno>
+#include <fmt/format.h>
 #include <optional>
 #include <string_view>
 #include <type_traits>
@@ -39,12 +40,10 @@ public:
 
     template<typename U>
     ESSA_ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorType>> && (std::is_convertible_v<U, T> || std::is_convertible_v<U, ErrorType>))
-        : Variant(std::forward<U>(value))
-    {
+        : Variant(std::forward<U>(value)) {
     }
 
-    T& value()
-    {
+    T& value() {
         return std::get<T>(*this);
     }
     T const& value() const { return std::get<T>(*this); }
@@ -56,8 +55,7 @@ public:
     T release_value() { return std::move(value()); }
     ErrorType release_error() { return std::move(error()); }
 
-    T release_value_but_fixme_should_propagate_errors()
-    {
+    T release_value_but_fixme_should_propagate_errors() {
         assert(!is_error());
         return release_value();
     }
@@ -68,8 +66,7 @@ template<typename ErrorType>
 class [[nodiscard]] ErrorOr<void, ErrorType> {
 public:
     ErrorOr(ErrorType error)
-        : m_error(std::move(error))
-    {
+        : m_error(std::move(error)) {
     }
 
     ErrorOr() = default;
@@ -96,5 +93,17 @@ struct OsError {
 
 template<class T>
 using OsErrorOr = ErrorOr<T, OsError>;
+
+}
+
+namespace fmt {
+
+template<>
+struct formatter<Util::OsError> : public formatter<std::string_view> {
+    template<typename FormatContext>
+    constexpr auto format(Util::OsError const& p, FormatContext& ctx) const {
+        return format_to(ctx.out(), "{}: {}", p.function, strerror(p.error));
+    }
+};
 
 }
