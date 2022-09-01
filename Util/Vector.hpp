@@ -39,15 +39,15 @@ public:
             components[3] = 1;
     }
 
-    T& x() requires(Components > 0) { return this->components[0]; };
-    T& y() requires(Components > 1) { return this->components[1]; };
-    T& z() requires(Components > 2) { return this->components[2]; };
-    T& w() requires(Components > 3) { return this->components[3]; };
+    constexpr T& x() requires(Components > 0) { return this->components[0]; };
+    constexpr T& y() requires(Components > 1) { return this->components[1]; };
+    constexpr T& z() requires(Components > 2) { return this->components[2]; };
+    constexpr T& w() requires(Components > 3) { return this->components[3]; };
 
-    T const& x() const requires(Components > 0) { return this->components[0]; };
-    T const& y() const requires(Components > 1) { return this->components[1]; };
-    T const& z() const requires(Components > 2) { return this->components[2]; };
-    T const& w() const requires(Components > 3) { return this->components[3]; };
+    constexpr T const& x() const requires(Components > 0) { return this->components[0]; };
+    constexpr T const& y() const requires(Components > 1) { return this->components[1]; };
+    constexpr T const& z() const requires(Components > 2) { return this->components[2]; };
+    constexpr T const& w() const requires(Components > 3) { return this->components[3]; };
 
     auto length_squared() const
     {
@@ -86,7 +86,7 @@ public:
         return result;
     }
 
-    inline Vector operator+(Vector const& b) const
+    constexpr Vector operator+(Vector const& b) const
     {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
@@ -94,12 +94,12 @@ public:
         return ab;
     }
 
-    inline Vector& operator+=(Vector const& b)
+    constexpr Vector& operator+=(Vector const& b)
     {
         return *this = *this + b;
     }
 
-    inline Vector operator-(Vector const& b) const
+    constexpr Vector operator-(Vector const& b) const
     {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
@@ -107,12 +107,12 @@ public:
         return ab;
     }
 
-    inline Vector& operator-=(Vector const& b)
+    constexpr Vector& operator-=(Vector const& b)
     {
         return *this = *this - b;
     }
 
-    inline Vector operator*(double x) const
+    constexpr Vector operator*(double x) const
     {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
@@ -120,12 +120,12 @@ public:
         return ab;
     }
 
-    inline Vector& operator*=(double x)
+    constexpr Vector& operator*=(double x)
     {
         return *this = *this * x;
     }
 
-    inline Vector operator/(double x) const
+    constexpr Vector operator/(double x) const
     {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
@@ -133,12 +133,12 @@ public:
         return ab;
     }
 
-    inline Vector& operator/=(double x)
+    constexpr Vector& operator/=(double x)
     {
         return *this = *this / x;
     }
 
-    inline Vector operator-() const
+    constexpr Vector operator-() const
     {
         Vector ap;
         for (size_t s = 0; s < Components; s++)
@@ -264,13 +264,13 @@ using Vector4f = Vector4<float>;
 using Vector4d = Vector4<double>;
 
 template<size_t S, class T>
-inline double get_distance(Detail::Vector<S, T> const& a, Detail::Vector<S, T> const& b)
+constexpr double get_distance(Detail::Vector<S, T> const& a, Detail::Vector<S, T> const& b)
 {
     return (a - b).length();
 }
 
 template<size_t S, class T>
-requires(S == 2 || S == 3) inline double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::Vector<S, T> line_end, Detail::Vector<S, T> point)
+requires(S == 2 || S == 3) constexpr double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::Vector<S, T> line_end, Detail::Vector<S, T> point)
 {
     auto d = (point - line_end) / get_distance(point, line_end);
     auto v = line_start - line_end;
