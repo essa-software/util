@@ -9,6 +9,7 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -25,7 +26,32 @@ UString::UString(std::span<uint32_t const> codepoints) {
     std::copy(codepoints.begin(), codepoints.end(), m_storage);
 }
 
-UString::~UString() {
+UString::UString(const char* ch){
+    size_t i = 0;
+    std::vector<uint32_t> vec;
+
+    while(ch[i]){
+        vec.push_back(ch[i]);
+    }
+
+    reallocate(vec.size());
+    std::copy(vec.data(), vec.data() + vec.size(), m_storage);
+}
+
+UString::UString(const wchar_t* ch){
+    size_t i = 0;
+    std::vector<uint32_t> vec;
+
+    while(ch[i]){
+        vec.push_back(ch[i]);
+    }
+
+    reallocate(vec.size());
+    std::copy(vec.data(), vec.data() + vec.size(), m_storage);
+}
+
+UString::~UString()
+{
     // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << std::endl;
     delete[] m_storage;
 }
@@ -63,7 +89,8 @@ UString::UString(uint32_t codepoint) {
 
 namespace Utf8 {
 
-static int bytes_requiRed_to_store_codepoint(uint32_t codepoint) {
+static int bytes_required_to_store_codepoint(uint32_t codepoint)
+{
     if (codepoint < 0x80)
         return 1;
     if (codepoint < 0x800)
@@ -124,10 +151,10 @@ static bool decode_impl(std::string_view string, uint32_t replacement, Callback 
         }
 
         // Check if codepoint was stoRed optimally
-        auto requiRed_bytes = bytes_requiRed_to_store_codepoint(codepoint);
+        auto required_bytes = bytes_required_to_store_codepoint(codepoint);
         auto got_bytes = additional_bytes_to_expect + 1;
-        if (requiRed_bytes > got_bytes) {
-            std::cout << "got more bytes than required to encode codepoint " << codepoint << " (" << got_bytes << " > " << requiRed_bytes << ")\n";
+        if (required_bytes > got_bytes) {
+            std::cout << "got more bytes than required to encode codepoint " << codepoint << " (" << got_bytes << " > " << required_bytes << ")\n";
         }
 
         callback(codepoint);
