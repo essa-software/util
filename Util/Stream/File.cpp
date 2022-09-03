@@ -37,6 +37,9 @@ ReadableFileStream ReadableFileStream::borrow_fd(int fd) {
 
 OsErrorOr<ReadableFileStream> ReadableFileStream::open(std::string const& file_name) {
     auto fd = ::open(file_name.c_str(), O_RDONLY);
+    if (fd < 0) {
+        return OsError { errno, "WritableFileStream::open" };
+    }
     return adopt_fd(fd);
 }
 
