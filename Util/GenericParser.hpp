@@ -128,15 +128,21 @@ protected:
         return m_offset >= m_tokens.size();
     }
 
-    Token<T>* get() {
+    size_t offset() const { return m_offset; }
+
+    Token<T> const* get() {
         if (is_eof())
             return nullptr;
         return &m_tokens[m_offset++];
     }
-    Token<T>* peek() {
+    Token<T> const* peek() const {
         if (is_eof())
             return nullptr;
         return &m_tokens[m_offset];
+    }
+
+    bool next_token_is(T type) const {
+        return peek() && peek()->type() == type;
     }
 
     ParseErrorOr<Token<T>> expect(T type) {
@@ -145,7 +151,7 @@ protected:
             return error("Unexpected EOF");
         }
         if (token->type() != type) {
-            return expected(fmt::format("token of type {}", (int)token->type()), *token);
+            return expected(fmt::format("token of type {}", (int)type), *token);
         }
         return *token;
     }
@@ -156,6 +162,13 @@ protected:
             .location = is_eof()
                 ? m_tokens[m_offset - 1].range()
                 : m_tokens[m_offset].range()
+        };
+    }
+
+    ParseError error(std::string message, size_t token) {
+        return ParseError {
+            .message = message,
+            .location = m_tokens[token].range()
         };
     }
 
