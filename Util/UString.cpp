@@ -26,30 +26,6 @@ UString::UString(std::span<uint32_t const> codepoints) {
     std::copy(codepoints.begin(), codepoints.end(), m_storage);
 }
 
-UString::UString(const char* ch){
-    size_t i = 0;
-    std::vector<uint32_t> vec;
-
-    while(ch[i]){
-        vec.push_back(ch[i]);
-    }
-
-    reallocate(vec.size());
-    std::copy(vec.data(), vec.data() + vec.size(), m_storage);
-}
-
-UString::UString(const wchar_t* ch){
-    size_t i = 0;
-    std::vector<uint32_t> vec;
-
-    while(ch[i]){
-        vec.push_back(ch[i]);
-    }
-
-    reallocate(vec.size());
-    std::copy(vec.data(), vec.data() + vec.size(), m_storage);
-}
-
 UString::~UString()
 {
     // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << std::endl;

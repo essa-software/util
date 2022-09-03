@@ -47,9 +47,6 @@ public:
         : UString({ string, S - 1 }, encoding, replacement) {
     }
 
-    UString(const char* ch);
-    UString(const wchar_t* ch);
-
     [[nodiscard]] std::string encode(Encoding = Encoding::Utf8) const;
 
     [[nodiscard]] uint32_t at(size_t) const;
