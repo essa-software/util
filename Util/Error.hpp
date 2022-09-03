@@ -33,6 +33,14 @@ class [[nodiscard]] ErrorOr;
         _temporary_result.release_value();             \
     })
 
+#define MUST(...)                                      \
+    ({                                                 \
+        auto _temporary_result = (__VA_ARGS__);        \
+        if (_temporary_result.is_error()) [[unlikely]] \
+            ESSA_UNREACHABLE;                          \
+        _temporary_result.release_value();             \
+    })
+
 template<typename T, typename ErrorType>
 class [[nodiscard]] ErrorOr final : public std::variant<T, ErrorType> {
 public:
