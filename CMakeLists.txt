@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(fmt REQUIRED)
 
-add_library(essautil
+add_library(essautil SHARED
     Util/Buffer.cpp
     Util/Color.cpp
     Util/SimulationClock.cpp
