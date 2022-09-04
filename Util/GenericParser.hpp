@@ -157,6 +157,8 @@ protected:
     }
 
     ParseError error(std::string message) {
+        if (m_tokens.empty())
+            return ParseError { .message = message, .location = {} };
         return ParseError {
             .message = message,
             .location = is_eof()
@@ -166,6 +168,7 @@ protected:
     }
 
     ParseError error(std::string message, size_t token) {
+        assert(token < m_tokens.size());
         return ParseError {
             .message = message,
             .location = m_tokens[token].range()
@@ -173,6 +176,8 @@ protected:
     }
 
     ParseError error_in_already_read(std::string message) {
+        if (m_tokens.empty())
+            return ParseError { .message = message, .location = {} };
         assert(m_offset > 0);
         return ParseError {
             .message = message,
