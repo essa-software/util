@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Orientation.hpp"
+
 #include <array>
 #include <cmath>
 #include <initializer_list>
@@ -14,15 +16,13 @@ class Vector {
 public:
     static constexpr size_t Components = C;
 
-    constexpr Vector()
-    {
+    constexpr Vector() {
         if constexpr (Components == 4)
             components[3] = 1;
     }
 
     template<class... T2>
-    constexpr Vector(T2... packed_c) requires(sizeof...(packed_c) == Components || (Components == 4 && sizeof...(packed_c) == 3))
-    {
+    constexpr Vector(T2... packed_c) requires(sizeof...(packed_c) == Components || (Components == 4 && sizeof...(packed_c) == 3)) {
         auto c = std::initializer_list<T> { static_cast<T>(packed_c)... };
         std::copy(std::begin(c), std::end(c), components.begin());
         if constexpr (Components == 4 && sizeof...(packed_c) == 3)
@@ -30,8 +30,7 @@ public:
     }
 
     template<size_t OtherC, class OtherT, class... MoreT>
-    requires(OtherC + sizeof...(MoreT) == Components || (Components == 4 && OtherC + sizeof...(MoreT) == 3)) constexpr explicit Vector(Vector<OtherC, OtherT> const& other, MoreT... more)
-    {
+    requires(OtherC + sizeof...(MoreT) == Components || (Components == 4 && OtherC + sizeof...(MoreT) == 3)) constexpr explicit Vector(Vector<OtherC, OtherT> const& other, MoreT... more) {
         std::copy(other.components.begin(), other.components.end(), components.begin());
         auto c = std::initializer_list<T> { static_cast<T>(more)... };
         std::copy(std::begin(c), std::end(c), components.begin() + OtherC);
@@ -49,97 +48,82 @@ public:
     constexpr T const& z() const requires(Components > 2) { return this->components[2]; };
     constexpr T const& w() const requires(Components > 3) { return this->components[3]; };
 
-    auto length_squared() const
-    {
+    auto length_squared() const {
         double result = 0;
         for (size_t s = 0; s < Components; s++)
             result += components[s] * components[s];
         return result;
     }
 
-    auto length() const
-    {
+    auto length() const {
         return std::sqrt(length_squared());
     }
 
-    double inverted_length() const
-    {
+    double inverted_length() const {
         return 1 / length();
     }
 
-    auto normalized() const
-    {
+    auto normalized() const {
         return *this * inverted_length();
     }
 
-    bool is_normalized() const
-    {
+    bool is_normalized() const {
         auto length = length_squared();
         return length == 1 || length == 0;
     }
 
-    double dot(Vector const& a) const
-    {
+    double dot(Vector const& a) const {
         double result = 0;
         for (size_t s = 0; s < std::min<size_t>(Components, 3); s++)
             result += components[s] * a.components[s];
         return result;
     }
 
-    constexpr Vector operator+(Vector const& b) const
-    {
+    constexpr Vector operator+(Vector const& b) const {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] + b.components[s];
         return ab;
     }
 
-    constexpr Vector& operator+=(Vector const& b)
-    {
+    constexpr Vector& operator+=(Vector const& b) {
         return *this = *this + b;
     }
 
-    constexpr Vector operator-(Vector const& b) const
-    {
+    constexpr Vector operator-(Vector const& b) const {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] - b.components[s];
         return ab;
     }
 
-    constexpr Vector& operator-=(Vector const& b)
-    {
+    constexpr Vector& operator-=(Vector const& b) {
         return *this = *this - b;
     }
 
-    constexpr Vector operator*(double x) const
-    {
+    constexpr Vector operator*(double x) const {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] * x;
         return ab;
     }
 
-    constexpr Vector& operator*=(double x)
-    {
+    constexpr Vector& operator*=(double x) {
         return *this = *this * x;
     }
 
-    constexpr Vector operator/(double x) const
-    {
+    constexpr Vector operator/(double x) const {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] / x;
         return ab;
     }
 
-    constexpr Vector& operator/=(double x)
-    {
+    constexpr Vector& operator/=(double x) {
         return *this = *this / x;
     }
 
-    constexpr Vector operator-() const
-    {
+    constexpr Vector operator-() const {
         Vector ap;
         for (size_t s = 0; s < Components; s++)
             ap.components[s] = -components[s];
@@ -149,49 +133,59 @@ public:
     //// Vector2 ////
     template<size_t OtherC, class OtherT>
     requires(Components == 2 && OtherC >= 2) constexpr explicit Vector(Vector<OtherC, OtherT> other)
-        : Vector { other.x(), other.y() }
-    {
+        : Vector { other.x(), other.y() } {
+    }
+
+    constexpr static Vector from_main_cross(Orientation orientation, T main, T cross) requires(Components == 2) {
+        if (orientation == Orientation::Vertical)
+            return { cross, main };
+        return { main, cross };
     }
 
     // Angle is CCW starting from positive X axis.
-    constexpr static Vector create_polar(double angle_radians, double length) requires(Components == 2)
-    {
+    constexpr static Vector create_polar(double angle_radians, double length) requires(Components == 2) {
         return { std::sin(angle_radians) * length, std::cos(angle_radians) * length };
     }
 
-    constexpr double angle() const requires(Components == 2)
-    {
+    constexpr double angle() const requires(Components == 2) {
         return std::atan2(this->y(), this->x());
     }
 
     template<class OtherT = T>
-    requires(Components == 2) constexpr Vector<2, OtherT> rotate(double theta) const
-    {
+    requires(Components == 2) constexpr Vector<2, OtherT> rotate(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->y() * t_sin, this->x() * t_sin + this->y() * t_cos };
     }
 
     template<class OtherT = T>
-    requires(Components == 2) constexpr auto perpendicular()
-    {
+    requires(Components == 2) constexpr auto perpendicular() const {
         return Vector<2, OtherT> { -this->y(), this->x() };
     }
 
     template<class OtherT>
-    requires(Components == 2) constexpr auto mirror(Vector<2, OtherT> axis)
-    {
+    requires(Components == 2) constexpr auto mirror(Vector<2, OtherT> axis) const {
         return *this - (decltype(this->x()))2 * dot(axis.normalized()) * axis;
+    }
+
+    constexpr auto main(Orientation orientation) const requires(Components == 2) {
+        if (orientation == Orientation::Vertical)
+            return y();
+        return x();
+    }
+
+    constexpr auto cross(Orientation orientation) const requires(Components == 2) {
+        if (orientation == Orientation::Horizontal)
+            return y();
+        return x();
     }
 
     //// Vector3 ////
     template<size_t OtherC, class OtherT>
     requires(OtherC >= 3) constexpr explicit Vector(Vector<OtherC, OtherT> other)
-        : Vector { other.x(), other.y(), other.z() }
-    {
+        : Vector { other.x(), other.y(), other.z() } {
     }
 
-    constexpr static Vector create_spheric(double lat_radians, double lon_radians, double radius) requires(Components == 3)
-    {
+    constexpr static Vector create_spheric(double lat_radians, double lon_radians, double radius) requires(Components == 3) {
         return {
             static_cast<T>(radius * std::cos(lat_radians) * std::sin(lon_radians)),
             static_cast<T>(radius * std::sin(lat_radians) * std::sin(lon_radians)),
@@ -200,15 +194,13 @@ public:
     }
 
     template<class OtherT = T>
-    requires(Components == 3) constexpr Vector<3, OtherT> rotate(double theta) const
-    {
+    requires(Components == 3) constexpr Vector<3, OtherT> rotate(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->y() * t_sin, this->x() * t_sin + this->y() * t_cos, this->z() };
     }
 
     template<class OtherT = T>
-    requires(Components == 3) constexpr Vector<3, OtherT> cross(Vector<3, T> const& a) const
-    {
+    requires(Components == 3) constexpr Vector<3, OtherT> cross(Vector<3, T> const& a) const {
         Vector<3, OtherT> result;
         result.x() = this->y() * a.z() - this->z() * a.y();
         result.y() = this->z() * a.x() - this->x() * a.z();
@@ -220,14 +212,12 @@ public:
 
     template<size_t OtherC, class OtherT>
     requires(Components == 4 && OtherC >= 4) constexpr explicit Vector(Vector<OtherC, OtherT> other)
-        : Vector { other.x(), other.y(), other.z(), other.w() }
-    {
+        : Vector { other.x(), other.y(), other.z(), other.w() } {
     }
 
     bool operator==(Vector const&) const = default;
 
-    friend std::ostream& operator<<(std::ostream& out, Vector const& v)
-    {
+    friend std::ostream& operator<<(std::ostream& out, Vector const& v) {
         out << "[";
         for (size_t s = 0; s < Components; s++) {
             out << v.components[s];
@@ -264,14 +254,12 @@ using Vector4f = Vector4<float>;
 using Vector4d = Vector4<double>;
 
 template<size_t S, class T>
-constexpr double get_distance(Detail::Vector<S, T> const& a, Detail::Vector<S, T> const& b)
-{
+constexpr double get_distance(Detail::Vector<S, T> const& a, Detail::Vector<S, T> const& b) {
     return (a - b).length();
 }
 
 template<size_t S, class T>
-requires(S == 2 || S == 3) constexpr double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::Vector<S, T> line_end, Detail::Vector<S, T> point)
-{
+requires(S == 2 || S == 3) constexpr double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::Vector<S, T> line_end, Detail::Vector<S, T> point) {
     auto d = (point - line_end) / get_distance(point, line_end);
     auto v = line_start - line_end;
     double t = v.dot(d);
