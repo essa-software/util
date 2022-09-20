@@ -194,7 +194,19 @@ public:
     }
 
     template<class OtherT = T>
-    requires(Components == 3) constexpr Vector<3, OtherT> rotate(double theta) const {
+    requires(Components == 3) constexpr Vector<3, OtherT> rotate_x(double theta) const {
+        double t_cos = std::cos(theta), t_sin = std::sin(theta);
+        return { this->x(), this->y() * t_cos - this->z() * t_sin, this->y() * t_sin + this->z() * t_cos };
+    }
+
+    template<class OtherT = T>
+    requires(Components == 3) constexpr Vector<3, OtherT> rotate_y(double theta) const {
+        double t_cos = std::cos(theta), t_sin = std::sin(theta);
+        return { this->x() * t_cos - this->z() * t_sin, this->y(), this->x() * t_sin + this->z() * t_cos };
+    }
+
+    template<class OtherT = T>
+    requires(Components == 3) constexpr Vector<3, OtherT> rotate_z(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->y() * t_sin, this->x() * t_sin + this->y() * t_cos, this->z() };
     }
