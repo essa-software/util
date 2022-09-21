@@ -26,8 +26,7 @@ UString::UString(std::span<uint32_t const> codepoints) {
     std::copy(codepoints.begin(), codepoints.end(), m_storage);
 }
 
-UString::~UString()
-{
+UString::~UString() {
     // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << std::endl;
     delete[] m_storage;
 }
@@ -65,8 +64,7 @@ UString::UString(uint32_t codepoint) {
 
 namespace Utf8 {
 
-static int bytes_required_to_store_codepoint(uint32_t codepoint)
-{
+static int bytes_required_to_store_codepoint(uint32_t codepoint) {
     if (codepoint < 0x80)
         return 1;
     if (codepoint < 0x800)
@@ -126,7 +124,7 @@ static bool decode_impl(std::string_view string, uint32_t replacement, Callback 
             codepoint |= (string[s] & 0b111111);
         }
 
-        // Check if codepoint was stoRed optimally
+        // Check if codepoint was stored optimally
         auto required_bytes = bytes_required_to_store_codepoint(codepoint);
         auto got_bytes = additional_bytes_to_expect + 1;
         if (required_bytes > got_bytes) {
@@ -208,6 +206,9 @@ UString::UString(std::string_view string, Encoding encoding, uint32_t replacemen
     }
     // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << std::endl;
 }
+
+UString::UString(std::span<uint8_t const> data, Encoding encoding, uint32_t replacement)
+    : UString { std::string_view { reinterpret_cast<char const*>(data.data()), data.size() }, encoding, replacement } { }
 
 std::string UString::encode(Encoding encoding) const {
     switch (encoding) {

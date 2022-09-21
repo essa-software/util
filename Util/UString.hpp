@@ -40,6 +40,7 @@ public:
         Utf8
     };
 
+    UString(std::span<uint8_t const>, Encoding = Encoding::Utf8, uint32_t replacement = 0xfffd);
     UString(std::string_view, Encoding = Encoding::Utf8, uint32_t replacement = 0xfffd);
 
     template<size_t S>

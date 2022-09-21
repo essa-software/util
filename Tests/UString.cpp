@@ -20,6 +20,11 @@ TEST_CASE(construction) {
     EXPECT(str3.size() == 1);
     EXPECT(str3.at(0) == L'ą');
 
+    // Constructor from std::span
+    uint8_t arr[] = { 'x', 'd', 'l', 'o', 'l' };
+    UString str4 { arr };
+    EXPECT(str4 == "xdlol");
+
     return {};
 }
 
