@@ -181,7 +181,7 @@ public:
 
     //// Vector3 ////
     template<size_t OtherC, class OtherT>
-    requires(OtherC >= 3) constexpr explicit Vector(Vector<OtherC, OtherT> other)
+    requires(Components == 3 && OtherC >= 3) constexpr explicit Vector(Vector<OtherC, OtherT> other)
         : Vector { other.x(), other.y(), other.z() } {
     }
 
