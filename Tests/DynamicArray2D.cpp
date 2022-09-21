@@ -35,6 +35,14 @@ TEST_CASE(constructors) {
     return {};
 }
 
+TEST_CASE(ref) {
+    Util::DynamicArray2D<int, 4, 4> arr { 2 };
+    EXPECT_EQ(arr.get(0, 0), 2);
+    arr.ref(2, 3) = 2137;
+    EXPECT_EQ(arr.get(2, 3), 2137);
+    return {};
+}
+
 TEST_CASE(set) {
     Util::DynamicArray2D<int, 4, 4> arr { 2 };
     EXPECT_EQ(arr.get(0, 0), 2);

@@ -46,10 +46,16 @@ public:
         std::fill(m_storage, m_storage + size(), fill);
     }
 
+    Type& ref(size_t x, size_t y) {
+        assert(m_storage);
+        assert(x < X && y < Y);
+        return *cell(x, y);
+    }
+
     Type get(size_t x, size_t y) const {
         if (!m_storage) {
             // Array doesn't take memory but appears default-initialized here.
-            return T{};
+            return T {};
         }
         assert(x < X && y < Y);
         return *cell(x, y);
