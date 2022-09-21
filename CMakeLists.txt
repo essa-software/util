@@ -5,7 +5,7 @@ include(cmake/utils.cmake)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(fmt REQUIRED)
+find_package(fmt 9.1.0 REQUIRED)
 
 add_library(essautil SHARED
     Util/Buffer.cpp
