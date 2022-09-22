@@ -52,6 +52,12 @@ public:
         return *cell(x, y);
     }
 
+    Type const& ref(size_t x, size_t y) const {
+        assert(m_storage);
+        assert(x < X && y < Y);
+        return *cell(x, y);
+    }
+
     Type get(size_t x, size_t y) const {
         if (!m_storage) {
             // Array doesn't take memory but appears default-initialized here.
