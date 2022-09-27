@@ -9,7 +9,6 @@ public:
         Initial,
         Auto,
         Px,
-        PxOtherSide,
         Percent
     };
 
@@ -40,10 +39,6 @@ private:
 
 constexpr Util::Length operator""_px(long double v) {
     return Util::Length(v, Util::Length::Px);
-}
-
-constexpr Util::Length operator""_px_o(long double v) {
-    return Util::Length(v, Util::Length::PxOtherSide);
 }
 
 constexpr Util::Length operator""_perc(long double v) {
