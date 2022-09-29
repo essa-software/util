@@ -20,9 +20,16 @@ Util::Vector3d Plane::normal() const {
 }
 
 Util::Vector3d Plane::point() const {
-    if (m_c == 0)
-        return { -m_d / m_a, 0, 0 };
-    return { 0, 0, -m_d / m_c };
+    if (m_a == 0) {
+        if (m_b == 0) {
+            if (m_c == 0) {
+                return {};
+            }
+            return { 0, 0, -m_d / m_c };
+        }
+        return { 0, -m_d / m_b, 0 };
+    }
+    return { -m_d / m_a, 0, 0 };
 }
 
 Plane Plane::transformed(Util::Matrix4x4d const& matrix) const {
