@@ -66,7 +66,7 @@ public:
     [[nodiscard]] UString substring(size_t start) const;
 
     [[nodiscard]] UString substring(size_t start, size_t size) const;
-    [[nodiscard]] std::optional<size_t> find(UString needle, size_t start = 0) const;
+    [[nodiscard]] std::optional<size_t> find(UString const& needle, size_t start = 0) const;
     [[nodiscard]] UString erase(size_t start, size_t size = 1) const;
     [[nodiscard]] UString insert(UString other, size_t where) const;
 
