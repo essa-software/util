@@ -152,14 +152,14 @@ TEST_CASE(insert) {
     return {};
 }
 
-TEST_CASE(for_each_line) {
+TEST_CASE(for_each_split) {
 
     bool failed = false;
     size_t index = 0;
 
     {
-        UString test1 { "line\nlong\n" };
-        test1.for_each_line([&](std::span<uint32_t const> span) {
+        UString test1 { "line long " };
+        test1.for_each_split(" ", [&](std::span<uint32_t const> span) {
             if (index == 0 && UString { span } != "line")
                 failed = true;
             if (index == 1 && UString { span } != "long")

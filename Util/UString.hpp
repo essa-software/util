@@ -71,20 +71,25 @@ public:
     [[nodiscard]] UString insert(UString other, size_t where) const;
 
     template<class Callback>
-    void for_each_line(Callback&& callback) const {
+    void for_each_split(UString const& splitter, Callback&& callback) const {
         size_t index = 0;
         while (true) {
-            auto next_newline = find("\n", index);
-            if (!next_newline.has_value()) {
-                next_newline = size();
+            auto next = find(splitter, index);
+            if (!next.has_value()) {
+                next = size();
             }
             if (index > size() - 1)
                 break;
-            callback({ m_storage + index, *next_newline - index });
-            if (next_newline == size())
+            callback({ m_storage + index, *next - index });
+            if (next == size())
                 break;
-            index = *next_newline + 1;
+            index = *next + 1;
         }
+    }
+
+    template<class Callback>
+    void for_each_line(Callback&& callback) const {
+        for_each_split("\n", std::forward<Callback>(callback));
     }
 
     std::strong_ordering operator<=>(UString const& other) const;
