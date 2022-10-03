@@ -1,8 +1,7 @@
 #pragma once
 
+#include "../Vector.hpp"
 #include "Plane.hpp"
-
-#include <EssaUtil/Vector.hpp>
 #include <optional>
 
 namespace Util::Math {

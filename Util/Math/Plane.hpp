@@ -1,7 +1,7 @@
 #pragma once
 
-#include <EssaUtil/Matrix.hpp>
-#include <EssaUtil/Vector.hpp>
+#include "../Matrix.hpp"
+#include "../Vector.hpp"
 
 namespace Util::Math {
 

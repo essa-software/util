@@ -1,7 +1,7 @@
 #pragma once
 
-#include <EssaUtil/NonCopyable.hpp>
-#include <EssaUtil/Vector.hpp>
+#include "NonCopyable.hpp"
+#include "Vector.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
