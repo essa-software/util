@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Dependency install
-      run: sudo apt install ninja-build libsfml-dev libfmt-dev
+      run: sudo apt install ninja-build
     - name: Build & install
       env:
         CMAKE_OPTIONS: -DESSAUTIL_ENABLE_SFML=1
