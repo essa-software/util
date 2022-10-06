@@ -130,6 +130,11 @@ protected:
 
     size_t offset() const { return m_offset; }
 
+    SourceRange range(size_t start, size_t size) {
+        assert(start + size < m_tokens.size());
+        return SourceRange { .start = m_tokens[start].start(), .end = m_tokens[start + size - 1].end() };
+    }
+
     Token<T> const* get() {
         if (is_eof())
             return nullptr;
