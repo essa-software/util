@@ -79,6 +79,30 @@ public:
         return result;
     }
 
+    auto floored() const {
+        Vector output;
+        for (size_t s = 0; s < Components; s++) {
+            output.components[s] = std::floor(components[s]);
+        }
+        return output;
+    }
+
+    auto ceiled() const {
+        Vector output;
+        for (size_t s = 0; s < Components; s++) {
+            output.components[s] = std::ceil(components[s]);
+        }
+        return output;
+    }
+
+    auto rounded() const {
+        Vector output;
+        for (size_t s = 0; s < Components; s++) {
+            output.components[s] = std::round(components[s]);
+        }
+        return output;
+    }
+
     constexpr Vector operator+(Vector const& b) const {
         Vector ab;
         for (size_t s = 0; s < Components; s++)
