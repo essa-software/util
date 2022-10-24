@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #define ESSA_ALWAYS_INLINE [[gnu::always_inline]]
 #define ESSA_UNREACHABLE __builtin_unreachable()
 
@@ -11,5 +13,8 @@ struct Overloaded : Ts... { using Ts::operator()...; };
 
 template<typename... Deps>
 inline constexpr bool DependentFalse = false;
+
+template<class T>
+concept Enum = std::is_enum_v<T>;
 
 }
