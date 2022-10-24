@@ -1,6 +1,6 @@
 # ESSA Util
 
-**ESSA Util** is a general-purpose utility library, a supplement/replacement to standard library.
+**ESSA Util** is a general-purpose utility library, a supplement to C++ standard library.
 
 ## Full feature list
 
@@ -13,10 +13,10 @@
 * [Endianness](./Util/Endianness.hpp) conversions
 * [Character type](./Util/CharacterType.hpp) detection (wrapper for C functions like `isdigit`, `isalpha`)
 * Some things imported from [SerenityOS AK](https://github.com/SerenityOS/serenity/tree/master/AK):
-    * [`Is.hpp`](./Util/Is.hpp) (dynamic & static polymorphism)
-    * [`Error.hpp`](./Util/Error.hpp) (`TRY()` error handling)
-    * [`EnumBits.hpp`](./Util/EnumBits.hpp) (using enums for bitfields).
-* CMake function to setup sensible defaults for targets (C++20, all warnings treated as errors, sanitizers enabled in Debug and optimizations in Release, add project root directory to include path)
+    * [`Is.hpp`](./Util/Is.hpp) - dynamic & static polymorphism helpers
+    * [`Error.hpp`](./Util/Error.hpp) - `TRY()` error handling
+    * [`Enum.hpp`](./Util/Enum.hpp) - bitfield operators for enums
+* CMake function `essautil_setup_target` to setup sensible defaults for targets (C++20, all warnings treated as errors, sanitizers enabled in Debug and optimizations in Release, add project root directory to include path)
 * (WIP) [Testing framework](./Tests) - currently not exported
 
 ## Building
