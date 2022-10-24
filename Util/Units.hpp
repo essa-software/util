@@ -6,22 +6,19 @@
 #include <ostream>
 #include <string>
 
-class Distance
-{
+class Distance {
 public:
-    enum Unit
-    {
+    enum Unit {
         Meter,
         Kilometer,
         Au
     };
-    
+
     constexpr Distance() = default;
 
     constexpr Distance(float v, Unit unit)
         : m_unit(unit)
-        , m_value(v)
-    {
+        , m_value(v) {
     }
 
     constexpr Unit unit() const { return m_unit; }
@@ -30,14 +27,13 @@ public:
     constexpr Distance operator-() const { return { -m_value, m_unit }; }
     constexpr bool operator==(Distance const& other) const { return m_unit == other.m_unit && m_value == other.m_value; }
 
-    friend std::ostream& operator<<(std::ostream& out, Distance dist)
-    {
+    friend std::ostream& operator<<(std::ostream& out, Distance dist) {
         if (dist.m_unit == Meter)
             return out << dist.value() << " m";
         else if (dist.m_unit == Kilometer)
             return out << dist.value() / 1000 << " km";
         else
-            return out << dist.value() / AU << " AU";
+            return out << dist.value() / Util::Constants::AU << " AU";
     }
 
 private:
@@ -45,17 +41,14 @@ private:
     float m_value = 0;
 };
 
-constexpr Distance operator""_m(long double v)
-{
+constexpr Distance operator""_m(long double v) {
     return Distance(v, Distance::Meter);
 }
 
-constexpr Distance operator""_km(long double v)
-{
+constexpr Distance operator""_km(long double v) {
     return Distance(v * 1000, Distance::Kilometer);
 }
 
-constexpr Distance operator""_AU(long double v)
-{
-    return Distance(v * AU, Distance::Au);
+constexpr Distance operator""_AU(long double v) {
+    return Distance(v * Util::Constants::AU, Distance::Au);
 }

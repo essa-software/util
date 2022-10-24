@@ -23,8 +23,8 @@ static const std::map<Quantity, std::vector<Unit>> s_units {
         {
             { "m", 1 },
             { "km", 1000 },
-            { "AU", AU },
-            { "ly", Year* LightSpeed },
+            { "AU", Constants::AU },
+            { "ly", Constants::Year* Constants::LightSpeed },
         } },
     { Quantity::Mass,
         {
@@ -35,7 +35,7 @@ static const std::map<Quantity, std::vector<Unit>> s_units {
         {
             { "m/s", 1 },
             { "km/s", 1000 },
-            { "c", LightSpeed },
+            { "c", Constants::LightSpeed },
         } },
     { Quantity::Time,
         {
@@ -43,7 +43,7 @@ static const std::map<Quantity, std::vector<Unit>> s_units {
             { "m", 60 },
             { "h", 3600 },
             { "days", 3600 * 24 },
-            { "years", Year },
+            { "years", Constants::Year },
         } },
     { Quantity::FileSize,
         {
@@ -55,8 +55,7 @@ static const std::map<Quantity, std::vector<Unit>> s_units {
         } }
 };
 
-UString to_exponent_string(double value)
-{
+UString to_exponent_string(double value) {
     std::ostringstream oss;
     if (value < 10) {
         oss << std::setprecision(2) << value;
@@ -72,8 +71,7 @@ UString to_exponent_string(double value)
     return std::string_view { oss.str() };
 };
 
-UnitValue unit_display(double value, Quantity quantity)
-{
+UnitValue unit_display(double value, Quantity quantity) {
     if (quantity == Quantity::None)
         return UnitValue { .value = to_exponent_string(value) };
     auto const& units = s_units.find(quantity)->second;
