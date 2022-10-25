@@ -17,4 +17,14 @@ inline constexpr bool DependentFalse = false;
 template<class T>
 concept Enum = std::is_enum_v<T>;
 
+namespace Detail {
+
+template<class T, class... Ts>
+struct _First { using Type = T; };
+
+}
+
+template<class... Ts>
+using First = typename Detail::_First<Ts...>::Type;
+
 }
