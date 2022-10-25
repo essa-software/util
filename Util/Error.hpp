@@ -22,7 +22,7 @@
 
 namespace Util {
 
-template<typename T, typename ErrorType>
+template<typename T, typename... ErrorTypes>
 class [[nodiscard]] ErrorOr;
 
 #define TRY(...)                                       \
@@ -41,27 +41,55 @@ class [[nodiscard]] ErrorOr;
         _temporary_result.release_value();             \
     })
 
-template<typename T, typename ErrorType>
-class [[nodiscard]] ErrorOr final : public std::variant<T, ErrorType> {
+template<typename T, typename... ErrorTypes>
+class [[nodiscard]] ErrorOr final : public std::variant<T, ErrorTypes...> {
 public:
-    using Variant = std::variant<T, ErrorType>;
+    using Variant = std::variant<T, ErrorTypes...>;
+
+    template<class E>
+    static constexpr bool IsConvertibleToError = { (std::is_convertible_v<E, ErrorTypes> || ...) };
+
+    template<class E>
+    static constexpr bool ContainsError = { (std::is_same_v<E, ErrorTypes> || ...) };
 
     template<typename U>
-    ESSA_ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorType>> && (std::is_convertible_v<U, T> || std::is_convertible_v<U, ErrorType>))
+    ESSA_ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorTypes...>> && (std::is_convertible_v<U, T> || IsConvertibleToError<U>))
         : Variant(std::forward<U>(value)) {
     }
+
+    // Construction from ErrorOr containing one of errors
+    template<class U, class ET>
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<U, ET>&& value) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (std::is_convertible_v<U, T> || IsConvertibleToError<ET>))
+        : Variant(value.is_error() ? value.release_error() : value.release_value()) {
+    }
+
+    // TODO: Construction from subset
 
     T& value() {
         return std::get<T>(*this);
     }
     T const& value() const { return std::get<T>(*this); }
-    ErrorType& error() { return std::get<ErrorType>(*this); }
-    ErrorType const& error() const { return std::get<ErrorType>(*this); }
 
-    bool is_error() const { return std::holds_alternative<ErrorType>(*this); }
+    First<ErrorTypes...>& error() requires(sizeof...(ErrorTypes) == 1) { return std::get<ErrorTypes...>(*this); }
+    First<ErrorTypes...> const& error() const requires(sizeof...(ErrorTypes) == 1) { return std::get<ErrorTypes...>(*this); }
+
+    template<class E>
+    E& error_of_type() requires(ContainsError<E>) { return std::get<E>(*this); }
+
+    template<class E>
+    E const& error_of_type() const requires(ContainsError<E>) { return std::get<E>(*this); }
+
+    bool is_error() const { return !std::holds_alternative<T>(*this); }
+
+    template<class E>
+    requires(ContainsError<E>) bool is_error_of_type() const { return std::holds_alternative<E>(*this); }
 
     T release_value() { return std::move(value()); }
-    ErrorType release_error() { return std::move(error()); }
+
+    template<class E>
+    E release_error_of_type() { return std::move(error_of_type<E>()); }
+
+    auto release_error() { return std::move(error()); }
 
     T release_value_but_fixme_should_propagate_errors() {
         assert(!is_error());
