@@ -25,12 +25,12 @@ namespace Util {
 template<typename T, typename... ErrorTypes>
 class [[nodiscard]] ErrorOr;
 
-#define TRY(...)                                       \
-    ({                                                 \
-        auto _temporary_result = (__VA_ARGS__);        \
-        if (_temporary_result.is_error()) [[unlikely]] \
-            return _temporary_result.release_error();  \
-        _temporary_result.release_value();             \
+#define TRY(...)                                              \
+    ({                                                        \
+        auto _temporary_result = (__VA_ARGS__);               \
+        if (_temporary_result.is_error()) [[unlikely]]        \
+            return _temporary_result.release_error_variant(); \
+        _temporary_result.release_value();                    \
     })
 
 #define MUST(...)                                      \
@@ -41,8 +41,11 @@ class [[nodiscard]] ErrorOr;
         _temporary_result.release_value();             \
     })
 
+template<class... ErrorTypes>
+using ErrorVariant = std::variant<ErrorTypes...>;
+
 template<typename T, typename... ErrorTypes>
-class [[nodiscard]] ErrorOr final : public std::variant<T, ErrorTypes...> {
+class [[nodiscard]] ErrorOr : public std::variant<T, ErrorTypes...> {
 public:
     using Variant = std::variant<T, ErrorTypes...>;
 
@@ -63,7 +66,10 @@ public:
         : Variant(value.is_error() ? value.release_error() : value.release_value()) {
     }
 
-    // TODO: Construction from subset
+    // Construction from error variant, used by TRY()
+    template<class... ETs>
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack) requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
+        : Variant(std::visit([](auto&& v) -> Variant { return v; }, pack)) { }
 
     T& value() {
         return std::get<T>(*this);
@@ -80,6 +86,18 @@ public:
     E const& error_of_type() const requires(ContainsError<E>) { return std::get<E>(*this); }
 
     bool is_error() const { return !std::holds_alternative<T>(*this); }
+
+    ErrorVariant<ErrorTypes...> release_error_variant() {
+        return std::visit([](auto&& v) -> ErrorVariant<ErrorTypes...> {
+            if constexpr (std::is_same_v<std::remove_cvref_t<decltype(v)>, T>) {
+                ESSA_UNREACHABLE;
+            }
+            else {
+                return v;
+            }
+        },
+            *this);
+    }
 
     template<class E>
     requires(ContainsError<E>) bool is_error_of_type() const { return std::holds_alternative<E>(*this); }
@@ -98,28 +116,32 @@ public:
 };
 
 // Partial specialization for void value type
-template<typename ErrorType>
-class [[nodiscard]] ErrorOr<void, ErrorType> {
+template<typename... ErrorTypes>
+class [[nodiscard]] ErrorOr<void, ErrorTypes...> final : public ErrorOr<std::monostate, ErrorTypes...> {
 public:
-    ErrorOr(ErrorType error)
-        : m_error(std::move(error)) {
+    using Base = ErrorOr<std::monostate, ErrorTypes...>;
+
+    template<class E>
+    static constexpr bool IsConvertibleToError = { (std::is_convertible_v<E, ErrorTypes> || ...) };
+
+    ErrorOr()
+        : Base { std::monostate {} } { }
+
+    template<typename U>
+    ErrorOr(U&& value) requires(IsConvertibleToError<U>)
+        : Base(std::forward<U>(value)) {
     }
 
-    ErrorOr() = default;
-    ErrorOr(ErrorOr&& other) = default;
-    ErrorOr(ErrorOr const& other) = default;
-    ~ErrorOr() = default;
+    // Construction from ErrorOr containing one of errors
+    template<class ET>
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<void, ET>&& value) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (IsConvertibleToError<ET>))
+        : Base(std::forward<decltype(value)>(value)) {
+    }
 
-    ErrorOr& operator=(ErrorOr&& other) = default;
-    ErrorOr& operator=(ErrorOr const& other) = default;
-
-    ErrorType& error() { return m_error.value(); }
-    bool is_error() const { return m_error.has_value(); }
-    ErrorType release_error() { return std::move(m_error.value()); }
-    void release_value() { }
-
-private:
-    std::optional<ErrorType> m_error;
+    // Construction from error variant, used by TRY()
+    template<class... ETs>
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack) requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
+        : Base(std::forward<decltype(pack)>(pack)) { }
 };
 
 struct OsError {

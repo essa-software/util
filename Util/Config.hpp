@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tuple>
 #include <type_traits>
 
 #define ESSA_ALWAYS_INLINE [[gnu::always_inline]]
@@ -26,5 +27,15 @@ struct _First { using Type = T; };
 
 template<class... Ts>
 using First = typename Detail::_First<Ts...>::Type;
+
+template<typename T, typename... Ts>
+inline constexpr bool IsOneOf = (std::is_same_v<T, Ts> || ...);
+
+// https://stackoverflow.com/questions/42580997/check-if-one-set-of-types-is-a-subset-of-the-other
+template<typename Subset, typename Set>
+inline constexpr bool IsSubsetOf = false;
+
+template<typename... Ts, typename... Us>
+inline constexpr bool IsSubsetOf<std::tuple<Ts...>, std::tuple<Us...>> = (IsOneOf<Ts, Us...> && ...);
 
 }
