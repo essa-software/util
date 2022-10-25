@@ -1,5 +1,5 @@
 #include "Writer.hpp"
-#include "Util/Stream/Stream.hpp"
+
 #include <fmt/core.h>
 
 namespace Util {
