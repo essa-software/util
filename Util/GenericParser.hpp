@@ -42,16 +42,10 @@ private:
     SourceRange m_range;
 };
 
-template<class T>
-class GenericLexer {
+class Lexer {
 public:
-    explicit GenericLexer(ReadableStream& stream)
+    explicit Lexer(ReadableStream& stream)
         : m_reader(stream) { }
-
-protected:
-    auto create_token(T type, std::string value, SourceLocation start) {
-        return Token<T> { type, std::move(value), { start, location() } };
-    }
 
     SourceLocation location() { return m_location; }
 
@@ -107,6 +101,18 @@ protected:
 private:
     Reader m_reader;
     SourceLocation m_location;
+};
+
+template<class T>
+class GenericLexer : protected Lexer {
+public:
+    explicit GenericLexer(ReadableStream& stream)
+        : Lexer(stream) { }
+
+protected:
+    auto create_token(T type, std::string value, SourceLocation start) requires(!std::is_same_v<T, void>) {
+        return Token<T> { type, std::move(value), { start, location() } };
+    }
 };
 
 struct ParseError {
