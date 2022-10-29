@@ -20,16 +20,14 @@ public:
         : left(left_)
         , top(top_)
         , width(width_)
-        , height(height_)
-    {
+        , height(height_) {
     }
 
     Rect(Vector2<T> position, Vector2<T> size)
         : left(position.x())
         , top(position.y())
         , width(size.x())
-        , height(size.y())
-    {
+        , height(size.y()) {
     }
 
     template<class U>
@@ -37,22 +35,19 @@ public:
         : left(other.left)
         , top(other.top)
         , width(other.width)
-        , height(other.height)
-    {
+        , height(other.height) {
     }
 
     Vector2<T> position() const { return { left, top }; }
     Vector2<T> size() const { return { width, height }; }
 
     template<class U = T>
-    bool contains(Vector2<U> pos) const
-    {
+    bool contains(Vector2<U> pos) const {
         return pos.x() >= left && pos.x() <= left + width && pos.y() >= top && pos.y() <= top + height;
     }
 
     template<class U = T>
-    Rect<U> intersection(Rect<U> const& other) const
-    {
+    Rect<U> intersection(Rect<U> const& other) const {
         T max_x = std::max<U>(left, other.left);
         T max_y = std::max<U>(top, other.top);
 
@@ -61,6 +56,8 @@ public:
 
         return max_x < min_x && max_y < min_y ? Rect<U>({ max_x, max_y }, { min_x - max_x, min_y - max_y }) : Rect<U>();
     }
+
+    bool operator==(Rect<T> const&) const = default;
 };
 
 using Recti = Rect<int>;
