@@ -70,6 +70,8 @@ public:
     [[nodiscard]] UString erase(size_t start, size_t size = 1) const;
     [[nodiscard]] UString insert(UString other, size_t where) const;
 
+    [[nodiscard]] size_t indent() const;
+
     template<class Callback>
     void for_each_split(UString const& splitter, Callback&& callback) const {
         size_t index = 0;

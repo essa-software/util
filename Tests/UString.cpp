@@ -152,6 +152,14 @@ TEST_CASE(insert) {
     return {};
 }
 
+TEST_CASE(indent) {
+    EXPECT_EQ(UString { "test" }.indent(), 0ull);
+    EXPECT_EQ(UString { "    test" }.indent(), 4ull);
+    EXPECT_EQ(UString { "    " }.indent(), 4ull);
+
+    return {};
+}
+
 TEST_CASE(for_each_split) {
 
     bool failed = false;

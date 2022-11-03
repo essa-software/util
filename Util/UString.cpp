@@ -298,6 +298,16 @@ UString UString::insert(UString other, size_t where) const {
     return result;
 }
 
+[[nodiscard]] size_t UString::indent() const {
+    if (is_empty())
+        return 0;
+    for (size_t s = 0; s < size(); s++) {
+        if (!isspace(m_storage[s])) {
+            return s;
+        }
+    }
+    return size();
+}
 void UString::reallocate(size_t size) {
     auto old_storage = m_storage;
     if (size > 0) {
