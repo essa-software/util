@@ -56,6 +56,18 @@ UString& UString::operator=(UString&& other) {
     return *this;
 }
 
+UString UString::take_ownership(std::span<uint32_t const> codepoints) {
+    UString str;
+    // NOTE: This assumes that the storage isn't modified by any of
+    //       the methods. We can't enforce m_storage being const
+    //       because it is written by constructors (e.g uint32 or UTF-8).
+    // FIXME: Find a way to enforce m_storage being const to avoid this
+    //        const_cast.
+    str.m_storage = const_cast<uint32_t*>(codepoints.data());
+    str.m_size = codepoints.size();
+    return str;
+}
+
 UString::UString(uint32_t codepoint) {
     // std::cout << __PRETTY_FUNCTION__ << std::endl;
     reallocate(1);
@@ -308,6 +320,7 @@ UString UString::insert(UString other, size_t where) const {
     }
     return size();
 }
+
 void UString::reallocate(size_t size) {
     auto old_storage = m_storage;
     if (size > 0) {

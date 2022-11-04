@@ -24,6 +24,8 @@ public:
     UString(UString&& other);
     UString& operator=(UString&& other);
 
+    static UString take_ownership(std::span<uint32_t const>);
+
     explicit UString(uint32_t codepoint);
     explicit UString(std::span<uint32_t const>);
 
