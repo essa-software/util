@@ -20,6 +20,7 @@ add_library(essautil SHARED
     Util/Stream/Writer.cpp
     Util/UnitDisplay.cpp
     Util/UString.cpp
+    Util/UStringBuilder.cpp
 )
 
 essautil_setup_target(essautil)
