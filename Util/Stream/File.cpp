@@ -1,5 +1,6 @@
 #include "File.hpp"
 
+#include "../Config.hpp"
 #include <fcntl.h>
 #include <string>
 #include <unistd.h>
@@ -25,6 +26,25 @@ File& File::operator=(File&& other) {
     m_fd = std::exchange(other.m_fd, 0);
     m_owned = std::exchange(other.m_owned, false);
     return *this;
+}
+
+static int seek_direction_to_c(SeekDirection dir) {
+    switch (dir) {
+    case SeekDirection::FromCurrent:
+        return SEEK_CUR;
+    case SeekDirection::FromStart:
+        return SEEK_SET;
+    case SeekDirection::FromEnd:
+        return SEEK_END;
+    }
+    ESSA_UNREACHABLE;
+}
+
+OsErrorOr<void> File::seek(ssize_t count, SeekDirection direction) {
+    if (lseek(m_fd, count, seek_direction_to_c(direction)) < 0) {
+        return OsError { errno, "File::seek" };
+    }
+    return {};
 }
 
 ReadableFileStream ReadableFileStream::adopt_fd(int fd) {

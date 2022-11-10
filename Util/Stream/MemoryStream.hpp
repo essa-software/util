@@ -26,6 +26,7 @@ public:
 
     virtual OsErrorOr<size_t> read(std::span<uint8_t>) override;
     virtual bool is_eof() const override;
+    virtual OsErrorOr<void> seek(ssize_t count, SeekDirection direction = SeekDirection::FromCurrent) override;
 
 private:
     Buffer m_data;
@@ -37,6 +38,7 @@ public:
     std::span<uint8_t const> data() const { return m_data.span(); }
 
     virtual OsErrorOr<size_t> write(std::span<uint8_t const>) override;
+    virtual OsErrorOr<void> seek(ssize_t count, SeekDirection direction = SeekDirection::FromCurrent) override;
 
 private:
     Buffer m_data;

@@ -22,6 +22,7 @@ public:
     OsErrorOr<bool> read_all(std::span<uint8_t>);
     OsErrorOr<std::optional<uint8_t>> get();
     OsErrorOr<std::optional<uint8_t>> peek();
+    OsErrorOr<void> seek(ssize_t offset, SeekDirection = SeekDirection::FromCurrent);
 
 private:
     bool buffer_is_empty() const { return m_buffer_offset >= m_buffer.size(); }

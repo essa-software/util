@@ -250,3 +250,20 @@ TEST_CASE(file_streams) {
     remove(FileName);
     return {};
 }
+
+TEST_CASE(seek) {
+    std::initializer_list<uint8_t> data = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+    Util::ReadableMemoryStream out { data };
+
+    Util::BinaryReader reader { out };
+
+    EXPECT_EQ(reader.read_big_endian<uint32_t>().release_value(), 0x00112233ull);
+    EXPECT_NO_ERROR(reader.seek(0, SeekDirection::FromStart));
+    EXPECT_EQ(reader.read_big_endian<uint32_t>().release_value(), 0x00112233ull);
+    EXPECT_NO_ERROR(reader.seek(4, SeekDirection::FromCurrent));
+    EXPECT_EQ(reader.read_big_endian<uint32_t>().release_value(), 0x8899aabbull);
+    EXPECT_NO_ERROR(reader.seek(-12, SeekDirection::FromEnd));
+    EXPECT_EQ(reader.read_big_endian<uint32_t>().release_value(), 0x44556677ull);
+
+    return {};
+}

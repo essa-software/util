@@ -7,6 +7,12 @@
 
 namespace Util {
 
+enum class SeekDirection {
+    FromCurrent,
+    FromStart,
+    FromEnd
+};
+
 class ReadableStream {
 public:
     virtual ~ReadableStream() = default;
@@ -16,6 +22,8 @@ public:
 
     // Return true if data read failed because of end-of-file.
     virtual bool is_eof() const = 0;
+
+    virtual OsErrorOr<void> seek(ssize_t count, SeekDirection direction = SeekDirection::FromCurrent) = 0;
 };
 
 class WritableStream {
@@ -24,6 +32,8 @@ public:
 
     // Try to write data to buffer. Returns number of bytes written.
     virtual OsErrorOr<size_t> write(std::span<uint8_t const>) = 0;
+
+    virtual OsErrorOr<void> seek(ssize_t count, SeekDirection direction = SeekDirection::FromCurrent) = 0;
 };
 
 }

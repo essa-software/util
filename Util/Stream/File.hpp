@@ -18,6 +18,8 @@ public:
 
     int fd() const { return m_fd; }
 
+    OsErrorOr<void> seek(ssize_t count, SeekDirection direction = SeekDirection::FromCurrent);
+
 protected:
     File(int fd, bool owned)
         : m_fd(fd)
@@ -38,6 +40,10 @@ public:
     virtual OsErrorOr<size_t> read(std::span<uint8_t>) override;
     virtual bool is_eof() const override;
 
+    virtual OsErrorOr<void> seek(ssize_t count, SeekDirection direction = SeekDirection::FromCurrent) override {
+        return File::seek(count, direction);
+    }
+
 private:
     ReadableFileStream(int fd, bool owned)
         : File(fd, owned) { }
@@ -57,6 +63,10 @@ public:
     static OsErrorOr<WritableFileStream> open(std::string const& file_name, OpenOptions options);
 
     virtual OsErrorOr<size_t> write(std::span<uint8_t const>) override;
+
+    virtual OsErrorOr<void> seek(ssize_t count, SeekDirection direction = SeekDirection::FromCurrent) override {
+        return File::seek(count, direction);
+    }
 
 private:
     WritableFileStream(int fd, bool owned)

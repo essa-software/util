@@ -67,6 +67,15 @@ OsErrorOr<std::optional<uint8_t>> BufferedReader::peek() {
     return std::optional<uint8_t> {};
 }
 
+OsErrorOr<void> BufferedReader::seek(ssize_t offset, SeekDirection dir) {
+    if (dir == SeekDirection::FromCurrent) {
+        offset -= m_buffer.size() - m_buffer_offset;
+    }
+    m_buffer_offset = m_buffer.size();
+    m_buffer = {};
+    return m_stream.seek(offset, dir);
+}
+
 OsErrorOr<Buffer> BinaryReader::read_until(uint8_t delim) {
     Buffer result;
     while (true) {

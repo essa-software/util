@@ -1,4 +1,7 @@
 #include "MemoryStream.hpp"
+#include "Util/Config.hpp"
+#include <asm-generic/errno-base.h>
+#include <cerrno>
 
 namespace Util {
 
@@ -19,9 +22,32 @@ bool ReadableMemoryStream::is_eof() const {
     return m_offset >= m_data.size();
 }
 
+OsErrorOr<void> ReadableMemoryStream::seek(ssize_t count, SeekDirection direction) {
+    auto new_offset = [&]() -> ssize_t {
+        switch (direction) {
+        case SeekDirection::FromCurrent:
+            return (ssize_t)m_offset + count;
+        case SeekDirection::FromStart:
+            return count;
+        case SeekDirection::FromEnd:
+            return (ssize_t)m_data.size() + count;
+        }
+        ESSA_UNREACHABLE;
+    }();
+    if (new_offset < 0 || new_offset > (ssize_t)m_data.size()) {
+        return OsError { EINVAL, "ReadableMemoryStream::seek" };
+    }
+    m_offset = new_offset;
+    return {};
+}
+
 OsErrorOr<size_t> WritableMemoryStream::write(std::span<uint8_t const> data) {
     m_data.append(data);
     return data.size();
+}
+
+OsErrorOr<void> WritableMemoryStream::seek(ssize_t, SeekDirection) {
+    return OsError { ENOTSUP, "WritableMemoryStream::seek: TODO" };
 }
 
 }
