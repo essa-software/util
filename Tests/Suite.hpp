@@ -52,7 +52,7 @@ ErrorOr<void, TestError> expect(bool condition, std::string_view expression, std
 
 ErrorOr<void, TestError> expect_equal(auto v1, auto v2, std::string_view expr1, std::string_view expr2, std::string_view file, int line) {
     if (v1 != v2) {
-        return TestError { fmt::format("{} == {}", expr1, expr2), file, line, fmt::format("{} != {}", FormatIfFormattable { v1 }, FormatIfFormattable { v2 }) };
+        return TestError { fmt::format("{} == {}", expr1, expr2), file, line, fmt::format("'{}' != '{}'", FormatIfFormattable { v1 }, FormatIfFormattable { v2 }) };
     }
     return {};
 }
