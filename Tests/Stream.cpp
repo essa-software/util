@@ -31,6 +31,18 @@ TEST_CASE(writer_fmt_integration) {
     return {};
 }
 
+TEST_CASE(writer_endian) {
+
+    Util::WritableMemoryStream out;
+
+    EXPECT_NO_ERROR(Writer { out }.write_little_endian<uint32_t>(0x12345678));
+    TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x78, 0x56, 0x34, 0x12 } }));
+    EXPECT_NO_ERROR(Writer { out }.write_big_endian<uint32_t>(0x12345678));
+    TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x78, 0x56, 0x34, 0x12, 0x12, 0x34, 0x56, 0x78 } }));
+
+    return {};
+}
+
 TEST_CASE(readable_memory_stream) {
     return {};
 
