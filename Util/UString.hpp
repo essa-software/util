@@ -29,6 +29,10 @@ public:
     explicit UString(uint32_t codepoint);
     explicit UString(std::span<uint32_t const>);
 
+    explicit UString(uint8_t ch)
+        : UString(static_cast<uint32_t>(ch)) {
+    }
+
     UString(char ch)
         : UString(static_cast<uint32_t>(ch)) {
     }
