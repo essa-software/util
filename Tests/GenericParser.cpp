@@ -48,7 +48,7 @@ public:
             }
             else {
                 TRY(consume());
-                tokens.push_back(create_token(TestTokenType::Garbage, std::string { (char)next }, start));
+                tokens.push_back(create_token(TestTokenType::Garbage, Util::UString { next }, start));
             }
             TRY(ignore_whitespace());
         }
@@ -60,7 +60,7 @@ namespace AST {
 
 struct Array;
 
-using Expression = std::variant<Array, int, std::string>;
+using Expression = std::variant<Array, int, UString>;
 
 struct Array {
     std::list<Expression> subexpressions;
@@ -72,8 +72,8 @@ void print(OutputIt out, int i) {
 }
 
 template<class OutputIt>
-void print(OutputIt out, std::string const& str) {
-    fmt::format_to(out, "'{}'", str);
+void print(OutputIt out, Util::UString const& str) {
+    fmt::format_to(out, "'{}'", str.encode());
 }
 
 template<class OutputIt>
@@ -110,7 +110,7 @@ public:
     ParseErrorOr<AST::Expression> parse_expression();
     ParseErrorOr<AST::Array> parse_array();
     ParseErrorOr<int> parse_number();
-    ParseErrorOr<std::string> parse_text();
+    ParseErrorOr<UString> parse_text();
 };
 
 ParseErrorOr<AST::Expression> TestParser::parse_expression() {
@@ -154,13 +154,13 @@ ParseErrorOr<AST::Array> TestParser::parse_array() {
 ParseErrorOr<int> TestParser::parse_number() {
     auto value = TRY(expect(TestTokenType::Number)).value();
     try {
-        return std::stoi(value);
+        return std::stoi(value.encode());
     } catch (...) {
         return error_in_already_read("Invalid number");
     }
 }
 
-ParseErrorOr<std::string> TestParser::parse_text() {
+ParseErrorOr<UString> TestParser::parse_text() {
     return TRY(expect(TestTokenType::Text)).value();
 }
 

@@ -4,11 +4,11 @@ namespace Util {
 
 constexpr auto BufferSize = 4096;
 
-bool Reader::is_eof() const {
+bool BufferedReader::is_eof() const {
     return m_stream.is_eof() && buffer_is_empty();
 }
 
-OsErrorOr<size_t> Reader::read(std::span<uint8_t> data) {
+OsErrorOr<size_t> BufferedReader::read(std::span<uint8_t> data) {
     auto read = read_from_buffer(data);
     if (read < data.size() && !m_stream.is_eof()) {
         if (data.size() - read > BufferSize) {
@@ -21,7 +21,7 @@ OsErrorOr<size_t> Reader::read(std::span<uint8_t> data) {
     return read;
 }
 
-size_t Reader::read_from_buffer(std::span<uint8_t> data) {
+size_t BufferedReader::read_from_buffer(std::span<uint8_t> data) {
     if (buffer_is_empty())
         return 0;
     auto to_read = std::min(m_buffer.size() - m_buffer_offset, data.size());
@@ -30,7 +30,7 @@ size_t Reader::read_from_buffer(std::span<uint8_t> data) {
     return to_read;
 }
 
-OsErrorOr<size_t> Reader::refill_buffer() {
+OsErrorOr<size_t> BufferedReader::refill_buffer() {
     m_buffer.resize_uninitialized(BufferSize);
     m_buffer_offset = 0;
     auto read = TRY(m_stream.read(m_buffer.span()));
@@ -38,7 +38,7 @@ OsErrorOr<size_t> Reader::refill_buffer() {
     return read;
 }
 
-OsErrorOr<bool> Reader::read_all(std::span<uint8_t> data) {
+OsErrorOr<bool> BufferedReader::read_all(std::span<uint8_t> data) {
     size_t bytes_read = 0;
     while (bytes_read < data.size()) {
         auto bytes = TRY(read(data.subspan(bytes_read)));
@@ -49,7 +49,7 @@ OsErrorOr<bool> Reader::read_all(std::span<uint8_t> data) {
     return true;
 }
 
-OsErrorOr<std::optional<uint8_t>> Reader::get() {
+OsErrorOr<std::optional<uint8_t>> BufferedReader::get() {
     uint8_t byte;
     auto bytes_read = TRY(read_all({ &byte, 1 }));
     if (!bytes_read)
@@ -57,7 +57,7 @@ OsErrorOr<std::optional<uint8_t>> Reader::get() {
     return byte;
 }
 
-OsErrorOr<std::optional<uint8_t>> Reader::peek() {
+OsErrorOr<std::optional<uint8_t>> BufferedReader::peek() {
     if (buffer_is_empty()) {
         TRY(refill_buffer());
     }
@@ -67,21 +67,32 @@ OsErrorOr<std::optional<uint8_t>> Reader::peek() {
     return std::optional<uint8_t> {};
 }
 
-OsErrorOr<Buffer> Reader::read_until(uint8_t delim) {
-    Buffer buffer;
+OsErrorOr<Buffer> BinaryReader::read_until(uint8_t delim) {
+    Buffer result;
     while (true) {
         auto ch = TRY(get());
-        if (!ch || ch == delim) {
+        if (!ch || *ch == delim) {
             break;
         }
-        buffer.append(*ch);
+        result.append(*ch);
     }
-    return buffer;
+    return result;
 }
 
-OsErrorOr<UString> Reader::read_line() {
-    auto buffer = TRY(read_until('\n'));
-    return buffer.decode(m_encoding);
+OsErrorOr<UString> TextReader::consume_until(char delim) {
+    Buffer result;
+    while (true) {
+        auto ch = TRY(consume());
+        if (!ch || *ch == delim) {
+            break;
+        }
+        result.append(*ch);
+    }
+    return result.decode(m_encoding);
+}
+
+OsErrorOr<UString> TextReader::consume_line() {
+    return TRY(consume_until('\n'));
 }
 
 }

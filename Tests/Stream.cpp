@@ -37,7 +37,7 @@ TEST_CASE(readable_memory_stream) {
     uint8_t buffer[] { 0x65, 0x73, 0x73, 0x61, 0x67, 0x75, 0x69, 0x20, 0x69, 0x73, 0x20, 0x6f, 0x6b };
 
     Util::ReadableMemoryStream in { buffer };
-    Reader reader { in };
+    BinaryReader reader { in };
 
     {
         uint8_t read_buffer[6];
@@ -56,7 +56,7 @@ TEST_CASE(readable_memory_stream) {
     return {};
 }
 
-TEST_CASE(reader_buffering) {
+TEST_CASE(binary_reader_buffering) {
     uint8_t big_buffer[16384];
     for (size_t s = 0; s < 16384; s++) {
         big_buffer[s] = rand() & 0xff;
@@ -64,7 +64,7 @@ TEST_CASE(reader_buffering) {
 
     {
         Util::ReadableMemoryStream in { big_buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
 
         uint8_t read_buffer[4000];
         EXPECT_NO_ERROR(reader.read(read_buffer));
@@ -75,7 +75,7 @@ TEST_CASE(reader_buffering) {
 
     {
         Util::ReadableMemoryStream in { big_buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
 
         uint8_t read_buffer[8292]; // 2*BufferSize+100
         EXPECT_NO_ERROR(reader.read(read_buffer));
@@ -85,11 +85,11 @@ TEST_CASE(reader_buffering) {
     return {};
 }
 
-TEST_CASE(reader_get_peek) {
+TEST_CASE(binary_reader_get_peek) {
     uint8_t buffer[] { 0x01, 0x02 };
 
     Util::ReadableMemoryStream in { buffer };
-    Util::Reader reader { in };
+    Util::BinaryReader reader { in };
 
     uint8_t read_buffer[1];
     EXPECT_EQ(reader.peek().release_value().value(), 0x01);
@@ -103,64 +103,64 @@ TEST_CASE(reader_get_peek) {
     return {};
 }
 
-TEST_CASE(reader_big_endian) {
+TEST_CASE(binary_reader_big_endian) {
     uint8_t buffer[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
 
     {
         Util::ReadableMemoryStream in { buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_big_endian<uint8_t>().release_value(), 0x01ull);
     }
     {
         Util::ReadableMemoryStream in { buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_big_endian<uint16_t>().release_value(), 0x0123ull);
     }
 
     {
         Util::ReadableMemoryStream in { buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_big_endian<uint32_t>().release_value(), 0x01234567ull);
     }
     {
         Util::ReadableMemoryStream in { buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_big_endian<uint64_t>().release_value(), 0x0123456789abcdefull);
     }
     return {};
 }
 
-TEST_CASE(reader_little_endian) {
+TEST_CASE(binary_reader_little_endian) {
     uint8_t buffer[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
 
     {
         Util::ReadableMemoryStream in { buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_little_endian<uint8_t>().release_value(), 0x01ull);
     }
     {
         Util::ReadableMemoryStream in { buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_little_endian<uint16_t>().release_value(), 0x2301ll);
     }
 
     {
         Util::ReadableMemoryStream in { buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_little_endian<uint32_t>().release_value(), 0x67452301ll);
     }
     {
         Util::ReadableMemoryStream in { buffer };
-        Util::Reader reader { in };
+        Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_little_endian<uint64_t>().release_value(), 0xefcdab8967452301ll);
     }
     return {};
 }
 
-TEST_CASE(reader_read_until) {
+TEST_CASE(binary_reader_read_until) {
     uint8_t buffer[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
     Util::ReadableMemoryStream in { buffer };
-    Util::Reader reader { in };
+    Util::BinaryReader reader { in };
 
     auto data_read = reader.read_until(0x67).release_value();
     Buffer expected { 0x01, 0x23, 0x45 };
@@ -170,10 +170,10 @@ TEST_CASE(reader_read_until) {
     return {};
 }
 
-TEST_CASE(reader_read_while) {
+TEST_CASE(binary_reader_read_while) {
     uint8_t buffer[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
     Util::ReadableMemoryStream in { buffer };
-    Util::Reader reader { in };
+    Util::BinaryReader reader { in };
 
     auto data_read = reader.read_while([](uint8_t byte) { return byte < 0x67; }).release_value();
     Buffer expected { 0x01, 0x23, 0x45 };
@@ -183,12 +183,23 @@ TEST_CASE(reader_read_while) {
     return {};
 }
 
-TEST_CASE(reader_read_line) {
+TEST_CASE(text_reader_consume_while) {
     Util::ReadableMemoryStream in = Util::ReadableMemoryStream::from_string("test\nhello");
-    Util::Reader reader { in };
+    Util::TextReader reader { in };
 
-    EXPECT_EQ(reader.read_line().release_value().encode(), "test");
-    EXPECT_EQ(reader.read_line().release_value().encode(), "hello");
+    EXPECT_EQ(reader.consume_while([](uint8_t c) { return c != '\n'; }).release_value().encode(), "test");
+    EXPECT_NO_ERROR(reader.consume());
+    EXPECT_EQ(reader.consume_while([](uint8_t c) { return c != 'o'; }).release_value().encode(), "hell");
+
+    return {};
+}
+
+TEST_CASE(text_reader_consume_line) {
+    Util::ReadableMemoryStream in = Util::ReadableMemoryStream::from_string("test\nhello");
+    Util::TextReader reader { in };
+
+    EXPECT_EQ(reader.consume_line().release_value().encode(), "test");
+    EXPECT_EQ(reader.consume_line().release_value().encode(), "hello");
 
     return {};
 }
@@ -220,7 +231,7 @@ TEST_CASE(file_streams) {
         auto readable_stream = Util::ReadableFileStream::open(FileName).release_value();
         uint8_t expected_data[] = { 't', 'e', 's', 't', '1', '2', '3' };
         uint8_t read_data[sizeof(expected_data)];
-        EXPECT_NO_ERROR(Reader { readable_stream }.read_all(read_data));
+        EXPECT_NO_ERROR(BinaryReader { readable_stream }.read_all(read_data));
         TRY(expect_buffers_equal(expected_data, read_data));
     }
 
