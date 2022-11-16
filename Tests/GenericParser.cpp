@@ -154,7 +154,10 @@ ParseErrorOr<AST::Array> TestParser::parse_array() {
 ParseErrorOr<int> TestParser::parse_number() {
     auto value = TRY(expect(TestTokenType::Number)).value();
     try {
-        return std::stoi(value.encode());
+        return value.parse<int>().map_error<ParseError>(
+            [](OsError&& err) {
+                return ParseError { .message = std::string { err.function }, .location = {} };
+            });
     } catch (...) {
         return error_in_already_read("Invalid number");
     }
