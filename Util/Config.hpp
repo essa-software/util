@@ -38,4 +38,7 @@ inline constexpr bool IsSubsetOf = false;
 template<typename... Ts, typename... Us>
 inline constexpr bool IsSubsetOf<std::tuple<Ts...>, std::tuple<Us...>> = (IsOneOf<Ts, Us...> && ...);
 
+template<class T>
+concept Arithmetic = std::is_arithmetic_v<T>;
+
 }

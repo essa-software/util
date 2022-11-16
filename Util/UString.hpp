@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Error.hpp"
 #include <compare>
 #include <cstdint>
 #include <optional>
 #include <ostream>
 #include <span>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace Util {
@@ -107,6 +109,9 @@ public:
         return out << str.encode();
     }
 
+    template<Arithmetic I>
+    OsErrorOr<I> parse() const;
+
 private:
     friend UString operator+(UString const& lhs, UString const& rhs);
 
@@ -121,5 +126,9 @@ template<typename T>
 UString to_ustring(const T& to_convert) {
     return UString { std::to_string(to_convert) };
 }
+
+// For some reason, there is no std::stou for that. :(
+template<>
+OsErrorOr<unsigned int> UString::parse<unsigned int>() const = delete;
 
 }

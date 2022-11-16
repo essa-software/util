@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -343,6 +344,70 @@ std::string UString::dump() const {
     std::ostringstream oss;
     oss << "US[" << m_storage << " +" << m_size << "]";
     return oss.str();
+}
+
+template<class T>
+using StoiFunction = T(const std::string& __str, size_t* __idx, int __base);
+
+template<class T>
+using StofFunction = T(const std::string& __str, size_t* __idx);
+
+template<class T>
+OsErrorOr<T> parse_impl(StoiFunction<T>&& stot, Util::UString const& str) {
+    try {
+        return stot(str.encode(), nullptr, 10);
+    } catch (...) {
+        return OsError { .error = 0, .function = "Failed to parse int" };
+    }
+}
+
+template<class T>
+OsErrorOr<T> parse_impl(StofFunction<T>&& stot, Util::UString const& str) {
+    try {
+        return stot(str.encode(), nullptr);
+    } catch (...) {
+        return OsError { .error = 0, .function = "Failed to parse int" };
+    }
+}
+
+template<>
+OsErrorOr<int> UString::parse<int>() const {
+    return parse_impl(std::stoi, *this);
+}
+
+template<>
+OsErrorOr<long> UString::parse<long>() const {
+    return parse_impl(std::stol, *this);
+}
+
+template<>
+OsErrorOr<long long> UString::parse<long long>() const {
+    return parse_impl(std::stoll, *this);
+}
+
+template<>
+OsErrorOr<unsigned long> UString::parse<unsigned long>() const {
+    return parse_impl(std::stoul, *this);
+}
+
+template<>
+OsErrorOr<unsigned long long> UString::parse<unsigned long long>() const {
+    return parse_impl(std::stoull, *this);
+}
+
+template<>
+OsErrorOr<float> UString::parse<float>() const {
+    return parse_impl(std::stof, *this);
+}
+
+template<>
+OsErrorOr<double> UString::parse<double>() const {
+    return parse_impl(std::stod, *this);
+}
+
+template<>
+OsErrorOr<long double> UString::parse<long double>() const {
+    return parse_impl(std::stold, *this);
 }
 
 std::strong_ordering UString::operator<=>(UString const& other) const {

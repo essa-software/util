@@ -220,3 +220,20 @@ TEST_CASE(for_each_split) {
 
     return {};
 }
+
+TEST_CASE(parse) {
+    UString in1 { "-1234" };
+    EXPECT_EQ(in1.parse<int>().release_value(), -1234);
+    EXPECT_EQ(in1.parse<long>().release_value(), -1234);
+    EXPECT_EQ(in1.parse<long long>().release_value(), -1234);
+
+    UString in2 { "1234" };
+    EXPECT_EQ(in2.parse<unsigned long>().release_value(), 1234ul);
+    EXPECT_EQ(in2.parse<unsigned long long>().release_value(), 1234ull);
+
+    UString in3 { "123.375" };
+    EXPECT_EQ(in3.parse<float>().release_value(), 123.375);
+    EXPECT_EQ(in3.parse<double>().release_value(), 123.375);
+    EXPECT_EQ(in3.parse<long double>().release_value(), 123.375);
+    return {};
+}
