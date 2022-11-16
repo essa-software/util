@@ -62,8 +62,8 @@ public:
 
     // Construction from ErrorOr containing one of errors
     template<class U, class ET>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<U, ET>&& value) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (std::is_convertible_v<U, T> || IsConvertibleToError<ET>))
-        : Variant(value.is_error() ? value.release_error() : value.release_value()) {
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<U, ET>&& value) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (std::is_convertible_v<U, T> && IsConvertibleToError<ET>))
+        : Variant(value.is_error() ? Variant { value.release_error() } : Variant { value.release_value() }) {
     }
 
     // Construction from error variant, used by TRY()
