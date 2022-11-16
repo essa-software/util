@@ -30,7 +30,7 @@ Util::ErrorOr<int, Util::OsError, Util::ParseError, MyError> subset_test(bool os
 }
 
 Util::ErrorOr<int, Util::ParseError> map_test() {
-    return os_error(true).map_error<Util::ParseError>(
+    return os_error(true).map_error(
         [](Util::OsError&& os) {
             return Util::ParseError { .message = std::string { os.function }, .location = {} };
         });

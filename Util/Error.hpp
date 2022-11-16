@@ -113,10 +113,9 @@ public:
         assert(!is_error());
         return release_value();
     }
-
     // TODO: Implement this for multiple errors
-    template<class E>
-        ErrorOr<T, E> map_error(auto callback) && requires(sizeof...(ErrorTypes) == 1 && std::is_convertible_v<std::invoke_result_t<decltype(callback), ErrorTypes...>, E>) {
+    auto map_error(auto callback) && -> ErrorOr<T, std::remove_reference_t<decltype(callback(ErrorTypes {}...))>>
+    requires(sizeof...(ErrorTypes) == 1) {
         if (!is_error()) {
             return release_value();
         }

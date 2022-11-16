@@ -154,7 +154,7 @@ ParseErrorOr<AST::Array> TestParser::parse_array() {
 ParseErrorOr<int> TestParser::parse_number() {
     auto value = TRY(expect(TestTokenType::Number)).value();
     try {
-        return value.parse<int>().map_error<ParseError>(
+        return value.parse<int>().map_error(
             [](OsError&& err) {
                 return ParseError { .message = std::string { err.function }, .location = {} };
             });
