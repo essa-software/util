@@ -113,6 +113,15 @@ public:
         assert(!is_error());
         return release_value();
     }
+
+    // TODO: Implement this for multiple errors
+    template<class E>
+        ErrorOr<T, E> map_error(auto callback) && requires(sizeof...(ErrorTypes) == 1 && std::is_convertible_v<std::invoke_result_t<decltype(callback), ErrorTypes...>, E>) {
+        if (!is_error()) {
+            return release_value();
+        }
+        return callback(release_error());
+    }
 };
 
 // Partial specialization for void value type

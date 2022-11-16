@@ -29,12 +29,19 @@ Util::ErrorOr<int, Util::OsError, Util::ParseError, MyError> subset_test(bool os
     return TRY(test(os, parse));
 }
 
+Util::ErrorOr<int, Util::ParseError> map_test() {
+    return os_error(true).map_error<Util::ParseError>(
+        [](Util::OsError&& os) {
+            return Util::ParseError { .message = std::string { os.function }, .location = {} };
+        });
+}
+
 TEST_CASE(basic) {
     EXPECT_EQ(test(false, false).release_value(), 58);
     EXPECT_EQ(test(true, false).release_error_of_type<Util::OsError>().function, "test");
     EXPECT_EQ(test(false, true).release_error_of_type<Util::ParseError>().message, "test");
     EXPECT_EQ(subset_test(false, true, false).release_error_of_type<Util::ParseError>().message, "test");
     EXPECT_EQ(subset_test(false, false, true).release_error_of_type<MyError>().value, "test1234");
-
+    EXPECT_EQ(map_test().release_error().message, "test");
     return {};
 }
