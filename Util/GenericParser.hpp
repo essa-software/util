@@ -126,7 +126,7 @@ protected:
     }
 
     ParseError expected(std::string what, Token<T> got) {
-        return error("Expected " + what + ", got '" + got.value().encode() + "'");
+        return error_in_already_read("Expected " + what + ", got '" + got.value().encode() + "'");
     }
 
 private:
