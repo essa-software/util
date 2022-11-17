@@ -10,6 +10,7 @@ find_package(fmt 9.1.0 REQUIRED)
 add_library(essautil SHARED
     Util/Buffer.cpp
     Util/Color.cpp
+    Util/DisplayError.cpp
     Util/Math/Plane.cpp
     Util/Math/Ray.cpp
     Util/SimulationClock.cpp
