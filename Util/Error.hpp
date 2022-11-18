@@ -114,7 +114,7 @@ public:
         return release_value();
     }
     // TODO: Implement this for multiple errors
-    auto map_error(auto callback) && -> ErrorOr<T, std::remove_reference_t<decltype(callback(ErrorTypes {}...))>>
+    auto map_error(auto callback) && -> ErrorOr<T, std::remove_reference_t<decltype(callback(std::declval<ErrorTypes>()...))>>
     requires(sizeof...(ErrorTypes) == 1) {
         if (!is_error()) {
             return release_value();
