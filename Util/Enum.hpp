@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <EssaUtil/Config.hpp>
+#include "Config.hpp"
 #include <string_view>
 #include <type_traits>
 

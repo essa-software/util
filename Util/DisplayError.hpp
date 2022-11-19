@@ -1,8 +1,8 @@
 #pragma once
 
-#include <EssaUtil/SourceLocation.hpp>
-#include <EssaUtil/Stream/Stream.hpp>
-#include <EssaUtil/UString.hpp>
+#include "SourceLocation.hpp"
+#include "Stream/Stream.hpp"
+#include "UString.hpp"
 
 namespace Util {
 

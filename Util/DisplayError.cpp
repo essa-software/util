@@ -1,6 +1,7 @@
 #include "DisplayError.hpp"
-#include <EssaUtil/Stream/Reader.hpp>
-#include <EssaUtil/Stream/Stream.hpp>
+
+#include "Stream/Reader.hpp"
+#include "Stream/Stream.hpp"
 
 namespace Util {
 

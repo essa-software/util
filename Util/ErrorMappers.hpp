@@ -1,8 +1,8 @@
 #pragma once
 
-#include <EssaUtil/Error.hpp>
-#include <EssaUtil/GenericParser.hpp>
-#include <EssaUtil/SourceLocation.hpp>
+#include "Error.hpp"
+#include "GenericParser.hpp"
+#include "SourceLocation.hpp"
 
 namespace Util {
 
