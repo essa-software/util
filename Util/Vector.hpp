@@ -168,7 +168,7 @@ public:
 
     // Angle is CCW starting from positive X axis.
     constexpr static Vector create_polar(double angle_radians, double length) requires(Components == 2) {
-        return { std::sin(angle_radians) * length, std::cos(angle_radians) * length };
+        return { std::cos(angle_radians) * length, std::sin(angle_radians) * length };
     }
 
     constexpr double angle() const requires(Components == 2) {
