@@ -14,7 +14,7 @@ if [ $FMT_FOUND -eq 1 ]; then
     git clone https://github.com/fmtlib/fmt fmt --depth 1 --branch 9.1.0
     mkdir fmt/build
     cd fmt/build
-    cmake .. -GNinja -DBUILD_SHARED_LIBS=1
+    cmake .. -GNinja -DBUILD_SHARED_LIBS=1 -DFMT_TEST=0
     ninja
     sudo ninja install
     cd ../..
