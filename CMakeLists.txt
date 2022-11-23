@@ -25,7 +25,7 @@ add_library(essautil SHARED
 )
 
 essautil_setup_target(essautil)
-target_link_libraries(essautil fmt)
+target_link_libraries(essautil fmt::fmt)
 
 install(TARGETS essautil EXPORT EssaUtil DESTINATION lib)
 
