@@ -91,7 +91,7 @@ protected:
             return error("Unexpected EOF");
         }
         if (token->type() != type) {
-            return expected(fmt::format("token of type {}", (int)type), *token);
+            return expected_in_already_read(fmt::format("token of type {}", (int)type), *token);
         }
         return *token;
     }
@@ -126,6 +126,10 @@ protected:
     }
 
     ParseError expected(std::string what, Token<T> got) {
+        return error("Expected " + what + ", got '" + got.value().encode() + "'");
+    }
+
+    ParseError expected_in_already_read(std::string what, Token<T> got) {
         return error_in_already_read("Expected " + what + ", got '" + got.value().encode() + "'");
     }
 
