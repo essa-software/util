@@ -32,13 +32,37 @@ TEST_CASE(writer_fmt_integration) {
 }
 
 TEST_CASE(writer_endian) {
+    {
+        Util::WritableMemoryStream out;
+        EXPECT_NO_ERROR(Writer { out }.write_little_endian<uint32_t>(0x12345678));
+        TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x78, 0x56, 0x34, 0x12 } }));
+        EXPECT_NO_ERROR(Writer { out }.write_big_endian<uint32_t>(0x12345678));
+        TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x78, 0x56, 0x34, 0x12, 0x12, 0x34, 0x56, 0x78 } }));
+    }
 
-    Util::WritableMemoryStream out;
+    // Float
+    {
+        Util::WritableMemoryStream out;
+        EXPECT_NO_ERROR(Writer { out }.write_big_endian<float>(123.f));
+        TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x42, 0xF6, 0x00, 0x00 } }));
+    }
+    {
+        Util::WritableMemoryStream out;
+        EXPECT_NO_ERROR(Writer { out }.write_little_endian<float>(123.f));
+        TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x00, 0x00, 0xF6, 0x42 } }));
+    }
 
-    EXPECT_NO_ERROR(Writer { out }.write_little_endian<uint32_t>(0x12345678));
-    TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x78, 0x56, 0x34, 0x12 } }));
-    EXPECT_NO_ERROR(Writer { out }.write_big_endian<uint32_t>(0x12345678));
-    TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x78, 0x56, 0x34, 0x12, 0x12, 0x34, 0x56, 0x78 } }));
+    // Double
+    {
+        Util::WritableMemoryStream out;
+        EXPECT_NO_ERROR(Writer { out }.write_big_endian<double>(123456.0));
+        TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x40, 0xFE, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00 } }));
+    }
+    {
+        Util::WritableMemoryStream out;
+        EXPECT_NO_ERROR(Writer { out }.write_little_endian<double>(123456.0));
+        TRY(expect_buffers_equal(out.data(), std::span<uint8_t const> { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0xFE, 0x40 } }));
+    }
 
     return {};
 }
@@ -139,6 +163,22 @@ TEST_CASE(binary_reader_big_endian) {
         Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_big_endian<uint64_t>().release_value(), 0x0123456789abcdefull);
     }
+
+    // Float
+    {
+        uint8_t buffer[] { 0x42, 0xF6, 0x00, 0x00 };
+        Util::ReadableMemoryStream in { buffer };
+        Util::BinaryReader reader { in };
+        EXPECT_EQ(reader.read_big_endian<float>().release_value(), 123.f);
+    }
+
+    // Double
+    {
+        uint8_t buffer[] { 0x40, 0xFE, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        Util::ReadableMemoryStream in { buffer };
+        Util::BinaryReader reader { in };
+        EXPECT_EQ(reader.read_big_endian<double>().release_value(), 123456.0);
+    }
     return {};
 }
 
@@ -165,6 +205,22 @@ TEST_CASE(binary_reader_little_endian) {
         Util::ReadableMemoryStream in { buffer };
         Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_little_endian<uint64_t>().release_value(), 0xefcdab8967452301ll);
+    }
+
+    // Float
+    {
+        uint8_t buffer[] { 0x00, 0x00, 0xF6, 0x42 };
+        Util::ReadableMemoryStream in { buffer };
+        Util::BinaryReader reader { in };
+        EXPECT_EQ(reader.read_little_endian<float>().release_value(), 123.f);
+    }
+
+    // Double
+    {
+        uint8_t buffer[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0xFE, 0x40 };
+        Util::ReadableMemoryStream in { buffer };
+        Util::BinaryReader reader { in };
+        EXPECT_EQ(reader.read_little_endian<double>().release_value(), 123456.0);
     }
     return {};
 }

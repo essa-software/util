@@ -40,7 +40,7 @@ public:
     explicit BinaryReader(ReadableStream& stream)
         : BufferedReader(stream) { }
 
-    template<class T>
+    template<std::integral T>
     requires requires(T t) {
         { convert_from_little_to_host_endian(t) } -> std::same_as<T>;
     }
@@ -51,7 +51,15 @@ public:
         return convert_from_little_to_host_endian(value);
     }
 
-    template<class T>
+    template<std::floating_point FP>
+    requires(sizeof(FP) == 4)
+        OsErrorOr<FP> read_little_endian() { return std::bit_cast<FP>(TRY(read_little_endian<uint32_t>())); }
+
+    template<std::floating_point FP>
+    requires(sizeof(FP) == 8)
+        OsErrorOr<FP> read_little_endian() { return std::bit_cast<FP>(TRY(read_little_endian<uint64_t>())); }
+
+    template<std::integral T>
     requires requires(T t) {
         { convert_from_big_to_host_endian(t) } -> std::same_as<T>;
     }
@@ -61,6 +69,14 @@ public:
             return OsError { 0, "EOF in read_big_endian" };
         return convert_from_big_to_host_endian(value);
     }
+
+    template<std::floating_point FP>
+    requires(sizeof(FP) == 4)
+        OsErrorOr<FP> read_big_endian() { return std::bit_cast<FP>(TRY(read_big_endian<uint32_t>())); }
+
+    template<std::floating_point FP>
+    requires(sizeof(FP) == 8)
+        OsErrorOr<FP> read_big_endian() { return std::bit_cast<FP>(TRY(read_big_endian<uint64_t>())); }
 
     // This reads `delim` but doesn't include it in the buffer.
     OsErrorOr<Buffer> read_until(uint8_t delim);
