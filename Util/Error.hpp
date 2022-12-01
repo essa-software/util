@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <cerrno>
+#include <fmt/core.h>
 #include <fmt/format.h>
 #include <optional>
 #include <string_view>
@@ -33,12 +34,19 @@ class [[nodiscard]] ErrorOr;
         _temporary_result.release_value();                    \
     })
 
-#define MUST(...)                                      \
-    ({                                                 \
-        auto _temporary_result = (__VA_ARGS__);        \
-        if (_temporary_result.is_error()) [[unlikely]] \
-            ESSA_UNREACHABLE;                          \
-        _temporary_result.release_value();             \
+#define MUST(...)                                                                          \
+    ({                                                                                     \
+        auto _temporary_result = (__VA_ARGS__);                                            \
+        if (_temporary_result.is_error()) [[unlikely]] {                                   \
+            using T = decltype(_temporary_result);                                         \
+            fmt::print("\e[1;31mUnhandled error \e[mat \e[0;33m{}:{}", __FILE__, __LINE__); \
+            if constexpr (fmt::is_formattable<T::Error>()) {                               \
+                fmt::print("\e[m: {}", _temporary_result.release_error());                 \
+            }                                                                              \
+            fmt::print("\e[m\n");                                                          \
+            ESSA_UNREACHABLE;                                                              \
+        }                                                                                  \
+        _temporary_result.release_value();                                                 \
     })
 
 template<class... ErrorTypes>
@@ -48,6 +56,8 @@ template<typename T, typename... ErrorTypes>
 class [[nodiscard]] ErrorOr : public std::variant<T, ErrorTypes...> {
 public:
     using Variant = std::variant<T, ErrorTypes...>;
+
+    using Error = First<ErrorTypes...>;
 
     template<class E>
     static constexpr bool IsConvertibleToError = { (std::is_convertible_v<E, ErrorTypes> || ...) };
