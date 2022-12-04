@@ -11,7 +11,7 @@
 #pragma once
 
 #include "Config.hpp"
-
+#include "CppSourceLocation.hpp"
 #include <cassert>
 #include <cerrno>
 #include <fmt/core.h>
@@ -26,27 +26,22 @@ namespace Util {
 template<typename T, typename... ErrorTypes>
 class [[nodiscard]] ErrorOr;
 
-#define TRY(...)                                              \
-    ({                                                        \
-        auto _temporary_result = (__VA_ARGS__);               \
-        if (_temporary_result.is_error()) [[unlikely]]        \
-            return _temporary_result.release_error_variant(); \
-        _temporary_result.release_value();                    \
+#define TRY(...)                                                                                \
+    ({                                                                                          \
+        auto _temporary_result = (__VA_ARGS__);                                                 \
+        if (_temporary_result.is_error()) [[unlikely]]                                          \
+            return { _temporary_result.release_error_variant(), _temporary_result.location() }; \
+        _temporary_result.release_value();                                                      \
     })
 
-#define MUST(...)                                                                          \
-    ({                                                                                     \
-        auto _temporary_result = (__VA_ARGS__);                                            \
-        if (_temporary_result.is_error()) [[unlikely]] {                                   \
-            using T = decltype(_temporary_result);                                         \
-            fmt::print("\e[1;31mUnhandled error \e[mat \e[0;33m{}:{}", __FILE__, __LINE__); \
-            if constexpr (fmt::is_formattable<T::Error>()) {                               \
-                fmt::print("\e[m: {}", _temporary_result.release_error());                 \
-            }                                                                              \
-            fmt::print("\e[m\n");                                                          \
-            ESSA_UNREACHABLE;                                                              \
-        }                                                                                  \
-        _temporary_result.release_value();                                                 \
+#define MUST(...)                                        \
+    ({                                                   \
+        auto _temporary_result = (__VA_ARGS__);          \
+        if (_temporary_result.is_error()) [[unlikely]] { \
+            _temporary_result.dump("Unhandled error");   \
+            abort();                                     \
+        }                                                \
+        _temporary_result.release_value();               \
     })
 
 template<class... ErrorTypes>
@@ -66,20 +61,28 @@ public:
     static constexpr bool ContainsError = { (std::is_same_v<E, ErrorTypes> || ...) };
 
     template<typename U>
-    ESSA_ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorTypes...>> && (std::is_convertible_v<U, T> || IsConvertibleToError<U>))
+    ESSA_ALWAYS_INLINE ErrorOr(U&& value, CppSourceLocation loc = CppSourceLocation::current()) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorTypes...>> && (IsConvertibleToError<U>))
+        : Variant(std::forward<U>(value))
+        , m_location(loc) {
+    }
+
+    template<typename U>
+    ESSA_ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorTypes...>> && (std::is_convertible_v<U, T>))
         : Variant(std::forward<U>(value)) {
     }
 
     // Construction from ErrorOr containing one of errors
     template<class U, class ET>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<U, ET>&& value) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (std::is_convertible_v<U, T> && IsConvertibleToError<ET>))
-        : Variant(value.is_error() ? Variant { value.release_error() } : Variant { value.release_value() }) {
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<U, ET>&& value, CppSourceLocation loc = CppSourceLocation::current()) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (std::is_convertible_v<U, T> && IsConvertibleToError<ET>))
+        : Variant(value.is_error() ? Variant { value.release_error() } : Variant { value.release_value() })
+        , m_location(loc) {
     }
 
     // Construction from error variant, used by TRY()
     template<class... ETs>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack) requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
-        : Variant(std::visit([](auto&& v) -> Variant { return v; }, pack)) { }
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack, CppSourceLocation loc) requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
+        : Variant(std::visit([](auto&& v) -> Variant { return v; }, pack))
+        , m_location(loc) { }
 
     T& value() {
         return std::get<T>(*this);
@@ -131,6 +134,30 @@ public:
         }
         return callback(release_error());
     }
+
+    auto location() const { return m_location; }
+
+    void dump(std::string_view header, CppSourceLocation loc = CppSourceLocation::current()) const {
+        if (is_error()) {
+            fmt::print("\e[31;1m{}\e[m", header);
+            std::visit(
+                [](auto const& t) {
+                    if constexpr (std::is_same_v<std::remove_cvref_t<decltype(t)>, T>) {
+                    }
+                    else if constexpr (fmt::is_formattable<decltype(t)>()) {
+                        fmt::print("\e[m: {}", t);
+                    }
+                },
+                *this);
+            fmt::print("\e[m\n");
+            fmt::print("  at {}\n", CppSourceLocation { location() });
+            fmt::print("  ...\n");
+            fmt::print("  at {}\n", loc);
+        }
+    }
+
+private:
+    CppSourceLocation m_location;
 };
 
 // Partial specialization for void value type
@@ -146,20 +173,20 @@ public:
         : Base { std::monostate {} } { }
 
     template<typename U>
-    ErrorOr(U&& value) requires(IsConvertibleToError<U>)
-        : Base(std::forward<U>(value)) {
+    ErrorOr(U&& value, CppSourceLocation loc = CppSourceLocation::current()) requires(IsConvertibleToError<U>)
+        : Base(std::forward<U>(value), loc) {
     }
 
     // Construction from ErrorOr containing one of errors
     template<class ET>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<void, ET>&& value) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (IsConvertibleToError<ET>))
-        : Base(std::forward<decltype(value)>(value)) {
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<void, ET>&& value, CppSourceLocation loc = CppSourceLocation::current()) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (IsConvertibleToError<ET>))
+        : Base(std::forward<decltype(value)>(value), loc) {
     }
 
     // Construction from error variant, used by TRY()
     template<class... ETs>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack) requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
-        : Base(std::forward<decltype(pack)>(pack)) { }
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack, CppSourceLocation loc) requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
+        : Base(std::forward<decltype(pack)>(pack), loc) { }
 };
 
 struct OsError {
