@@ -62,6 +62,13 @@ public:
     requires(sizeof(FP) == 8)
         OsErrorOr<void> write_big_endian(FP value) { return write_big_endian(std::bit_cast<uint64_t>(value)); }
 
+    template<class T>
+    requires(std::is_trivial_v<T>)
+        OsErrorOr<void> write_struct(T t) {
+        TRY(write_all({ reinterpret_cast<uint8_t*>(&t), sizeof(t) }));
+        return {};
+    }
+
 private:
     // TODO: Make this fallible
     void vwriteff(fmt::string_view fmtstr, fmt::format_args args);

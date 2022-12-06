@@ -78,6 +78,16 @@ public:
     requires(sizeof(FP) == 8)
         OsErrorOr<FP> read_big_endian() { return std::bit_cast<FP>(TRY(read_big_endian<uint64_t>())); }
 
+    template<class T>
+    requires(std::is_trivial_v<T>)
+        OsErrorOr<T> read_struct() {
+        T t;
+        if (!TRY(read_all({ reinterpret_cast<uint8_t*>(&t), sizeof(t) }))) {
+            return OsError { 0, "EOF in read_struct" };
+        }
+        return t;
+    }
+
     // This reads `delim` but doesn't include it in the buffer.
     OsErrorOr<Buffer> read_until(uint8_t delim);
 
