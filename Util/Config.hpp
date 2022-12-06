@@ -5,6 +5,8 @@
 
 #define ESSA_ALWAYS_INLINE [[gnu::always_inline]]
 #define ESSA_UNREACHABLE __builtin_unreachable()
+constexpr bool TODO = false;
+#define ESSA_TODO assert(TODO)
 
 namespace Util {
 
