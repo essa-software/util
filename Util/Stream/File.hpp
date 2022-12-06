@@ -12,6 +12,10 @@ namespace Util {
 
 class File : public NonCopyable {
 public:
+    File(int fd, bool owned)
+        : m_fd(fd)
+        , m_owned(owned) { }
+
     virtual ~File();
     File(File&& other);
     File& operator=(File&& other);
@@ -19,11 +23,6 @@ public:
     int fd() const { return m_fd; }
 
     OsErrorOr<void> seek(ssize_t count, SeekDirection direction = SeekDirection::FromCurrent);
-
-protected:
-    File(int fd, bool owned)
-        : m_fd(fd)
-        , m_owned(owned) { }
 
 private:
     int m_fd {};
