@@ -37,11 +37,13 @@ public:
         return write_all({ reinterpret_cast<uint8_t const*>(&converted_value), sizeof(T) });
     }
 
-    template <std::floating_point FP> requires(sizeof(FP) == 4)
-    OsErrorOr<void> write_little_endian(FP value) { return write_little_endian(std::bit_cast<uint32_t>(value)); }
+    template<std::floating_point FP>
+    requires(sizeof(FP) == 4)
+        OsErrorOr<void> write_little_endian(FP value) { return write_little_endian(std::bit_cast<uint32_t>(value)); }
 
-    template <std::floating_point FP> requires(sizeof(FP) == 8)
-    OsErrorOr<void> write_little_endian(FP value) { return write_little_endian(std::bit_cast<uint64_t>(value)); }
+    template<std::floating_point FP>
+    requires(sizeof(FP) == 8)
+        OsErrorOr<void> write_little_endian(FP value) { return write_little_endian(std::bit_cast<uint64_t>(value)); }
 
     template<std::integral T>
     requires requires(T t) {
@@ -52,11 +54,13 @@ public:
         return write_all({ reinterpret_cast<uint8_t const*>(&converted_value), sizeof(T) });
     }
 
-    template <std::floating_point FP> requires(sizeof(FP) == 4)
-    OsErrorOr<void> write_big_endian(FP value) { return write_big_endian(std::bit_cast<uint32_t>(value)); }
+    template<std::floating_point FP>
+    requires(sizeof(FP) == 4)
+        OsErrorOr<void> write_big_endian(FP value) { return write_big_endian(std::bit_cast<uint32_t>(value)); }
 
-    template <std::floating_point FP> requires(sizeof(FP) == 8)
-    OsErrorOr<void> write_big_endian(FP value) { return write_big_endian(std::bit_cast<uint64_t>(value)); }
+    template<std::floating_point FP>
+    requires(sizeof(FP) == 8)
+        OsErrorOr<void> write_big_endian(FP value) { return write_big_endian(std::bit_cast<uint64_t>(value)); }
 
 private:
     // TODO: Make this fallible
