@@ -57,6 +57,34 @@ public:
         return max_x < min_x && max_y < min_y ? Rect<U>({ max_x, max_y }, { min_x - max_x, min_y - max_y }) : Rect<U>();
     }
 
+    Rect<T> move_x(T t) const {
+        return Rect { left + t, top, width, height };
+    }
+
+    Rect<T> move_y(T t) const {
+        return Rect { left, top + t, width, height };
+    }
+
+    Rect<T> take_top(T t) const {
+        return Rect { left, top, width, t };
+    }
+
+    Rect<T> take_right(T t) const {
+        return Rect { left + width - t, top, t, height };
+    }
+
+    Rect<T> take_bottom(T t) const {
+        return Rect { left, top + height - t, width, t };
+    }
+
+    Rect<T> take_left(T t) const {
+        return Rect { left, top, t, height };
+    }
+
+    Rect<T> inflated(T t) const {
+        return Rect { left - t, top - t, width + 2 * t, height + 2 * t };
+    }
+
     bool operator==(Rect<T> const&) const = default;
 };
 
