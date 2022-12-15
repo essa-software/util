@@ -10,7 +10,7 @@
 namespace Util {
 
 template<class T, size_t X, size_t Y>
-class DynamicArray2D : public NonCopyable {
+class [[deprecated("use MultidimensionalArray instead")]] DynamicArray2D : public NonCopyable {
 public:
     using Type = T;
     static constexpr size_t SizeX = X;
@@ -23,7 +23,7 @@ public:
     DynamicArray2D(DynamicArray2D const&) = delete;
     DynamicArray2D& operator=(DynamicArray2D const&) = delete;
 
-    DynamicArray2D(DynamicArray2D&& arr) {
+    DynamicArray2D(DynamicArray2D && arr) {
         *this = std::move(arr);
     }
     DynamicArray2D& operator=(DynamicArray2D&& arr) {
