@@ -1,14 +1,11 @@
 #pragma once
 
-#include <bits/utility.h>
-#include <type_traits>
-#pragma once
-
 #include "NonCopyable.hpp"
 #include "Vector.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 namespace Util {
@@ -106,7 +103,7 @@ private:
     template<std::convertible_to<size_t>... Dim>
     constexpr size_t coords_to_index(Dim... index) const {
         size_t idx = 0;
-        ((idx += index, idx *= Dimensions), ...);
+        ((idx *= Dimensions, idx += index), ...);
         return idx;
     }
 
