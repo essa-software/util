@@ -5,6 +5,11 @@
 namespace Util
 {
 
+struct Unit {
+    UString string;
+    double multiplier;
+};
+
 enum class Quantity
 {
     Length,
@@ -28,6 +33,10 @@ struct UnitValue
     UString to_string() const { return value + " " + unit; }
 };
 
+// Display value in the form "value[ × 10^n] <unit>", using predefined units.
 UnitValue unit_display(double value, Quantity);
+
+// Display value in the form "value[ × 10^n] <unit>", using a user-given unit.
+UnitValue unit_display(double value, std::vector<Unit>);
 
 }

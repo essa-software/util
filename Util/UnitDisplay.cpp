@@ -11,11 +11,6 @@
 
 namespace Util {
 
-struct Unit {
-    UString string;
-    double multiplier;
-};
-
 // FIXME: This could be done at compile time.
 // NOTE: Keep the list sorted by sizes ascending, the algorithm relies on this!
 static const std::map<Quantity, std::vector<Unit>> s_units {
@@ -75,6 +70,10 @@ UnitValue unit_display(double value, Quantity quantity) {
     if (quantity == Quantity::None)
         return UnitValue { .value = to_exponent_string(value) };
     auto const& units = s_units.find(quantity)->second;
+    return unit_display(value, units);
+}
+
+UnitValue unit_display(double value, std::vector<Unit> units) {
     for (auto it = units.rbegin(); it != units.rend(); it++) {
         auto const& unit = *it;
         if (value >= unit.multiplier)
