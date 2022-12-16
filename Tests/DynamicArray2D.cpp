@@ -2,6 +2,8 @@
 
 #include <Util/DynamicArray2D.hpp>
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 TEST_CASE(constructors) {
     {
         // Default constructor
