@@ -8,7 +8,8 @@ TEST_CASE(append) {
     builder.append("siema tej");
     builder.append("hello there");
     builder.append('\n');
-    EXPECT_EQ(builder.build().encode(), "siema tejhello there\n");
+    builder.appendff("{:.2f}", 1.2345);
+    EXPECT_EQ(builder.build().encode(), "siema tejhello there\n1.23");
     return {};
 }
 

@@ -33,6 +33,10 @@ void UStringBuilder::append(std::span<uint32_t const> codepoints) {
     m_size += codepoints.size();
 }
 
+void UStringBuilder::vappendff(fmt::string_view fmtstr, fmt::format_args args) {
+    append(UString { fmt::vformat(fmtstr, args) });
+}
+
 UString UStringBuilder::build() const {
     return UString { codepoints() };
 }

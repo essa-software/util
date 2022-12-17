@@ -20,6 +20,13 @@ public:
     void append(uint32_t);
     void append(std::span<uint32_t const>);
 
+    template<class... Args>
+    void appendff(fmt::format_string<Args...> fmtstr, Args&&... args) {
+        vappendff(fmtstr, fmt::make_format_args(args...));
+    }
+
+    void vappendff(fmt::string_view fmtstr, fmt::format_args args);
+
     // Return a copy of built string
     UString build() const;
 
