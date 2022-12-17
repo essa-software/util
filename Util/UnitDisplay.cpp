@@ -50,36 +50,41 @@ static const std::map<Quantity, std::vector<Unit>> s_units {
         } }
 };
 
-UString to_exponent_string(double value) {
+UString to_exponent_string(double value, Options options) {
     std::ostringstream oss;
-    if (value < 10) {
-        oss << std::setprecision(2) << value;
-        return std::string_view { oss.str() };
-    }
     if (value < 10'000'000) {
-        oss << std::fixed << std::setprecision(2) << value;
-        return std::string_view { oss.str() };
+        int precision = std::min<int>(fmt::format("{}", (value - std::trunc(value))).size() - 1, options.precision);
+        UString string { fmt::format("{:.{}f}", value, precision) };
+        if (string.find(".").has_value()) {
+            string = string.substring(0, std::min<size_t>(string.size(), options.precision + 2));
+            if (string.find(".") == string.size() - 1) {
+                return string.substring(0, string.size() - 1);
+            }
+            return string;
+        }
+        else {
+            return string;
+        }
     }
     int exponent = (double)std::log10(value);
     double mantissa = value / std::pow(10, exponent);
-    oss << std::fixed << std::setprecision(4) << mantissa << " \u00D7 10^" << exponent; // × (MULTIPLICATION SIGN)
-    return std::string_view { oss.str() };
+    return UString { fmt::format("{:.{}f} \u00D7 10^{}", mantissa, options.scientific_precision, exponent) }; // × (MULTIPLICATION SIGN)
 };
 
-UnitValue unit_display(double value, Quantity quantity) {
+UnitValue unit_display(double value, Quantity quantity, Options options) {
     if (quantity == Quantity::None)
-        return UnitValue { .value = to_exponent_string(value) };
+        return UnitValue { .value = to_exponent_string(value, options) };
     auto const& units = s_units.find(quantity)->second;
-    return unit_display(value, units);
+    return unit_display(value, units, options);
 }
 
-UnitValue unit_display(double value, std::vector<Unit> units) {
+UnitValue unit_display(double value, std::vector<Unit> units, Options options) {
     for (auto it = units.rbegin(); it != units.rend(); it++) {
         auto const& unit = *it;
         if (value >= unit.multiplier)
-            return UnitValue { .value = to_exponent_string(value / unit.multiplier), .unit = unit.string };
+            return UnitValue { .value = to_exponent_string(value / unit.multiplier, options), .unit = unit.string };
     }
-    return UnitValue { .value = to_exponent_string(value), .unit = units[0].string };
+    return UnitValue { .value = to_exponent_string(value, options), .unit = units[0].string };
 }
 
 }

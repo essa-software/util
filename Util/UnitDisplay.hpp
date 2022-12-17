@@ -2,16 +2,14 @@
 
 #include "UString.hpp"
 
-namespace Util
-{
+namespace Util {
 
 struct Unit {
     UString string;
     double multiplier;
 };
 
-enum class Quantity
-{
+enum class Quantity {
     Length,
     Mass,
     Velocity,
@@ -21,12 +19,18 @@ enum class Quantity
     None,
 };
 
-// All strings here are UTF-8 strings.
-// FIXME: Add some replacement for SFML sf::String which is a *true* unicode string.
-UString to_exponent_string(double value);
+struct Options {
+    // Display precision or 0 for best fit.
+    int precision = 2;
 
-struct UnitValue
-{
+    // Precision used for displaying values bigger than 10^7 (in the [ × 10^n] form)
+    int scientific_precision = 4;
+};
+
+// All strings here are UTF-8 strings.
+UString to_exponent_string(double value, Options options);
+
+struct UnitValue {
     UString value {};
     UString unit {};
 
@@ -34,9 +38,9 @@ struct UnitValue
 };
 
 // Display value in the form "value[ × 10^n] <unit>", using predefined units.
-UnitValue unit_display(double value, Quantity);
+UnitValue unit_display(double value, Quantity, Options = {});
 
 // Display value in the form "value[ × 10^n] <unit>", using a user-given unit.
-UnitValue unit_display(double value, std::vector<Unit>);
+UnitValue unit_display(double value, std::vector<Unit>, Options = {});
 
 }
