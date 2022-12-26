@@ -18,7 +18,7 @@ T integer(T min, T max) {
 }
 
 template<std::floating_point T>
-T floating(float min, float max) {
+T floating(T min, T max) {
     return std::uniform_real_distribution<T>(min, max)(default_engine());
 }
 
