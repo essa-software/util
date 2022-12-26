@@ -1,5 +1,6 @@
 // No #pragma once, this is expected to be included only once per test file
 
+#include <Util/Clock.hpp>
 #include <Util/Error.hpp>
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -66,8 +67,10 @@ ErrorOr<void, TestError> expect_no_error(ErrorOr<T, E> value, std::string_view e
 }
 
 using Test = ErrorOr<void, TestError>();
+using Benchmark = void();
 
 std::map<std::string_view, Test*> tests;
+std::map<std::string_view, Benchmark*> benchmarks;
 
 }
 
@@ -86,11 +89,18 @@ constexpr bool Fail = false;
     } __test_##name##_adder;                                                            \
     ErrorOr<void, __TestSuite::TestError> __test_##name##_func()
 
+#define BENCHMARK(name)                                                                                \
+    void __benchmark_##name##_func();                                                                  \
+    struct __Benchmark_##name {                                                                        \
+        __Benchmark_##name() { __TestSuite::benchmarks.insert({ #name, __benchmark_##name##_func }); } \
+    } __benchmark_##name##_adder;                                                                      \
+    void __benchmark_##name##_func()
+
 int main(int, char** argv) {
     bool failed = false;
     for (auto const& test : __TestSuite::tests) {
         std::string test_name = (std::string_view { argv[0] }.starts_with("./") ? std::string { argv[0] }.substr(2) : argv[0]) + "/" + std::string { test.first };
-        std::cout << "\r\e[2K\e[33m . \e[m" << test_name << std::flush;
+        std::cout << "\r\e[2K\e[33m . \e[m test: " << test_name << std::flush;
         auto result = test.second();
         if (result.is_error()) {
             auto error = result.release_error();
@@ -103,5 +113,16 @@ int main(int, char** argv) {
         }
     }
     std::cout << "\r\e[2K";
+    for (auto const& benchmark : __TestSuite::benchmarks) {
+        std::string test_name = (std::string_view { argv[0] }.starts_with("./") ? std::string { argv[0] }.substr(2) : argv[0]) + "/" + std::string { benchmark.first };
+        std::cout << "\r\e[2K\e[33m . \e[m benchmark: " << test_name << std::flush;
+        Util::Clock clock;
+        constexpr int RUNS = 1'000'000;
+        for (size_t s = 0; s < RUNS; s++) {
+            benchmark.second();
+        }
+        auto time = clock.elapsed();
+        fmt::print("\r\e\2K• \e[1m{}\e[m finished in: {} ({} per test)\n", test_name, fmt::streamed(time), fmt::streamed(time / RUNS));
+    }
     return failed ? 1 : 0;
 }
