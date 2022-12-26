@@ -17,11 +17,13 @@ T integer(T min, T max) {
     return std::uniform_int_distribution<T>(min, max)(default_engine());
 }
 
+// Generate random T ∈ ℝ ∩ <min; max)
 template<std::floating_point T>
 T floating(T min, T max) {
     return std::uniform_real_distribution<T>(min, max)(default_engine());
 }
 
+// Generate random vector [ℝ×ℝ] of length [length]
 template<class T>
 Util::Vector2<T> vector2(float length) {
     double angle = floating<T>(0, 2 * M_PI);
