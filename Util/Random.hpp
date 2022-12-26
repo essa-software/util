@@ -11,6 +11,12 @@ inline auto& default_engine() {
     return rng;
 }
 
+// Generate random T ∈ ℤ ∩ <min; max>
+template<std::integral T>
+T integer(T min, T max) {
+    return std::uniform_int_distribution<T>(min, max)(default_engine());
+}
+
 template<std::floating_point T>
 T floating(float min, float max) {
     return std::uniform_real_distribution<T>(min, max)(default_engine());
