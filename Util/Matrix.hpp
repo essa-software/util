@@ -7,6 +7,10 @@
 #include <initializer_list>
 #include <iostream>
 
+#ifdef ESSA_COMPILER_GCC
+#pragma GCC optimize("O3")
+#endif
+
 namespace Util {
 
 template<class T, size_t Size>
