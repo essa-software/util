@@ -3,6 +3,12 @@
 #include <tuple>
 #include <type_traits>
 
+#if defined(__clang__)
+#    define ESSA_COMPILER_CLANG
+#elif defined(__GNUC__)
+#    define ESSA_COMPILER_GCC
+#endif
+
 #define ESSA_ALWAYS_INLINE [[gnu::always_inline]]
 #define ESSA_UNREACHABLE __builtin_unreachable()
 constexpr bool TODO = false;
