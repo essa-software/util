@@ -12,14 +12,12 @@ namespace Util {
 template<class T, size_t Size>
 requires(Size > 0) struct Matrix {
 
-    constexpr Matrix()
-    {
+    constexpr Matrix() {
         for (size_t s = 0; s < Size; s++)
             m_data[s][s] = 1;
     }
 
-    constexpr Matrix(std::initializer_list<T> data)
-    {
+    constexpr Matrix(std::initializer_list<T> data) {
         assert(data.size() == Size * Size);
         for (size_t row = 0; row < Size; row++) {
             for (size_t column = 0; column < Size; column++) {
@@ -30,12 +28,10 @@ requires(Size > 0) struct Matrix {
 
     template<class... T2>
     constexpr Matrix(T2... data) requires(sizeof...(data) == Size * Size)
-        : Matrix { std::initializer_list<T> { data... } }
-    {
+        : Matrix { std::initializer_list<T> { data... } } {
     }
 
-    static constexpr Matrix identity()
-    {
+    static constexpr Matrix identity() {
         return {};
     }
 
@@ -49,8 +45,7 @@ requires(Size > 0) struct Matrix {
     Matrix<T, Size - 1> minor(size_t row, size_t column) const;
 
     template<class TT>
-    Matrix<TT, Size> convert() const
-    {
+    Matrix<TT, Size> convert() const {
         Matrix<TT, Size> output;
         for (size_t x = 0; x < Size; x++) {
             for (size_t y = 0; y < Size; y++) {
@@ -71,8 +66,7 @@ private:
 };
 
 template<class T, size_t Size>
-std::ostream& operator<<(std::ostream& out, Matrix<T, Size> const& mat)
-{
+std::ostream& operator<<(std::ostream& out, Matrix<T, Size> const& mat) {
     out << "[";
     for (size_t x = 0; x < Size; x++) {
         for (size_t y = 0; y < Size; y++) {
@@ -91,8 +85,7 @@ using Matrix4x4f = Matrix<float, 4>;
 using Matrix4x4d = Matrix<double, 4>;
 
 template<class T, size_t Size>
-Matrix<T, Size> operator*(Matrix<T, Size> const& left, T right)
-{
+Matrix<T, Size> operator*(Matrix<T, Size> const& left, T right) {
     Matrix<T, Size> result;
     for (size_t i = 0; i < Size; i++) {
         for (size_t j = 0; j < Size; j++) {
@@ -102,14 +95,12 @@ Matrix<T, Size> operator*(Matrix<T, Size> const& left, T right)
     return result;
 }
 template<class T, size_t Size>
-Matrix<T, Size> operator*(T left, Matrix<T, Size> const& right)
-{
+Matrix<T, Size> operator*(T left, Matrix<T, Size> const& right) {
     return right * left;
 }
 
 template<class T, size_t Size>
-Matrix<T, Size> operator*(Matrix<T, Size> const& left, Matrix<T, Size> const& right)
-{
+Matrix<T, Size> operator*(Matrix<T, Size> const& left, Matrix<T, Size> const& right) {
     // FIXME: I am naive
     Matrix<T, Size> result;
     for (size_t i = 0; i < Size; i++) {
@@ -124,8 +115,7 @@ Matrix<T, Size> operator*(Matrix<T, Size> const& left, Matrix<T, Size> const& ri
 }
 
 template<class T, size_t Size>
-requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::inverted() const
-{
+requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::inverted() const {
     // https://math.icalculator.info/4x4-matrix-inverse-calculator.html
     // A^-1 = 1 / det(A) × adj(A)
     return 1 / determinant() * adjoint();
@@ -133,8 +123,7 @@ requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::inverted() const
 
 template<class T, size_t Size>
 requires(Size > 0) Matrix<T, Size - 1>
-inline Matrix<T, Size>::minor(size_t row, size_t column) const
-{
+inline Matrix<T, Size>::minor(size_t row, size_t column) const {
     Matrix<T, Size - 1> submatrix;
     size_t source_i = 0;
     for (size_t ii = 0; ii < Size - 1; ii++) {
@@ -153,8 +142,7 @@ inline Matrix<T, Size>::minor(size_t row, size_t column) const
 }
 
 template<class T, size_t Size>
-requires(Size > 0) inline T Matrix<T, Size>::determinant() const
-{
+requires(Size > 0) inline T Matrix<T, Size>::determinant() const {
     if constexpr (Size == 1)
         return m_data[0][0];
     if constexpr (Size == 2)
@@ -176,8 +164,7 @@ requires(Size > 0) inline T Matrix<T, Size>::determinant() const
 }
 
 template<class T, size_t Size>
-requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::transposed() const
-{
+requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::transposed() const {
     Matrix result;
     for (size_t i = 0; i < Size; i++) {
         for (size_t j = 0; j < Size; j++) {
@@ -188,8 +175,7 @@ requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::transposed() const
 }
 
 template<class T, size_t Size>
-requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::adjoint() const
-{
+requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::adjoint() const {
     Matrix cofactors;
 
     for (size_t i = 0; i < Size; i++) {
@@ -202,8 +188,7 @@ requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::adjoint() const
 }
 
 template<class T>
-inline Vector4<T> operator*(Matrix<T, 4> const& mat, Vector4<T> const& vec)
-{
+inline Vector4<T> operator*(Matrix<T, 4> const& mat, Vector4<T> const& vec) {
     Vector4<T> result;
     result.x() = vec.x() * mat.element(0, 0) + vec.y() * mat.element(0, 1) + vec.z() * mat.element(0, 2) + vec.w() * mat.element(0, 3);
     result.y() = vec.x() * mat.element(1, 0) + vec.y() * mat.element(1, 1) + vec.z() * mat.element(1, 2) + vec.w() * mat.element(1, 3);
