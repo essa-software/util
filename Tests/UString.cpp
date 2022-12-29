@@ -127,6 +127,17 @@ TEST_CASE(find) {
     return {};
 }
 
+TEST_CASE(find_one_of) {
+    UString haystack { "abcabcabc" };
+    EXPECT_EQ(haystack.find_one_of({ 'a' }, 0), 0);
+    EXPECT_EQ(haystack.find_one_of({ 'b' }, 0), 1);
+    EXPECT_EQ(haystack.find_one_of({ 'a' }, 3), 3);
+    EXPECT_EQ(haystack.find_one_of({ 'b' }, 3), 4);
+    EXPECT_EQ(haystack.find_one_of({ 'z' }, 0), std::optional<size_t>());
+
+    return {};
+}
+
 TEST_CASE(erase) {
     UString test { "abcdefghij" };
     EXPECT_EQ(test.erase(0).encode(), "bcdefghij");

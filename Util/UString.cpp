@@ -282,6 +282,16 @@ std::optional<size_t> UString::find(UString const& needle, size_t start) const {
     return {};
 }
 
+std::optional<size_t> UString::find_one_of(std::initializer_list<uint32_t> codepoints, size_t start) const {
+    assert(start < m_size);
+    for (size_t s = start; s < m_size; s++) {
+        if (std::any_of(codepoints.begin(), codepoints.end(), [&](uint32_t c) { return m_storage[s] == c; })) {
+            return s;
+        }
+    }
+    return {};
+}
+
 UString UString::erase(size_t start, size_t size) const {
     if (start + size > m_size) {
         size = m_size - start;
