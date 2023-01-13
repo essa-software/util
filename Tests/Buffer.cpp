@@ -100,6 +100,14 @@ TEST_CASE(append) {
     return {};
 }
 
+TEST_CASE(take_from_back) {
+    Buffer buffer { 0x12, 0x34, 0x56, 0x78 };
+    buffer.take_from_back(2);
+    EXPECT_EQ(buffer[0], 0x12);
+    EXPECT_EQ(buffer[1], 0x34);
+    return {};
+}
+
 TEST_CASE(resize_uninitialized) {
     // Grow
     {

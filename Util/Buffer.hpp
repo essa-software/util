@@ -39,6 +39,9 @@ public:
     void resize_uninitialized(size_t);
     UString decode(UString::Encoding = UString::Encoding::Utf8) const;
 
+    // Remove s bytes from back
+    void take_from_back(size_t s = 1);
+
     bool operator==(Buffer const& other) const;
 
 private:

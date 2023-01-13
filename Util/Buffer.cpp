@@ -74,6 +74,10 @@ UString Buffer::decode(UString::Encoding encoding) const {
     return UString { std::string_view { reinterpret_cast<char const*>(m_data), m_size }, encoding };
 }
 
+void Buffer::take_from_back(size_t s) {
+    resize_uninitialized(m_size - s);
+}
+
 void Buffer::resize_uninitialized(size_t size) {
     auto old_storage = m_data;
     if (size > 0) {
