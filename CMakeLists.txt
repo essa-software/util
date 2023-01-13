@@ -19,6 +19,7 @@ add_library(essautil SHARED
     Util/Stream/Reader.cpp
     Util/Stream/StandardStreams.cpp
     Util/Stream/Writer.cpp
+    Util/System.cpp
     Util/UnitDisplay.cpp
     Util/UString.cpp
     Util/UStringBuilder.cpp
