@@ -13,4 +13,13 @@ OsErrorOr<UString> getenv_or_error(std::string const& name) {
     return UString { env };
 }
 
+OsErrorOr<struct stat> stat(std::string const& name) {
+    struct stat st;
+    auto result = ::stat(name.c_str(), &st);
+    if (result < 0) {
+        return OsError { errno, "stat" };
+    }
+    return st;
+}
+
 }
