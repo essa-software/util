@@ -145,13 +145,13 @@ public:
     }
 
     // TODO: Implement this for multiple errors
-    auto map_error(auto callback) && -> ErrorOr<T, std::remove_reference_t<decltype(callback(std::declval<ErrorTypes>()...))>>
+    auto map_error(auto callback, CppSourceLocation loc = CppSourceLocation::current()) && -> ErrorOr<T, std::remove_reference_t<decltype(callback(std::declval<ErrorTypes>()...))>>
         requires(sizeof...(ErrorTypes) == 1)
     {
         if (!is_error()) {
             return release_value();
         }
-        return callback(release_error());
+        return { callback(release_error()), loc };
     }
 
     auto location() const { return m_location; }
