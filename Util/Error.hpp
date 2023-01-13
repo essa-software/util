@@ -61,26 +61,30 @@ public:
     static constexpr bool ContainsError = { (std::is_same_v<E, ErrorTypes> || ...) };
 
     template<typename U>
-    ESSA_ALWAYS_INLINE ErrorOr(U&& value, CppSourceLocation loc = CppSourceLocation::current()) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorTypes...>> && (IsConvertibleToError<U>))
+    ESSA_ALWAYS_INLINE ErrorOr(U&& value, CppSourceLocation loc = CppSourceLocation::current())
+        requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorTypes...>> && (IsConvertibleToError<U>))
         : Variant(std::forward<U>(value))
         , m_location(loc) {
     }
 
     template<typename U>
-    ESSA_ALWAYS_INLINE ErrorOr(U&& value) requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorTypes...>> && (std::is_convertible_v<U, T>))
+    ESSA_ALWAYS_INLINE ErrorOr(U&& value)
+        requires(!std::is_same_v<std::remove_cvref_t<U>, ErrorOr<T, ErrorTypes...>> && (std::is_convertible_v<U, T>))
         : Variant(std::forward<U>(value)) {
     }
 
     // Construction from ErrorOr containing one of errors
     template<class U, class ET>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<U, ET>&& value, CppSourceLocation loc = CppSourceLocation::current()) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (std::is_convertible_v<U, T> && IsConvertibleToError<ET>))
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<U, ET>&& value, CppSourceLocation loc = CppSourceLocation::current())
+        requires(!std::is_same_v<ET, First<ErrorTypes...>> && (std::is_convertible_v<U, T> && IsConvertibleToError<ET>))
         : Variant(value.is_error() ? Variant { value.release_error() } : Variant { value.release_value() })
         , m_location(loc) {
     }
 
     // Construction from error variant, used by TRY()
     template<class... ETs>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack, CppSourceLocation loc) requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack, CppSourceLocation loc)
+        requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
         : Variant(std::visit([](auto&& v) -> Variant { return v; }, pack))
         , m_location(loc) { }
 
@@ -89,14 +93,23 @@ public:
     }
     T const& value() const { return std::get<T>(*this); }
 
-    First<ErrorTypes...>& error() requires(sizeof...(ErrorTypes) == 1) { return std::get<ErrorTypes...>(*this); }
-    First<ErrorTypes...> const& error() const requires(sizeof...(ErrorTypes) == 1) { return std::get<ErrorTypes...>(*this); }
+    First<ErrorTypes...>& error()
+        requires(sizeof...(ErrorTypes) == 1)
+    { return std::get<ErrorTypes...>(*this); }
+
+    First<ErrorTypes...> const& error() const
+        requires(sizeof...(ErrorTypes) == 1)
+    { return std::get<ErrorTypes...>(*this); }
 
     template<class E>
-    E& error_of_type() requires(ContainsError<E>) { return std::get<E>(*this); }
+    E& error_of_type()
+        requires(ContainsError<E>)
+    { return std::get<E>(*this); }
 
     template<class E>
-    E const& error_of_type() const requires(ContainsError<E>) { return std::get<E>(*this); }
+    E const& error_of_type() const
+        requires(ContainsError<E>)
+    { return std::get<E>(*this); }
 
     bool is_error() const { return !std::holds_alternative<T>(*this); }
 
@@ -113,7 +126,8 @@ public:
     }
 
     template<class E>
-    requires(ContainsError<E>) bool is_error_of_type() const { return std::holds_alternative<E>(*this); }
+        requires(ContainsError<E>) bool
+    is_error_of_type() const { return std::holds_alternative<E>(*this); }
 
     T release_value() { return std::move(value()); }
 
@@ -122,13 +136,18 @@ public:
 
     auto release_error() { return std::move(error()); }
 
-    T release_value_but_fixme_should_propagate_errors() {
-        assert(!is_error());
+    T release_value_but_fixme_should_propagate_errors(CppSourceLocation loc = CppSourceLocation::current()) {
+        if (is_error()) [[unlikely]] {
+            dump("FIXME: Should propagate error", loc);
+            abort();
+        }
         return release_value();
     }
+
     // TODO: Implement this for multiple errors
     auto map_error(auto callback) && -> ErrorOr<T, std::remove_reference_t<decltype(callback(std::declval<ErrorTypes>()...))>>
-    requires(sizeof...(ErrorTypes) == 1) {
+        requires(sizeof...(ErrorTypes) == 1)
+    {
         if (!is_error()) {
             return release_value();
         }
@@ -173,19 +192,22 @@ public:
         : Base { std::monostate {} } { }
 
     template<typename U>
-    ErrorOr(U&& value, CppSourceLocation loc = CppSourceLocation::current()) requires(IsConvertibleToError<U>)
+    ErrorOr(U&& value, CppSourceLocation loc = CppSourceLocation::current())
+        requires(IsConvertibleToError<U>)
         : Base(std::forward<U>(value), loc) {
     }
 
     // Construction from ErrorOr containing one of errors
     template<class ET>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<void, ET>&& value, CppSourceLocation loc = CppSourceLocation::current()) requires(!std::is_same_v<ET, First<ErrorTypes...>> && (IsConvertibleToError<ET>))
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorOr<void, ET>&& value, CppSourceLocation loc = CppSourceLocation::current())
+        requires(!std::is_same_v<ET, First<ErrorTypes...>> && (IsConvertibleToError<ET>))
         : Base(std::forward<decltype(value)>(value), loc) {
     }
 
     // Construction from error variant, used by TRY()
     template<class... ETs>
-    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack, CppSourceLocation loc) requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
+    ESSA_ALWAYS_INLINE ErrorOr(ErrorVariant<ETs...>&& pack, CppSourceLocation loc)
+        requires(IsSubsetOf<std::tuple<ETs...>, std::tuple<ErrorTypes...>>)
         : Base(std::forward<decltype(pack)>(pack), loc) { }
 };
 
