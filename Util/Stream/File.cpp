@@ -1,8 +1,13 @@
 #include "File.hpp"
 
 #include "../Config.hpp"
+#include "../Error.hpp"
+#include "../System.hpp"
+#include "Reader.hpp"
+
 #include <fcntl.h>
 #include <string>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <utility>
 
@@ -61,6 +66,27 @@ OsErrorOr<ReadableFileStream> ReadableFileStream::open(std::string const& file_n
         return OsError { errno, "WritableFileStream::open" };
     }
     return adopt_fd(fd);
+}
+
+OsErrorOr<Buffer> ReadableFileStream::read_file(std::string const& name, std::optional<size_t> max_size) {
+    // TODO: Disallow read_file for streams that may be "infinite" (e.g special devices)
+    auto file_size = TRY(System::stat(name)).st_size;
+    if (file_size <= 0) {
+        return Buffer {};
+    }
+    if (max_size && static_cast<size_t>(file_size) > *max_size) {
+        return OsError { EFBIG, "read_file" };
+    }
+
+    Buffer result;
+    auto stream = TRY(ReadableFileStream::open(name));
+    auto chunk = Buffer::uninitialized(4096);
+    BufferedReader reader { stream };
+    while (!stream.is_eof()) {
+        TRY(reader.read(chunk.span()));
+        result.append(chunk.span());
+    }
+    return result;
 }
 
 OsErrorOr<size_t> ReadableFileStream::read(std::span<uint8_t> data) {

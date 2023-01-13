@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Buffer.hpp"
 #include "../Error.hpp"
 #include "../NonCopyable.hpp"
 #include "Stream.hpp"
@@ -35,6 +36,10 @@ public:
     static ReadableFileStream adopt_fd(int fd);
     static ReadableFileStream borrow_fd(int fd);
     static OsErrorOr<ReadableFileStream> open(std::string const& file_name);
+
+    // Read the entire file into a buffer. This may allocate a lot for big files, so
+    // you can specify max size that can be read (otherwise an error will occur).
+    static OsErrorOr<Buffer> read_file(std::string const& name, std::optional<size_t> max_size = {});
 
     virtual OsErrorOr<size_t> read(std::span<uint8_t>) override;
     virtual bool is_eof() const override;
