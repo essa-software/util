@@ -129,7 +129,7 @@ static bool decode_impl(std::string_view string, uint32_t replacement, Callback 
 
         for (int i = 0; i < additional_bytes_to_expect; i++) {
             s++;
-            if (s > string.size()) {
+            if (s >= string.size()) {
                 std::cout << "unfinished utf8 sequence" << std::endl;
                 return false;
             }
