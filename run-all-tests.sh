@@ -5,18 +5,17 @@ mkdir -p build
 set -e
 cd build
 ninja
-cd Tests
 something_failed=0
 set +e
 
-for test in *; do
+for test in Tests/*; do
     if [ -f "$test" ] && [ -x "$test" ]; then
-        ./$test
+        $test
         if [ $? -eq 1 ]; then
-            echo -e "\033[30;41m FAIL \033[m $test"
+            echo -e "\033[30;41m FAIL \033[m $(basename $test)"
             something_failed=1
         else
-            echo -e "\033[30;42m PASS \033[m $test"
+            echo -e "\033[30;42m PASS \033[m $(basename $test)"
         fi
     fi
 done
