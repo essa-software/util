@@ -78,6 +78,17 @@ UString Buffer::decode(UString::Encoding encoding) const {
     return UString { std::string_view { reinterpret_cast<char const*>(m_data), m_size }, encoding };
 }
 
+void Buffer::insert(size_t position, uint8_t byte) {
+    insert(position, { &byte, 1 });
+}
+
+void Buffer::insert(size_t position, std::span<uint8_t const> data) {
+    // FIXME: This makes an unnecessary copy.
+    resize_uninitialized(m_size + data.size());
+    std::copy(begin() + position, end() - data.size(), begin() + position + data.size());
+    std::copy(data.begin(), data.end(), begin() + position);
+}
+
 void Buffer::take_from_back(size_t s) {
     resize_uninitialized(m_size - s);
 }

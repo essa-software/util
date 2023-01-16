@@ -115,6 +115,15 @@ TEST_CASE(take_from_back) {
     return {};
 }
 
+TEST_CASE(insert) {
+    Buffer buffer { 0x12, 0x56, 0xbc };
+    buffer.insert(1, 0x34);
+    buffer.insert(3, { 0x78, 0x9a });
+    uint8_t expected_result[] = { 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc };
+    EXPECT_EQ(buffer, Buffer { expected_result });
+    return {};
+}
+
 TEST_CASE(resize_uninitialized) {
     // Grow
     {

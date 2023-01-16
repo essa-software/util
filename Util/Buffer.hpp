@@ -38,6 +38,11 @@ public:
     void append(uint8_t);
     void append(std::span<uint8_t const>);
     void resize_uninitialized(size_t);
+    void insert(size_t position, uint8_t byte);
+    void insert(size_t position, std::span<uint8_t const> bytes);
+    void insert(size_t position, std::initializer_list<uint8_t> bytes) {
+        insert(position, std::span<uint8_t const> { bytes });
+    }
     UString decode(UString::Encoding = UString::Encoding::Utf8) const;
 
     // Remove s bytes from back
