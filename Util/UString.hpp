@@ -53,6 +53,10 @@ public:
     enum DecodingErrorTag { DecodingError };
     static ErrorOr<UString, DecodingErrorTag> decode(std::span<uint8_t const>, Encoding = Encoding::Utf8);
 
+    static auto decoding_error_to_os_error(UString::DecodingErrorTag) {
+        return OsError { .error = 0, .function = "Decoding failed" };
+    }
+
     template<size_t S>
     UString(char const (&string)[S], Encoding encoding = Encoding::Utf8, uint32_t replacement = 0xfffd)
         : UString({ string, S - 1 }, encoding, replacement) {
