@@ -43,7 +43,9 @@ public:
     void insert(size_t position, std::initializer_list<uint8_t> bytes) {
         insert(position, std::span<uint8_t const> { bytes });
     }
-    UString decode(UString::Encoding = UString::Encoding::Utf8) const;
+
+    UString decode_infallible(UString::Encoding = UString::Encoding::Utf8, uint32_t replacement = 0xfffd) const;
+    ErrorOr<UString, UString::DecodingErrorTag> decode(UString::Encoding = UString::Encoding::Utf8) const;
 
     // Remove s bytes from back
     void take_from_back(size_t s = 1);

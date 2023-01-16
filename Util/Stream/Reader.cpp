@@ -97,7 +97,9 @@ OsErrorOr<UString> TextReader::consume_until(char delim) {
         }
         result.append(*ch);
     }
-    return result.decode(m_encoding);
+    return result.decode(m_encoding).map_error([&](auto) {
+        return OsError { .error = 0, .function = "consume_until: Decoding failed" };
+    });
 }
 
 OsErrorOr<UString> TextReader::consume_line() {

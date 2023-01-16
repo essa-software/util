@@ -74,8 +74,12 @@ void Buffer::append(std::span<uint8_t const> data) {
     std::copy(data.begin(), data.end(), &m_data[m_size - data.size()]);
 }
 
-UString Buffer::decode(UString::Encoding encoding) const {
-    return UString { std::string_view { reinterpret_cast<char const*>(m_data), m_size }, encoding };
+UString Buffer::decode_infallible(UString::Encoding encoding, uint32_t replacement) const {
+    return UString { std::string_view { reinterpret_cast<char const*>(m_data), m_size }, encoding, replacement };
+}
+
+ErrorOr<UString, UString::DecodingErrorTag> Buffer::decode(UString::Encoding encoding) const {
+    return UString::decode(span(), encoding);
 }
 
 void Buffer::insert(size_t position, uint8_t byte) {

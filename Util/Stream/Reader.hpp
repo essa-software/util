@@ -41,9 +41,9 @@ public:
         : BufferedReader(stream) { }
 
     template<std::integral T>
-    requires requires(T t) {
-        { convert_from_little_to_host_endian(t) } -> std::same_as<T>;
-    }
+        requires requires(T t) {
+                     { convert_from_little_to_host_endian(t) } -> std::same_as<T>;
+                 }
     OsErrorOr<T> read_little_endian() {
         T value;
         if (!TRY(read_all({ reinterpret_cast<uint8_t*>(&value), sizeof(T) })))
@@ -52,17 +52,17 @@ public:
     }
 
     template<std::floating_point FP>
-    requires(sizeof(FP) == 4)
-        OsErrorOr<FP> read_little_endian() { return std::bit_cast<FP>(TRY(read_little_endian<uint32_t>())); }
+        requires(sizeof(FP) == 4)
+    OsErrorOr<FP> read_little_endian() { return std::bit_cast<FP>(TRY(read_little_endian<uint32_t>())); }
 
     template<std::floating_point FP>
-    requires(sizeof(FP) == 8)
-        OsErrorOr<FP> read_little_endian() { return std::bit_cast<FP>(TRY(read_little_endian<uint64_t>())); }
+        requires(sizeof(FP) == 8)
+    OsErrorOr<FP> read_little_endian() { return std::bit_cast<FP>(TRY(read_little_endian<uint64_t>())); }
 
     template<std::integral T>
-    requires requires(T t) {
-        { convert_from_big_to_host_endian(t) } -> std::same_as<T>;
-    }
+        requires requires(T t) {
+                     { convert_from_big_to_host_endian(t) } -> std::same_as<T>;
+                 }
     OsErrorOr<T> read_big_endian() {
         T value;
         if (!TRY(read_all({ reinterpret_cast<uint8_t*>(&value), sizeof(T) })))
@@ -71,16 +71,16 @@ public:
     }
 
     template<std::floating_point FP>
-    requires(sizeof(FP) == 4)
-        OsErrorOr<FP> read_big_endian() { return std::bit_cast<FP>(TRY(read_big_endian<uint32_t>())); }
+        requires(sizeof(FP) == 4)
+    OsErrorOr<FP> read_big_endian() { return std::bit_cast<FP>(TRY(read_big_endian<uint32_t>())); }
 
     template<std::floating_point FP>
-    requires(sizeof(FP) == 8)
-        OsErrorOr<FP> read_big_endian() { return std::bit_cast<FP>(TRY(read_big_endian<uint64_t>())); }
+        requires(sizeof(FP) == 8)
+    OsErrorOr<FP> read_big_endian() { return std::bit_cast<FP>(TRY(read_big_endian<uint64_t>())); }
 
     template<class T>
-    requires(std::is_trivial_v<T>)
-        OsErrorOr<T> read_struct() {
+        requires(std::is_trivial_v<T>)
+    OsErrorOr<T> read_struct() {
         T t;
         if (!TRY(read_all({ reinterpret_cast<uint8_t*>(&t), sizeof(t) }))) {
             return OsError { 0, "EOF in read_struct" };
@@ -139,7 +139,9 @@ public:
             TRY(consume());
             c = TRY(peek());
         }
-        return result.decode(m_encoding);
+        return result.decode(m_encoding).map_error([&](auto) {
+            return OsError { .error = 0, .function = "consume_while: Decoding failed" };
+        });
     }
 
     OsErrorOr<UString> consume_line();
