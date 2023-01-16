@@ -149,9 +149,11 @@ static bool decode_impl(std::string_view string, uint32_t replacement, Callback 
     return !error;
 }
 
-static size_t strlen(std::string_view string) {
+static std::optional<size_t> strlen(std::string_view string) {
     size_t size = 0;
-    decode_impl(string, 0x0, [&size](auto) { size++; });
+    if (!decode_impl(string, 0x0, [&size](auto) { size++; })) {
+        return {};
+    }
     return size;
 }
 
@@ -212,16 +214,33 @@ UString::UString(std::string_view string, Encoding encoding, uint32_t replacemen
         reallocate(string.size());
         std::copy(string.begin(), string.end(), m_storage);
         break;
-    case Encoding::Utf8:
-        reallocate(Utf8::strlen(string));
+    case Encoding::Utf8: {
+        auto size = Utf8::strlen(string);
+        if (!size) {
+            size = 0;
+        }
+        reallocate(*size);
         Utf8::decode({ m_storage, m_size }, string, replacement);
         break;
+    }
     }
     // std::cout << __PRETTY_FUNCTION__ << ": " << dump() << std::endl;
 }
 
 UString::UString(std::span<uint8_t const> data, Encoding encoding, uint32_t replacement)
     : UString { std::string_view { reinterpret_cast<char const*>(data.data()), data.size() }, encoding, replacement } { }
+
+ErrorOr<UString, UString::DecodingErrorTag> UString::decode(std::span<uint8_t const> data, Encoding) {
+    std::string_view data_sv { reinterpret_cast<char const*>(data.data()), data.size() };
+    UString string;
+    auto size = Utf8::strlen(data_sv);
+    if (!size) {
+        return UString::DecodingError;
+    }
+    string.reallocate(*size);
+    assert(Utf8::decode({ string.m_storage, string.m_size }, data_sv, 0xfffd));
+    return string;
+}
 
 std::string UString::encode(Encoding encoding) const {
     switch (encoding) {

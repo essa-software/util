@@ -89,7 +89,17 @@ TEST_CASE(utf8) {
         EXPECT(std::equal(string_in_utf8.begin(), string_in_utf8.end(), testcase.string));
     }
 
-    // FIXME: Add some invalid cases
+    return {};
+}
+
+TEST_CASE(utf8_invalid) {
+    std::vector<uint8_t> testcases[] {
+        { 0xc4 }
+    };
+
+    for (auto const& testcase : testcases) {
+        EXPECT(UString::decode(testcase).is_error());
+    }
 
     return {};
 }

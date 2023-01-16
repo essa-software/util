@@ -50,6 +50,8 @@ public:
 
     UString(std::span<uint8_t const>, Encoding = Encoding::Utf8, uint32_t replacement = 0xfffd);
     UString(std::string_view, Encoding = Encoding::Utf8, uint32_t replacement = 0xfffd);
+    enum DecodingErrorTag { DecodingError };
+    static ErrorOr<UString, DecodingErrorTag> decode(std::span<uint8_t const>, Encoding = Encoding::Utf8);
 
     template<size_t S>
     UString(char const (&string)[S], Encoding encoding = Encoding::Utf8, uint32_t replacement = 0xfffd)
