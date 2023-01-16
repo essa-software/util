@@ -99,7 +99,7 @@ static bool decode_impl(std::string_view string, uint32_t replacement, Callback 
         uint32_t codepoint = 0;
         int additional_bytes_to_expect = 0;
         if (byte >= 0b1111'1110) {
-            std::cout << "invalid utf8 character: 0x" << std::hex << static_cast<uint16_t>(byte) << std::dec << std::endl;
+            // std::cout << "invalid utf8 character: 0x" << std::hex << static_cast<uint16_t>(byte) << std::dec << std::endl;
             error = true;
             codepoint = replacement;
         }
@@ -130,7 +130,7 @@ static bool decode_impl(std::string_view string, uint32_t replacement, Callback 
         for (int i = 0; i < additional_bytes_to_expect; i++) {
             s++;
             if (s >= string.size()) {
-                std::cout << "unfinished utf8 sequence" << std::endl;
+                // std::cout << "unfinished utf8 sequence" << std::endl;
                 return false;
             }
             codepoint <<= 6;
@@ -141,7 +141,7 @@ static bool decode_impl(std::string_view string, uint32_t replacement, Callback 
         auto required_bytes = bytes_required_to_store_codepoint(codepoint);
         auto got_bytes = additional_bytes_to_expect + 1;
         if (required_bytes > got_bytes) {
-            std::cout << "got more bytes than required to encode codepoint " << codepoint << " (" << got_bytes << " > " << required_bytes << ")\n";
+            // std::cout << "got more bytes than required to encode codepoint " << codepoint << " (" << got_bytes << " > " << required_bytes << ")\n";
         }
 
         callback(codepoint);
