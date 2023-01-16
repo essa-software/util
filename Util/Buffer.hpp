@@ -34,6 +34,7 @@ public:
     uint8_t operator[](size_t idx) const { return m_data[idx]; }
     uint8_t& operator[](size_t idx) { return m_data[idx]; }
 
+    void clear();
     void append(uint8_t);
     void append(std::span<uint8_t const>);
     void resize_uninitialized(size_t);

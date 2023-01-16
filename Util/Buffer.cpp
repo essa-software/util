@@ -60,6 +60,10 @@ Buffer Buffer::filled(size_t size, uint8_t byte) {
     return buffer;
 }
 
+void Buffer::clear() {
+    resize_uninitialized(0);
+}
+
 void Buffer::append(uint8_t byte) {
     resize_uninitialized(m_size + 1);
     m_data[m_size - 1] = byte;

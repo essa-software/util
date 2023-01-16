@@ -92,6 +92,13 @@ TEST_CASE(move) {
     return {};
 }
 
+TEST_CASE(clear) {
+    Buffer buffer { 0x12, 0x34, 0x56 };
+    buffer.clear();
+    EXPECT_EQ(buffer.size(), (size_t)0);
+    return {};
+}
+
 TEST_CASE(append) {
     Buffer buffer { 0x12, 0x34, 0x56 };
     buffer.append(0x78);
