@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Rect.hpp"
 #include "Vector.hpp"
 #include <cmath>
 #include <random>
@@ -10,7 +11,7 @@ template<class Random>
 class Engine {
 public:
     template<class... Args>
-    requires requires(Args... args) { Random(args...); }
+        requires requires(Args... args) { Random(args...); }
     Engine(Args&&... args)
         : m_std_random(std::forward<Args>(args)...) { }
 
@@ -41,6 +42,14 @@ public:
         return Util::Vector2<T> { x, y } * length;
     }
 
+    // Generate random vector [x ∈ ℝ, y ∈ ℝ], where x ∈ <rect_left; rect_right) and y ∈ <rect_top; rect_bottom).
+    template<std::floating_point T>
+    Util::Vector2<T> next_vec2_in_rect(Util::Rect<T> rect) {
+        T x = next_float(rect.left, rect.left + rect.width);
+        T y = next_float(rect.top, rect.top + rect.height);
+        return { x, y };
+    }
+
 private:
     Random m_std_random;
 };
@@ -68,6 +77,12 @@ T floating(T min, T max) {
 template<class T>
 Util::Vector2<T> vector2(float length) {
     return default_engine().next_vec2<T>(length);
+}
+
+// Generate random vector [x ∈ ℝ, y ∈ ℝ], where x ∈ <rect_left; rect_right) and y ∈ <rect_top; rect_bottom).
+template<std::floating_point T>
+Util::Vector2<T> vector2_in_rect(Util::Rect<T> rect) {
+    return default_engine().next_vec2_in_rect<T>(rect);
 }
 
 }
