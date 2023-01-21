@@ -317,6 +317,11 @@ public:
 
 }
 
+template<size_t C, class T>
+Detail::Vector<C, T> operator*(double fac, Detail::Vector<C, T> const& vec) {
+    return vec * fac;
+}
+
 template<class T>
 using Vector2 = Detail::Vector<2, T>;
 using Vector2i = Vector2<int>;
