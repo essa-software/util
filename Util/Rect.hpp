@@ -40,6 +40,7 @@ public:
 
     Vector2<T> position() const { return { left, top }; }
     Vector2<T> size() const { return { width, height }; }
+    Vector2<T> center() const { return { left + width / 2, top + height / 2 }; }
 
     template<class U = T>
     bool contains(Vector2<U> pos) const {
