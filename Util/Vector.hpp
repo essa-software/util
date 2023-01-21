@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Angle.hpp"
 #include "Orientation.hpp"
-
 #include <array>
 #include <cmath>
 #include <initializer_list>
@@ -22,7 +22,9 @@ public:
     }
 
     template<class... T2>
-    constexpr Vector(T2... packed_c) requires(sizeof...(packed_c) == Components || (Components == 4 && sizeof...(packed_c) == 3)) {
+    constexpr Vector(T2... packed_c)
+        requires(sizeof...(packed_c) == Components || (Components == 4 && sizeof...(packed_c) == 3))
+    {
         auto c = std::initializer_list<T> { static_cast<T>(packed_c)... };
         std::copy(std::begin(c), std::end(c), components.begin());
         if constexpr (Components == 4 && sizeof...(packed_c) == 3)
@@ -30,7 +32,8 @@ public:
     }
 
     template<size_t OtherC, class OtherT, class... MoreT>
-    requires(OtherC + sizeof...(MoreT) == Components || (Components == 4 && OtherC + sizeof...(MoreT) == 3)) constexpr explicit Vector(Vector<OtherC, OtherT> const& other, MoreT... more) {
+        requires(OtherC + sizeof...(MoreT) == Components || (Components == 4 && OtherC + sizeof...(MoreT) == 3))
+    constexpr explicit Vector(Vector<OtherC, OtherT> const& other, MoreT... more) {
         std::copy(other.components.begin(), other.components.end(), components.begin());
         auto c = std::initializer_list<T> { static_cast<T>(more)... };
         std::copy(std::begin(c), std::end(c), components.begin() + OtherC);
@@ -38,15 +41,31 @@ public:
             components[3] = 1;
     }
 
-    constexpr T& x() requires(Components > 0) { return this->components[0]; };
-    constexpr T& y() requires(Components > 1) { return this->components[1]; };
-    constexpr T& z() requires(Components > 2) { return this->components[2]; };
-    constexpr T& w() requires(Components > 3) { return this->components[3]; };
+    constexpr T& x()
+        requires(Components > 0)
+    { return this->components[0]; };
+    constexpr T& y()
+        requires(Components > 1)
+    { return this->components[1]; };
+    constexpr T& z()
+        requires(Components > 2)
+    { return this->components[2]; };
+    constexpr T& w()
+        requires(Components > 3)
+    { return this->components[3]; };
 
-    constexpr T const& x() const requires(Components > 0) { return this->components[0]; };
-    constexpr T const& y() const requires(Components > 1) { return this->components[1]; };
-    constexpr T const& z() const requires(Components > 2) { return this->components[2]; };
-    constexpr T const& w() const requires(Components > 3) { return this->components[3]; };
+    constexpr T const& x() const
+        requires(Components > 0)
+    { return this->components[0]; };
+    constexpr T const& y() const
+        requires(Components > 1)
+    { return this->components[1]; };
+    constexpr T const& z() const
+        requires(Components > 2)
+    { return this->components[2]; };
+    constexpr T const& w() const
+        requires(Components > 3)
+    { return this->components[3]; };
 
     auto length_squared() const {
         double result = 0;
@@ -156,48 +175,70 @@ public:
 
     //// Vector2 ////
     template<size_t OtherC, class OtherT>
-    requires(Components == 2 && OtherC >= 2) constexpr explicit Vector(Vector<OtherC, OtherT> other)
+        requires(Components == 2 && OtherC >= 2)
+    constexpr explicit Vector(Vector<OtherC, OtherT> other)
         : Vector { other.x(), other.y() } {
     }
 
-    constexpr static Vector from_main_cross(Orientation orientation, T main, T cross) requires(Components == 2) {
+    constexpr static Vector from_main_cross(Orientation orientation, T main, T cross)
+        requires(Components == 2)
+    {
         if (orientation == Orientation::Vertical)
             return { cross, main };
         return { main, cross };
     }
 
     // Angle is CCW starting from positive X axis.
-    constexpr static Vector create_polar(double angle_radians, double length) requires(Components == 2) {
+    constexpr static Vector create_polar(double angle_radians, double length)
+        requires(Components == 2)
+    {
         return { std::cos(angle_radians) * length, std::sin(angle_radians) * length };
     }
 
-    constexpr double angle() const requires(Components == 2) {
+    constexpr double angle() const
+        requires(Components == 2)
+    {
         return std::atan2(this->y(), this->x());
     }
 
+    constexpr Angle directed_angle_to(Vector<2, T> other) const
+        requires(Components == 2)
+    {
+        auto angle1 = angle();
+        auto angle2 = other.angle();
+        return Angle::radians(angle2 - angle1);
+    }
+
     template<class OtherT = T>
-    requires(Components == 2) constexpr Vector<2, OtherT> rotate(double theta) const {
+        requires(Components == 2)
+    constexpr Vector<2, OtherT> rotate(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->y() * t_sin, this->x() * t_sin + this->y() * t_cos };
     }
 
     template<class OtherT = T>
-    requires(Components == 2) constexpr auto perpendicular() const {
+        requires(Components == 2)
+    constexpr auto perpendicular() const {
         return Vector<2, OtherT> { -this->y(), this->x() };
     }
 
     template<class OtherT>
-    requires(Components == 2) constexpr auto mirror(Vector<2, OtherT> axis) const {
+        requires(Components == 2)
+    constexpr auto mirror(Vector<2, OtherT> axis) const {
         return *this - (decltype(this->x()))2 * dot(axis.normalized()) * axis;
     }
 
-    constexpr auto main(Orientation orientation) const requires(Components == 2) {
+    constexpr auto main(Orientation orientation) const
+        requires(Components == 2)
+    {
         if (orientation == Orientation::Vertical)
             return y();
         return x();
     }
 
-    constexpr auto cross(Orientation orientation) const requires(Components == 2) {
+    constexpr auto cross(Orientation orientation) const
+        requires(Components == 2)
+    {
         if (orientation == Orientation::Horizontal)
             return y();
         return x();
@@ -205,11 +246,14 @@ public:
 
     //// Vector3 ////
     template<size_t OtherC, class OtherT>
-    requires(Components == 3 && OtherC >= 3) constexpr explicit Vector(Vector<OtherC, OtherT> other)
+        requires(Components == 3 && OtherC >= 3)
+    constexpr explicit Vector(Vector<OtherC, OtherT> other)
         : Vector { other.x(), other.y(), other.z() } {
     }
 
-    constexpr static Vector create_spheric(double lat_radians, double lon_radians, double radius) requires(Components == 3) {
+    constexpr static Vector create_spheric(double lat_radians, double lon_radians, double radius)
+        requires(Components == 3)
+    {
         return {
             static_cast<T>(radius * std::cos(lat_radians) * std::sin(lon_radians)),
             static_cast<T>(radius * std::sin(lat_radians) * std::sin(lon_radians)),
@@ -218,25 +262,29 @@ public:
     }
 
     template<class OtherT = T>
-    requires(Components == 3) constexpr Vector<3, OtherT> rotate_x(double theta) const {
+        requires(Components == 3)
+    constexpr Vector<3, OtherT> rotate_x(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x(), this->y() * t_cos - this->z() * t_sin, this->y() * t_sin + this->z() * t_cos };
     }
 
     template<class OtherT = T>
-    requires(Components == 3) constexpr Vector<3, OtherT> rotate_y(double theta) const {
+        requires(Components == 3)
+    constexpr Vector<3, OtherT> rotate_y(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->z() * t_sin, this->y(), this->x() * t_sin + this->z() * t_cos };
     }
 
     template<class OtherT = T>
-    requires(Components == 3) constexpr Vector<3, OtherT> rotate_z(double theta) const {
+        requires(Components == 3)
+    constexpr Vector<3, OtherT> rotate_z(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->y() * t_sin, this->x() * t_sin + this->y() * t_cos, this->z() };
     }
 
     template<class OtherT = T>
-    requires(Components == 3) constexpr Vector<3, OtherT> cross(Vector<3, T> const& a) const {
+        requires(Components == 3)
+    constexpr Vector<3, OtherT> cross(Vector<3, T> const& a) const {
         Vector<3, OtherT> result;
         result.x() = this->y() * a.z() - this->z() * a.y();
         result.y() = this->z() * a.x() - this->x() * a.z();
@@ -247,7 +295,8 @@ public:
     //// Vector4 ////
 
     template<size_t OtherC, class OtherT>
-    requires(Components == 4 && OtherC >= 4) constexpr explicit Vector(Vector<OtherC, OtherT> other)
+        requires(Components == 4 && OtherC >= 4)
+    constexpr explicit Vector(Vector<OtherC, OtherT> other)
         : Vector { other.x(), other.y(), other.z(), other.w() } {
     }
 
@@ -295,7 +344,8 @@ constexpr double get_distance(Detail::Vector<S, T> const& a, Detail::Vector<S, T
 }
 
 template<size_t S, class T>
-requires(S == 2 || S == 3) constexpr double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::Vector<S, T> line_end, Detail::Vector<S, T> point) {
+    requires(S == 2 || S == 3)
+constexpr double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::Vector<S, T> line_end, Detail::Vector<S, T> point) {
     auto d = (point - line_end) / get_distance(point, line_end);
     auto v = line_start - line_end;
     double t = v.dot(d);
