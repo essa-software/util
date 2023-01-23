@@ -2,6 +2,7 @@
 
 #include "Angle.hpp"
 #include "Orientation.hpp"
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <initializer_list>
@@ -67,6 +68,19 @@ public:
         requires(Components > 3)
     { return this->components[3]; };
 
+    bool is_null_vector() const {
+        return std::ranges::all_of(components, [](auto n) { return n == 0; });
+    }
+
+    bool is_approximately_equal(Vector const& other, float epsilon = 10e-6) {
+        for (size_t s = 0; s < Components; s++) {
+            if (std::abs(other.components[s] - components[s]) > epsilon) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     auto length_squared() const {
         double result = 0;
         for (size_t s = 0; s < Components; s++)
@@ -118,6 +132,20 @@ public:
         Vector output;
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = std::round(components[s]);
+        }
+        return output;
+    }
+
+    // Returns `this` resized to `length`, i.e this.normalized()*length.
+    // If `this` is a null vector, this function returns null vector.
+    constexpr Vector with_length(double length) const {
+        if (is_null_vector()) {
+            return Vector {};
+        }
+        Vector normalized = this->normalized();
+        Vector output;
+        for (size_t s = 0; s < Components; s++) {
+            output.components[s] = normalized.components[s] * length;
         }
         return output;
     }
