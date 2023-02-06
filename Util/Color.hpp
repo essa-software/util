@@ -64,6 +64,8 @@ public:
     }
 
     Util::UString to_html_string() const;
+
+    bool operator==(Color const&) const = default;
 };
 
 struct HSV {
@@ -249,6 +251,8 @@ struct Colorf {
         , a(color.a / 255.f) { }
 
     float r, g, b, a;
+
+    bool operator==(Colorf const&) const = default;
 };
 
 constexpr Color HSV::to_rgb() const {
