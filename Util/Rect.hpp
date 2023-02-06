@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <fmt/core.h>
 
 #include "Vector.hpp"
 
@@ -36,6 +37,11 @@ public:
         , top(other.top)
         , width(other.width)
         , height(other.height) {
+    }
+
+    template<class U>
+    static Rect centered(Util::Vector2<U> center, Util::Vector2<U> size) {
+        return Rect { center - size / U { 2 }, size };
     }
 
     Vector2<T> position() const { return { left, top }; }
@@ -95,3 +101,13 @@ using Rectf = Rect<float>;
 using Rectd = Rect<double>;
 
 }
+
+template<class T>
+class fmt::formatter<Util::Rect<T>> : public fmt::formatter<std::string_view> {
+public:
+    template<typename FormatContext>
+    constexpr auto format(Util::Rect<T> const& p, FormatContext& ctx) const {
+        fmt::format_to(ctx.out(), "Rect[@{} {}x{}]", p.position(), p.size().x(), p.size().y());
+        return ctx.out();
+    }
+};

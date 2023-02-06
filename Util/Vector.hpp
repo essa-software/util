@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <fmt/core.h>
 #include <initializer_list>
 #include <ostream>
 
@@ -331,13 +332,7 @@ public:
     bool operator==(Vector const&) const = default;
 
     friend std::ostream& operator<<(std::ostream& out, Vector const& v) {
-        out << "[";
-        for (size_t s = 0; s < Components; s++) {
-            out << v.components[s];
-            if (s != Components - 1)
-                out << ", ";
-        }
-        return out << "]";
+        return out << fmt::format("{}", v);
     }
 
     std::array<T, Components> components {};
@@ -388,3 +383,19 @@ constexpr double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::V
 }
 
 }
+
+template<size_t C, class T>
+class fmt::formatter<Util::Detail::Vector<C, T>> : public fmt::formatter<std::string_view> {
+public:
+    template<typename FormatContext>
+    constexpr auto format(Util::Detail::Vector<C, T> const& v, FormatContext& ctx) const {
+        fmt::format_to(ctx.out(), "[");
+        for (size_t s = 0; s < C; s++) {
+            fmt::format_to(ctx.out(), "{}", v.components[s]);
+            if (s != C - 1)
+                fmt::format_to(ctx.out(), ", ");
+        }
+        return fmt::format_to(ctx.out(), "]");
+        return ctx.out();
+    }
+};
