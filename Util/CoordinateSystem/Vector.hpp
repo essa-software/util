@@ -19,9 +19,11 @@ class Vector : public Coordinates<C, T, Vector> {
 public:
     using Super = Coordinates<C, T, Vector>;
     using ThisPoint = Point<C, T>;
+    using ThisSize = Size<C, T>;
 
     // -> Interoperability
     ThisPoint to_point() const;
+    ThisSize to_size() const;
 
     template<class... Args>
         requires requires(Args... a) { Super(std::forward<Args>(a)...); }

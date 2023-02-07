@@ -25,4 +25,13 @@ Vector<C, T> Size<C, T>::to_vector() const {
     return result;
 }
 
+template<size_t C, class T>
+Size<C, T> Vector<C, T>::to_size() const {
+    ThisSize result;
+    for (size_t s = 0; s < C; s++) {
+        result.set_component(s, this->component(s));
+    }
+    return result;
+}
+
 }
