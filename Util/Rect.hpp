@@ -3,7 +3,7 @@
 #include <concepts>
 #include <fmt/core.h>
 
-#include "Vector.hpp"
+#include "CoordinateSystem.hpp"
 
 namespace Util {
 
@@ -24,7 +24,7 @@ public:
         , height(height_) {
     }
 
-    Rect(Vector2<T> position, Vector2<T> size)
+    Rect(Cs::Point2<T> position, Cs::Size2<T> size)
         : left(position.x())
         , top(position.y())
         , width(size.x())
@@ -40,16 +40,16 @@ public:
     }
 
     template<class U>
-    static Rect centered(Util::Vector2<U> center, Util::Vector2<U> size) {
+    static Rect centered(Cs::Point2<U> center, Cs::Size2<U> size) {
         return Rect { center - size / U { 2 }, size };
     }
 
-    Vector2<T> position() const { return { left, top }; }
-    Vector2<T> size() const { return { width, height }; }
-    Vector2<T> center() const { return { left + width / 2, top + height / 2 }; }
+    Cs::Point2<T> position() const { return { left, top }; }
+    Cs::Size2<T> size() const { return { width, height }; }
+    Cs::Point2<T> center() const { return { left + width / 2, top + height / 2 }; }
 
     template<class U = T>
-    bool contains(Vector2<U> pos) const {
+    bool contains(Cs::Point2<U> pos) const {
         return pos.x() >= left && pos.x() <= left + width && pos.y() >= top && pos.y() <= top + height;
     }
 

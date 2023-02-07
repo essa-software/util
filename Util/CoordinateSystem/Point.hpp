@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Vector.hpp"
 #include "Coordinates.hpp"
 #include <fmt/core.h>
 
@@ -23,6 +24,23 @@ public:
         requires requires(Args... a) { Super(std::forward<Args>(a)...); }
     Point(Args... a)
         : Super(std::forward<Args>(a)...) { }
+
+    template<class OtherT>
+    static Point from_deprecated_vector(DeprecatedVector<C, OtherT> const& c) {
+        Point p;
+        for (size_t s = 0; s < Super::Components; s++) {
+            p.set_component(s, c.components[s]);
+        }
+        return p;
+    }
+
+    DeprecatedVector<C, T> to_deprecated_vector() const {
+        DeprecatedVector<C, T> p;
+        for (size_t s = 0; s < Super::Components; s++) {
+            p.components[s] = this->component(s);
+        }
+        return p;
+    }
 
     // Point + Vector
     constexpr Point operator+(ThisVector const& b) const {

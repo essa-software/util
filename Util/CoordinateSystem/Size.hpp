@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Orientation.hpp"
+#include "../Vector.hpp"
 #include "Coordinates.hpp"
 #include <fmt/core.h>
 
@@ -26,6 +27,23 @@ public:
         requires requires(Args... a) { Super(std::forward<Args>(a)...); }
     Size(Args... a)
         : Super(std::forward<Args>(a)...) { }
+
+    template<class OtherT>
+    static Size from_deprecated_vector(DeprecatedVector<C, OtherT> const& c) {
+        Size p;
+        for (size_t s = 0; s < Super::Components; s++) {
+            p.set_component(s, c.components[s]);
+        }
+        return p;
+    }
+
+    DeprecatedVector<C, T> to_deprecated_vector() const {
+        DeprecatedVector<C, T> p;
+        for (size_t s = 0; s < Super::Components; s++) {
+            p.components[s] = this->component(s);
+        }
+        return p;
+    }
 
     auto diagonal_squared() const {
         double result = 0;
@@ -111,14 +129,14 @@ public:
         return { main, cross };
     }
 
-    //// Vector3 ////
+    //// Size3 ////
     template<size_t OtherC, class OtherT>
         requires(Super::Components == 3 && OtherC >= 3)
     constexpr explicit Size(Vector<OtherC, OtherT> other)
         : Size { other.x(), other.y(), other.z() } {
     }
 
-    //// Vector4 ////
+    //// Size4 ////
 
     template<size_t OtherC, class OtherT>
         requires(Super::Components == 4 && OtherC >= 4)
