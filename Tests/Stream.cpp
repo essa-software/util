@@ -1,4 +1,4 @@
-#include "Suite.hpp"
+#include <Util/Testing.hpp>
 
 #include <Util/Stream.hpp>
 #include <Util/Stream/File.hpp>
@@ -222,6 +222,8 @@ TEST_CASE(binary_reader_little_endian) {
         Util::BinaryReader reader { in };
         EXPECT_EQ(reader.read_little_endian<double>().release_value(), 123456.0);
     }
+
+    // TODO: Struct
     return {};
 }
 

@@ -1,4 +1,5 @@
-#include "Suite.hpp"
+#include <Util/Testing.hpp>
+
 #include <Util/Error.hpp>
 #include <Util/GenericParser.hpp>
 
@@ -43,5 +44,12 @@ TEST_CASE(basic) {
     EXPECT_EQ(subset_test(false, true, false).release_error_of_type<Util::ParseError>().message, "test");
     EXPECT_EQ(subset_test(false, false, true).release_error_of_type<MyError>().value, "test1234");
     EXPECT_EQ(map_test().release_error().message, "test");
+    return {};
+}
+
+TEST_CASE(stacktraces) {
+    fmt::print("\n");
+    test(true, false).dump("test");
+    map_test().dump("map_test");
     return {};
 }

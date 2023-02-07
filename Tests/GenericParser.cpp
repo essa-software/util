@@ -1,4 +1,5 @@
-#include "Suite.hpp"
+#include <Util/Testing.hpp>
+
 #include <Util/GenericParser.hpp>
 #include <Util/Stream/MemoryStream.hpp>
 #include <Util/Stream/Stream.hpp>
