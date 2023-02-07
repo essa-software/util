@@ -81,6 +81,18 @@ public:
         return *this = *this - b;
     }
 
+    constexpr Size operator-(Size const& b) const {
+        Size ab;
+        for (size_t s = 0; s < Super::Components; s++) {
+            ab.set_component(s, this->component(s) - b.component(s));
+        }
+        return ab;
+    }
+
+    constexpr Size& operator-=(Size const& b) {
+        return *this = *this - b;
+    }
+
     constexpr Size operator*(double x) const {
         Size ab;
         for (size_t s = 0; s < Super::Components; s++) {
