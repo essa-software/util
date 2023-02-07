@@ -48,6 +48,15 @@ public:
         assert_components_are_finite();
     }
 
+    template<class OtherT>
+    Derived<C, OtherT> cast() const {
+        Derived<C, OtherT> v;
+        for (size_t s = 0; s < C; s++) {
+            v.set_component(s, static_cast<OtherT>(this->component(s)));
+        }
+        return v;
+    }
+
     // Component getters
     template<size_t I>
     constexpr T component() const {
