@@ -2,6 +2,8 @@
 
 #include <Util/CoordinateSystem.hpp>
 
+using namespace Cs;
+
 TEST_CASE(magnitude) {
     Vector3f test { 3, 4, 5 };
     EXPECT_EQ(test.length_squared(), 50);
@@ -15,7 +17,7 @@ TEST_CASE(magnitude) {
 }
 
 TEST_CASE(length) {
-    auto test = [](Util::Vector3f v, float length) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector3f v, float length) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT_EQ_APPROX(v.length_squared(), length);
         return {};
     };
@@ -29,14 +31,14 @@ TEST_CASE(length) {
 }
 
 TEST_CASE(normalized) {
-    auto test = [](Util::Vector3f v, Util::Vector3f n) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector3f v, Vector3f n) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT(v.normalized().is_approximately_equal(n));
         return {};
     };
-    TRY(test(Util::Vector3f {}, Util::Vector3f {}));
-    TRY(test(Util::Vector3f { 1, 0, 0 }, Util::Vector3f { 1, 0, 0 }));
-    TRY(test(Util::Vector3f { 2, 0, 0 }, Util::Vector3f { 1, 0, 0 }));
-    TRY(test(Util::Vector3f { 2, 2, 2 }, Util::Vector3f { 0.57735026919, 0.57735026919, 0.57735026919 })); // 1/sqrt(3)
+    TRY(test(Vector3f {}, Vector3f {}));
+    TRY(test(Vector3f { 1, 0, 0 }, Vector3f { 1, 0, 0 }));
+    TRY(test(Vector3f { 2, 0, 0 }, Vector3f { 1, 0, 0 }));
+    TRY(test(Vector3f { 2, 2, 2 }, Vector3f { 0.57735026919, 0.57735026919, 0.57735026919 })); // 1/sqrt(3)
     return {};
 }
 
@@ -45,13 +47,13 @@ TEST_CASE(dot) {
         EXPECT_EQ_APPROX(v, n);
         return {};
     };
-    TRY(test(Util::Vector2f {}.dot(Util::Vector2f {}), 0));
-    TRY(test(Util::Vector2f { 1, 1 }.dot(Util::Vector2f {}), 0));
-    TRY(test(Util::Vector2f {}.dot(Util::Vector2f { 1, 1 }), 0));
-    TRY(test(Util::Vector2f { 1, 1 }.dot(Util::Vector2f { -1, 1 }), 0));
-    TRY(test(Util::Vector2f { -1, 1 }.dot(Util::Vector2f { 1, 1 }), 0));
-    TRY(test(Util::Vector2f { 1, 1 }.dot(Util::Vector2f { -2, 1 }), -1));
-    TRY(test(Util::Vector2f { 1, 1 }.dot(Util::Vector2f { 0, 1 }), 1));
+    TRY(test(Vector2f {}.dot(Vector2f {}), 0));
+    TRY(test(Vector2f { 1, 1 }.dot(Vector2f {}), 0));
+    TRY(test(Vector2f {}.dot(Vector2f { 1, 1 }), 0));
+    TRY(test(Vector2f { 1, 1 }.dot(Vector2f { -1, 1 }), 0));
+    TRY(test(Vector2f { -1, 1 }.dot(Vector2f { 1, 1 }), 0));
+    TRY(test(Vector2f { 1, 1 }.dot(Vector2f { -2, 1 }), -1));
+    TRY(test(Vector2f { 1, 1 }.dot(Vector2f { 0, 1 }), 1));
     return {};
 }
 
@@ -71,15 +73,15 @@ TEST_CASE(rounding) {
 
 TEST_CASE(with_length) {
     // This is mostly tested in normalized, so we don't need it here that much.
-    auto test = [](Util::Vector3f v, float l, Util::Vector3f n) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector3f v, float l, Vector3f n) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT(v.with_length(l).is_approximately_equal(n));
         return {};
     };
 
-    TRY(test(Util::Vector3f {}, 0, Util::Vector3f {}));
-    TRY(test(Util::Vector3f {}, 1, Util::Vector3f {}));
-    TRY(test(Util::Vector3f { 1, -3, 0 }, 0, Util::Vector3f {}));
-    TRY(test(Util::Vector3f { 1, -3, 0 }, 100, Util::Vector3f { 31.62277660168, -94.86832980505, 0 }));
+    TRY(test(Vector3f {}, 0, Vector3f {}));
+    TRY(test(Vector3f {}, 1, Vector3f {}));
+    TRY(test(Vector3f { 1, -3, 0 }, 0, Vector3f {}));
+    TRY(test(Vector3f { 1, -3, 0 }, 100, Vector3f { 31.62277660168, -94.86832980505, 0 }));
     return {};
 }
 
@@ -100,119 +102,119 @@ TEST_CASE(arithmetic) {
 }
 
 TEST_CASE(create_polar) {
-    auto test = [](Util::Vector2f v, Util::Vector2f n) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector2f v, Vector2f n) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT(v.is_approximately_equal(n));
         return {};
     };
-    TRY(test(Util::Vector2f::create_polar(0_deg, 1), Util::Vector2f { 1, 0 }));
-    TRY(test(Util::Vector2f::create_polar(90_deg, 1), Util::Vector2f { 0, 1 }));
-    TRY(test(Util::Vector2f::create_polar(180_deg, 2), Util::Vector2f { -2, 0 }));
-    TRY(test(Util::Vector2f::create_polar(270_deg, 2), Util::Vector2f { 0, -2 }));
+    TRY(test(Vector2f::create_polar(0_deg, 1), Vector2f { 1, 0 }));
+    TRY(test(Vector2f::create_polar(90_deg, 1), Vector2f { 0, 1 }));
+    TRY(test(Vector2f::create_polar(180_deg, 2), Vector2f { -2, 0 }));
+    TRY(test(Vector2f::create_polar(270_deg, 2), Vector2f { 0, -2 }));
     return {};
 }
 
 TEST_CASE(angle) {
-    auto test = [](Util::Vector2f v, float n) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector2f v, float n) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT_EQ_APPROX(v.angle().deg(), n);
         return {};
     };
-    TRY(test(Util::Vector2f {}, 0));
-    TRY(test(Util::Vector2f { 1, 0 }, 0));
-    TRY(test(Util::Vector2f { 0, 1 }, 90));
-    TRY(test(Util::Vector2f { -2, 0.001 }, 179.97134));
-    TRY(test(Util::Vector2f { -2, 0 }, 180));
-    TRY(test(Util::Vector2f { -2, -0.001 }, -179.97134));
-    TRY(test(Util::Vector2f { 0, -2 }, -90));
+    TRY(test(Vector2f {}, 0));
+    TRY(test(Vector2f { 1, 0 }, 0));
+    TRY(test(Vector2f { 0, 1 }, 90));
+    TRY(test(Vector2f { -2, 0.001 }, 179.97134));
+    TRY(test(Vector2f { -2, 0 }, 180));
+    TRY(test(Vector2f { -2, -0.001 }, -179.97134));
+    TRY(test(Vector2f { 0, -2 }, -90));
     return {};
 }
 
 TEST_CASE(directed_angle_to) {
-    auto test = [](Util::Vector2f v1, Util::Vector2f v2, float a) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector2f v1, Vector2f v2, float a) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT_EQ_APPROX(v1.directed_angle_to(v2).deg(), a);
         return {};
     };
-    TRY(test(Util::Vector2f { 0, 1 }, Util::Vector2f { 1, 0 }, -90));
-    TRY(test(Util::Vector2f { 1, 0 }, Util::Vector2f { 0, 1 }, 90));
-    TRY(test(Util::Vector2f { 1, 0 }, Util::Vector2f { -1, 0 }, -180));
-    TRY(test(Util::Vector2f { -1, 0 }, Util::Vector2f { 1, 0 }, 180));
-    TRY(test(Util::Vector2f { 0, -1 }, Util::Vector2f { 1, -1 }, 45));
-    TRY(test(Util::Vector2f { -2, 0.001 }, Util::Vector2f { -2, -0.001 }, 0.05730893));
-    TRY(test(Util::Vector2f { -2, -0.001 }, Util::Vector2f { -2, 0.001 }, -0.05730893));
+    TRY(test(Vector2f { 0, 1 }, Vector2f { 1, 0 }, -90));
+    TRY(test(Vector2f { 1, 0 }, Vector2f { 0, 1 }, 90));
+    TRY(test(Vector2f { 1, 0 }, Vector2f { -1, 0 }, -180));
+    TRY(test(Vector2f { -1, 0 }, Vector2f { 1, 0 }, 180));
+    TRY(test(Vector2f { 0, -1 }, Vector2f { 1, -1 }, 45));
+    TRY(test(Vector2f { -2, 0.001 }, Vector2f { -2, -0.001 }, 0.05730893));
+    TRY(test(Vector2f { -2, -0.001 }, Vector2f { -2, 0.001 }, -0.05730893));
     return {};
 }
 
 TEST_CASE(rotate_2d) {
-    auto test = [](Util::Vector2f v, float a, Util::Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
-        EXPECT(v.rotate(Util::Angle::degrees(a)).is_approximately_equal(result));
+    auto test = [](Vector2f v, float a, Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
+        EXPECT(v.rotate(Angle::degrees(a)).is_approximately_equal(result));
         return {};
     };
-    TRY(test(Util::Vector2f {}, 90, Util::Vector2f {}));
-    TRY(test(Util::Vector2f { 1, 0 }, 180, Util::Vector2f { -1, 0 }));
-    TRY(test(Util::Vector2f { 0, 1 }, 180, Util::Vector2f { 0, -1 }));
-    TRY(test(Util::Vector2f { 2, 0 }, 180, Util::Vector2f { -2, 0 }));
-    TRY(test(Util::Vector2f { 0, 2 }, 180, Util::Vector2f { 0, -2 }));
-    TRY(test(Util::Vector2f { M_SQRT1_2, M_SQRT1_2 }, 45, Util::Vector2f { 0, 1 }));
-    TRY(test(Util::Vector2f { M_SQRT1_2, M_SQRT1_2 }, -45, Util::Vector2f { 1, 0 }));
-    TRY(test(Util::Vector2f { M_SQRT1_2, M_SQRT1_2 }, 135, Util::Vector2f { -1, 0 }));
-    TRY(test(Util::Vector2f { M_SQRT1_2, M_SQRT1_2 }, -135, Util::Vector2f { 0, -1 }));
+    TRY(test(Vector2f {}, 90, Vector2f {}));
+    TRY(test(Vector2f { 1, 0 }, 180, Vector2f { -1, 0 }));
+    TRY(test(Vector2f { 0, 1 }, 180, Vector2f { 0, -1 }));
+    TRY(test(Vector2f { 2, 0 }, 180, Vector2f { -2, 0 }));
+    TRY(test(Vector2f { 0, 2 }, 180, Vector2f { 0, -2 }));
+    TRY(test(Vector2f { M_SQRT1_2, M_SQRT1_2 }, 45, Vector2f { 0, 1 }));
+    TRY(test(Vector2f { M_SQRT1_2, M_SQRT1_2 }, -45, Vector2f { 1, 0 }));
+    TRY(test(Vector2f { M_SQRT1_2, M_SQRT1_2 }, 135, Vector2f { -1, 0 }));
+    TRY(test(Vector2f { M_SQRT1_2, M_SQRT1_2 }, -135, Vector2f { 0, -1 }));
     // FIXME: Add more interesting cases
     return {};
 }
 
 TEST_CASE(perpendicular) {
-    auto test = [](Util::Vector2f v, Util::Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector2f v, Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT(v.perpendicular().is_approximately_equal(result));
         return {};
     };
-    TRY(test(Util::Vector2f { 0, 1 }, Util::Vector2f { -1, 0 }));
-    TRY(test(Util::Vector2f { 1, 0 }, Util::Vector2f { 0, 1 }));
-    TRY(test(Util::Vector2f { 1, 1 }, Util::Vector2f { -1, 1 }));
-    TRY(test(Util::Vector2f { -1, -1 }, Util::Vector2f { 1, -1 }));
+    TRY(test(Vector2f { 0, 1 }, Vector2f { -1, 0 }));
+    TRY(test(Vector2f { 1, 0 }, Vector2f { 0, 1 }));
+    TRY(test(Vector2f { 1, 1 }, Vector2f { -1, 1 }));
+    TRY(test(Vector2f { -1, -1 }, Vector2f { 1, -1 }));
     return {};
 }
 
 TEST_CASE(mirror_against_tangent) {
-    auto test = [](Util::Vector2f v, Util::Vector2f axis, Util::Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector2f v, Vector2f axis, Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT(v.mirror_against_tangent(axis.normalized()).is_approximately_equal(result));
         return {};
     };
-    TRY(test(Util::Vector2f { -1, 1 }, Util::Vector2f { 1, 0 }, Util::Vector2f { 1, 1 }));
-    TRY(test(Util::Vector2f { 1, 0 }, Util::Vector2f { 1, 1 }, Util::Vector2f { 0, -1 }));
+    TRY(test(Vector2f { -1, 1 }, Vector2f { 1, 0 }, Vector2f { 1, 1 }));
+    TRY(test(Vector2f { 1, 0 }, Vector2f { 1, 1 }, Vector2f { 0, -1 }));
     // FIXME: Add more interesting cases
     return {};
 }
 
 TEST_CASE(reflect_against_tangent) {
-    auto test = [](Util::Vector2f v, Util::Vector2f axis, Util::Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector2f v, Vector2f axis, Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT(v.reflect_against_tangent(axis.normalized()).is_approximately_equal(result));
         return {};
     };
-    TRY(test(Util::Vector2f { 0, 1 }, Util::Vector2f { 1, 0 }, Util::Vector2f { 0, -1 }));
-    TRY(test(Util::Vector2f { 1, 1 }, Util::Vector2f { 0, 1 }, Util::Vector2f { -1, 1 }));
+    TRY(test(Vector2f { 0, 1 }, Vector2f { 1, 0 }, Vector2f { 0, -1 }));
+    TRY(test(Vector2f { 1, 1 }, Vector2f { 0, 1 }, Vector2f { -1, 1 }));
     // FIXME: Add more interesting cases
     return {};
 }
 
 TEST_CASE(tangent_part) {
-    auto test = [](Util::Vector2f v, Util::Vector2f normal, Util::Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector2f v, Vector2f normal, Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT(v.tangent_part(normal.normalized()).is_approximately_equal(result));
         return {};
     };
-    TRY(test(Util::Vector2f { 1, -1 }, Util::Vector2f { 0, 1 }, Util::Vector2f { 0, -1 }));
-    TRY(test(Util::Vector2f { -1, 1 }, Util::Vector2f { 1, 1 }, Util::Vector2f {}));
-    TRY(test(Util::Vector2f { -1, 1 }, Util::Vector2f { -1, -1 }, Util::Vector2f {}));
+    TRY(test(Vector2f { 1, -1 }, Vector2f { 0, 1 }, Vector2f { 0, -1 }));
+    TRY(test(Vector2f { -1, 1 }, Vector2f { 1, 1 }, Vector2f {}));
+    TRY(test(Vector2f { -1, 1 }, Vector2f { -1, -1 }, Vector2f {}));
     // FIXME: Add more interesting cases
     return {};
 }
 
 TEST_CASE(normal_part) {
-    auto test = [](Util::Vector2f v, Util::Vector2f normal, Util::Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
+    auto test = [](Vector2f v, Vector2f normal, Vector2f result) -> ErrorOr<void, __TestSuite::TestError> {
         EXPECT(v.normal_part(normal.normalized()).is_approximately_equal(result));
         return {};
     };
-    TRY(test(Util::Vector2f { 1, -1 }, Util::Vector2f { 0, 1 }, Util::Vector2f { 1, 0 }));
-    TRY(test(Util::Vector2f { -1, 1 }, Util::Vector2f { 1, 1 }, Util::Vector2f { -1, 1 }));
-    TRY(test(Util::Vector2f { -1, 1 }, Util::Vector2f { -1, -1 }, Util::Vector2f { -1, 1 }));
+    TRY(test(Vector2f { 1, -1 }, Vector2f { 0, 1 }, Vector2f { 1, 0 }));
+    TRY(test(Vector2f { -1, 1 }, Vector2f { 1, 1 }, Vector2f { -1, 1 }));
+    TRY(test(Vector2f { -1, 1 }, Vector2f { -1, -1 }, Vector2f { -1, 1 }));
     // FIXME: Add more interesting cases
     return {};
 }

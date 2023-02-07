@@ -41,6 +41,5 @@ CREATE_TYPED_ALIASES(Vector)
 #undef CREATE_TYPED_ALIASES
 
 }
-using namespace Cs;
 
 }
