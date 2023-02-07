@@ -90,7 +90,7 @@ public:
     template<size_t OtherC, class OtherT>
         requires(Super::Components == 2 && OtherC >= 2)
     constexpr explicit Point(Point<OtherC, OtherT> other)
-        : Point { other.x(), other.y(), 0, 1 } {
+        : Point { other.x(), other.y() } {
     }
 
     // Angle is CCW starting from positive X axis.
@@ -104,7 +104,7 @@ public:
     template<size_t OtherC, class OtherT>
         requires(Super::Components == 3 && OtherC >= 3)
     constexpr explicit Point(Point<OtherC, OtherT> other)
-        : Point { other.x(), other.y(), other.z(), 1 } {
+        : Point { other.x(), other.y(), other.z() } {
     }
 
     constexpr static Point create_spheric(Angle lat, Angle lon, double radius)
