@@ -100,7 +100,12 @@ public:
         return 1 / length();
     }
 
+    // Return unit vector of direction the same as original. If original
+    // vector is null, return null.
     auto normalized() const {
+        if (is_null_vector()) {
+            return Vector {};
+        }
         return *this * inverted_length();
     }
 
