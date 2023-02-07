@@ -13,7 +13,7 @@ namespace Util {
 namespace Detail {
 
 // A generic class containing some numbers.
-template<size_t C, class T, class Derived>
+template<size_t C, class T, template<size_t, class> class Derived>
 class Coordinates {
 public:
     static constexpr size_t Components = C;
@@ -104,7 +104,7 @@ public:
         return std::ranges::all_of(m_components, [](auto n) { return n == 0; });
     }
 
-    bool is_approximately_equal(Derived const& other, float epsilon = 10e-6) {
+    bool is_approximately_equal(Derived<C, T> const& other, float epsilon = 10e-6) {
         for (size_t s = 0; s < Components; s++) {
             if (std::abs(other.m_components[s] - m_components[s]) > epsilon) {
                 return false;
@@ -114,7 +114,7 @@ public:
     }
 
     auto floored() const {
-        Derived output;
+        Derived<C, T> output;
         for (size_t s = 0; s < Components; s++) {
             output.set_component(s, std::floor(this->component(s)));
         }
@@ -122,7 +122,7 @@ public:
     }
 
     auto ceiled() const {
-        Derived output;
+        Derived<C, T> output;
         for (size_t s = 0; s < Components; s++) {
             output.set_component(s, std::ceil(this->component(s)));
         }
@@ -130,7 +130,7 @@ public:
     }
 
     auto rounded() const {
-        Derived output;
+        Derived<C, T> output;
         for (size_t s = 0; s < Components; s++) {
             output.set_component(s, std::round(this->component(s)));
         }

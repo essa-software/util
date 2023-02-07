@@ -13,9 +13,9 @@ template<size_t C, class T>
 class Vector;
 
 template<size_t C, class T>
-class Size : public Coordinates<C, T, Size<C, T>> {
+class Size : public Coordinates<C, T, Size> {
 public:
-    using Super = Coordinates<C, T, Size<C, T>>;
+    using Super = Coordinates<C, T, Size>;
     using ThisVector = Vector<C, T>;
 
     // -> Interoperability

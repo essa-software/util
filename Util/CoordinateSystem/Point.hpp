@@ -12,9 +12,9 @@ template<size_t C, class T>
 class Vector;
 
 template<size_t C, class T>
-class Point : public Coordinates<C, T, Point<C, T>> {
+class Point : public Coordinates<C, T, Point> {
 public:
-    using Super = Coordinates<C, T, Point<C, T>>;
+    using Super = Coordinates<C, T, Point>;
     using ThisVector = Vector<C, T>;
 
     // -> Interoperability
