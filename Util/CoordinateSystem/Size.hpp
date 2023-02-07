@@ -21,7 +21,7 @@ public:
     // -> Interoperability
     // Return top-left to bottom-right diagonal vector, effectively converting
     // this's components to vector without change.
-    ThisVector diagonal_vector() const;
+    ThisVector to_vector() const;
 
     template<class... Args>
         requires requires(Args... a) { Super(std::forward<Args>(a)...); }
