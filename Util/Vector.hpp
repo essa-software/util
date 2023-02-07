@@ -15,17 +15,17 @@ namespace Util {
 namespace Detail {
 
 template<size_t C, class T>
-class Vector {
+class DeprecatedVector {
 public:
     static constexpr size_t Components = C;
 
-    constexpr Vector() {
+    constexpr DeprecatedVector() {
         if constexpr (Components == 4)
             components[3] = 1;
     }
 
     template<class... T2>
-    constexpr Vector(T2... packed_c)
+    constexpr DeprecatedVector(T2... packed_c)
         requires(sizeof...(packed_c) == Components || (Components == 4 && sizeof...(packed_c) == 3))
     {
         auto c = std::initializer_list<T> { static_cast<T>(packed_c)... };
@@ -37,7 +37,7 @@ public:
 
     template<size_t OtherC, class OtherT, class... MoreT>
         requires(OtherC + sizeof...(MoreT) == Components || (Components == 4 && OtherC + sizeof...(MoreT) == 3))
-    constexpr explicit Vector(Vector<OtherC, OtherT> const& other, MoreT... more) {
+    constexpr explicit DeprecatedVector(DeprecatedVector<OtherC, OtherT> const& other, MoreT... more) {
         std::copy(other.components.begin(), other.components.end(), components.begin());
         auto c = std::initializer_list<T> { static_cast<T>(more)... };
         std::copy(std::begin(c), std::end(c), components.begin() + OtherC);
@@ -76,7 +76,7 @@ public:
         return std::ranges::all_of(components, [](auto n) { return n == 0; });
     }
 
-    bool is_approximately_equal(Vector const& other, float epsilon = 10e-6) {
+    bool is_approximately_equal(DeprecatedVector const& other, float epsilon = 10e-6) {
         for (size_t s = 0; s < Components; s++) {
             if (std::abs(other.components[s] - components[s]) > epsilon) {
                 return false;
@@ -104,7 +104,7 @@ public:
     // vector is null, return null.
     auto normalized() const {
         if (is_null_vector()) {
-            return Vector {};
+            return DeprecatedVector {};
         }
         return *this * inverted_length();
     }
@@ -114,7 +114,7 @@ public:
         return length == 1 || length == 0;
     }
 
-    double dot(Vector const& a) const {
+    double dot(DeprecatedVector const& a) const {
         double result = 0;
         for (size_t s = 0; s < std::min<size_t>(Components, 3); s++)
             result += components[s] * a.components[s];
@@ -122,7 +122,7 @@ public:
     }
 
     auto floored() const {
-        Vector output;
+        DeprecatedVector output;
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = std::floor(components[s]);
         }
@@ -131,7 +131,7 @@ public:
     }
 
     auto ceiled() const {
-        Vector output;
+        DeprecatedVector output;
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = std::ceil(components[s]);
         }
@@ -140,7 +140,7 @@ public:
     }
 
     auto rounded() const {
-        Vector output;
+        DeprecatedVector output;
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = std::round(components[s]);
         }
@@ -150,12 +150,12 @@ public:
 
     // Returns `this` resized to `length`, i.e this.normalized()*length.
     // If `this` is a null vector, this function returns null vector.
-    constexpr Vector with_length(double length) const {
+    constexpr DeprecatedVector with_length(double length) const {
         if (is_null_vector()) {
-            return Vector {};
+            return DeprecatedVector {};
         }
-        Vector normalized = this->normalized();
-        Vector output;
+        DeprecatedVector normalized = this->normalized();
+        DeprecatedVector output;
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = normalized.components[s] * length;
         }
@@ -163,56 +163,56 @@ public:
         return output;
     }
 
-    constexpr Vector operator+(Vector const& b) const {
-        Vector ab;
+    constexpr DeprecatedVector operator+(DeprecatedVector const& b) const {
+        DeprecatedVector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] + b.components[s];
         ab.assert_components_are_finite();
         return ab;
     }
 
-    constexpr Vector& operator+=(Vector const& b) {
+    constexpr DeprecatedVector& operator+=(DeprecatedVector const& b) {
         return *this = *this + b;
     }
 
-    constexpr Vector operator-(Vector const& b) const {
-        Vector ab;
+    constexpr DeprecatedVector operator-(DeprecatedVector const& b) const {
+        DeprecatedVector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] - b.components[s];
         ab.assert_components_are_finite();
         return ab;
     }
 
-    constexpr Vector& operator-=(Vector const& b) {
+    constexpr DeprecatedVector& operator-=(DeprecatedVector const& b) {
         return *this = *this - b;
     }
 
-    constexpr Vector operator*(double x) const {
-        Vector ab;
+    constexpr DeprecatedVector operator*(double x) const {
+        DeprecatedVector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] * x;
         ab.assert_components_are_finite();
         return ab;
     }
 
-    constexpr Vector& operator*=(double x) {
+    constexpr DeprecatedVector& operator*=(double x) {
         return *this = *this * x;
     }
 
-    constexpr Vector operator/(double x) const {
-        Vector ab;
+    constexpr DeprecatedVector operator/(double x) const {
+        DeprecatedVector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] / x;
         ab.assert_components_are_finite();
         return ab;
     }
 
-    constexpr Vector& operator/=(double x) {
+    constexpr DeprecatedVector& operator/=(double x) {
         return *this = *this / x;
     }
 
-    constexpr Vector operator-() const {
-        Vector ap;
+    constexpr DeprecatedVector operator-() const {
+        DeprecatedVector ap;
         for (size_t s = 0; s < Components; s++)
             ap.components[s] = -components[s];
         ap.assert_components_are_finite();
@@ -222,11 +222,11 @@ public:
     //// Vector2 ////
     template<size_t OtherC, class OtherT>
         requires(Components == 2 && OtherC >= 2)
-    constexpr explicit Vector(Vector<OtherC, OtherT> other)
-        : Vector { other.x(), other.y() } {
+    constexpr explicit DeprecatedVector(DeprecatedVector<OtherC, OtherT> other)
+        : DeprecatedVector { other.x(), other.y() } {
     }
 
-    constexpr static Vector from_main_cross(Orientation orientation, T main, T cross)
+    constexpr static DeprecatedVector from_main_cross(Orientation orientation, T main, T cross)
         requires(Components == 2)
     {
         if (orientation == Orientation::Vertical)
@@ -235,7 +235,7 @@ public:
     }
 
     // Angle is CCW starting from positive X axis.
-    constexpr static Vector create_polar(double angle_radians, double length)
+    constexpr static DeprecatedVector create_polar(double angle_radians, double length)
         requires(Components == 2)
     {
         return { std::cos(angle_radians) * length, std::sin(angle_radians) * length };
@@ -247,7 +247,7 @@ public:
         return std::atan2(this->y(), this->x());
     }
 
-    constexpr Angle directed_angle_to(Vector<2, T> other) const
+    constexpr Angle directed_angle_to(DeprecatedVector<2, T> other) const
         requires(Components == 2)
     {
         auto angle1 = angle();
@@ -257,7 +257,7 @@ public:
 
     template<class OtherT = T>
         requires(Components == 2)
-    constexpr Vector<2, OtherT> rotate(double theta) const {
+    constexpr DeprecatedVector<2, OtherT> rotate(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->y() * t_sin, this->x() * t_sin + this->y() * t_cos };
     }
@@ -265,12 +265,12 @@ public:
     template<class OtherT = T>
         requires(Components == 2)
     constexpr auto perpendicular() const {
-        return Vector<2, OtherT> { -this->y(), this->x() };
+        return DeprecatedVector<2, OtherT> { -this->y(), this->x() };
     }
 
     template<class OtherT>
         requires(Components == 2)
-    constexpr auto mirror(Vector<2, OtherT> axis) const {
+    constexpr auto mirror(DeprecatedVector<2, OtherT> axis) const {
         return *this - (decltype(this->x()))2 * dot(axis.normalized()) * axis;
     }
 
@@ -293,11 +293,11 @@ public:
     //// Vector3 ////
     template<size_t OtherC, class OtherT>
         requires(Components == 3 && OtherC >= 3)
-    constexpr explicit Vector(Vector<OtherC, OtherT> other)
-        : Vector { other.x(), other.y(), other.z() } {
+    constexpr explicit DeprecatedVector(DeprecatedVector<OtherC, OtherT> other)
+        : DeprecatedVector { other.x(), other.y(), other.z() } {
     }
 
-    constexpr static Vector create_spheric(double lat_radians, double lon_radians, double radius)
+    constexpr static DeprecatedVector create_spheric(double lat_radians, double lon_radians, double radius)
         requires(Components == 3)
     {
         return {
@@ -309,29 +309,29 @@ public:
 
     template<class OtherT = T>
         requires(Components == 3)
-    constexpr Vector<3, OtherT> rotate_x(double theta) const {
+    constexpr DeprecatedVector<3, OtherT> rotate_x(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x(), this->y() * t_cos - this->z() * t_sin, this->y() * t_sin + this->z() * t_cos };
     }
 
     template<class OtherT = T>
         requires(Components == 3)
-    constexpr Vector<3, OtherT> rotate_y(double theta) const {
+    constexpr DeprecatedVector<3, OtherT> rotate_y(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->z() * t_sin, this->y(), this->x() * t_sin + this->z() * t_cos };
     }
 
     template<class OtherT = T>
         requires(Components == 3)
-    constexpr Vector<3, OtherT> rotate_z(double theta) const {
+    constexpr DeprecatedVector<3, OtherT> rotate_z(double theta) const {
         double t_cos = std::cos(theta), t_sin = std::sin(theta);
         return { this->x() * t_cos - this->y() * t_sin, this->x() * t_sin + this->y() * t_cos, this->z() };
     }
 
     template<class OtherT = T>
         requires(Components == 3)
-    constexpr Vector<3, OtherT> cross(Vector<3, T> const& a) const {
-        Vector<3, OtherT> result;
+    constexpr DeprecatedVector<3, OtherT> cross(DeprecatedVector<3, T> const& a) const {
+        DeprecatedVector<3, OtherT> result;
         result.x() = this->y() * a.z() - this->z() * a.y();
         result.y() = this->z() * a.x() - this->x() * a.z();
         result.z() = this->x() * a.y() - this->y() * a.x();
@@ -343,13 +343,13 @@ public:
 
     template<size_t OtherC, class OtherT>
         requires(Components == 4 && OtherC >= 4)
-    constexpr explicit Vector(Vector<OtherC, OtherT> other)
-        : Vector { other.x(), other.y(), other.z(), other.w() } {
+    constexpr explicit DeprecatedVector(DeprecatedVector<OtherC, OtherT> other)
+        : DeprecatedVector { other.x(), other.y(), other.z(), other.w() } {
     }
 
-    bool operator==(Vector const&) const = default;
+    bool operator==(DeprecatedVector const&) const = default;
 
-    friend std::ostream& operator<<(std::ostream& out, Vector const& v) {
+    friend std::ostream& operator<<(std::ostream& out, DeprecatedVector const& v) {
         return out << fmt::format("{}", v);
     }
 
@@ -366,39 +366,39 @@ private:
 }
 
 template<size_t C, class T>
-Detail::Vector<C, T> operator*(double fac, Detail::Vector<C, T> const& vec) {
+Detail::DeprecatedVector<C, T> operator*(double fac, Detail::DeprecatedVector<C, T> const& vec) {
     return vec * fac;
 }
 
 template<class T>
-using Vector2 = Detail::Vector<2, T>;
+using Vector2 = Detail::DeprecatedVector<2, T>;
 using Vector2i = Vector2<int>;
 using Vector2u = Vector2<unsigned>;
 using Vector2f = Vector2<float>;
 using Vector2d = Vector2<double>;
 
 template<class T>
-using Vector3 = Detail::Vector<3, T>;
+using Vector3 = Detail::DeprecatedVector<3, T>;
 using Vector3i = Vector3<int>;
 using Vector3u = Vector3<unsigned>;
 using Vector3f = Vector3<float>;
 using Vector3d = Vector3<double>;
 
 template<class T>
-using Vector4 = Detail::Vector<4, T>;
+using Vector4 = Detail::DeprecatedVector<4, T>;
 using Vector4i = Vector4<int>;
 using Vector4u = Vector4<unsigned>;
 using Vector4f = Vector4<float>;
 using Vector4d = Vector4<double>;
 
 template<size_t S, class T>
-constexpr double get_distance(Detail::Vector<S, T> const& a, Detail::Vector<S, T> const& b) {
+constexpr double get_distance(Detail::DeprecatedVector<S, T> const& a, Detail::DeprecatedVector<S, T> const& b) {
     return (a - b).length();
 }
 
 template<size_t S, class T>
     requires(S == 2 || S == 3)
-constexpr double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::Vector<S, T> line_end, Detail::Vector<S, T> point) {
+constexpr double get_distance_to_line(Detail::DeprecatedVector<S, T> line_start, Detail::DeprecatedVector<S, T> line_end, Detail::DeprecatedVector<S, T> point) {
     auto d = (point - line_end) / get_distance(point, line_end);
     auto v = line_start - line_end;
     double t = v.dot(d);
@@ -410,10 +410,10 @@ constexpr double get_distance_to_line(Detail::Vector<S, T> line_start, Detail::V
 }
 
 template<size_t C, class T>
-class fmt::formatter<Util::Detail::Vector<C, T>> : public fmt::formatter<std::string_view> {
+class fmt::formatter<Util::Detail::DeprecatedVector<C, T>> : public fmt::formatter<std::string_view> {
 public:
     template<typename FormatContext>
-    constexpr auto format(Util::Detail::Vector<C, T> const& v, FormatContext& ctx) const {
+    constexpr auto format(Util::Detail::DeprecatedVector<C, T> const& v, FormatContext& ctx) const {
         fmt::format_to(ctx.out(), "[");
         for (size_t s = 0; s < C; s++) {
             fmt::format_to(ctx.out(), "{}", v.components[s]);
