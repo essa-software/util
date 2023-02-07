@@ -65,6 +65,11 @@ public:
 
     Util::UString to_html_string() const;
 
+    Util::Color with_red(uint8_t red) const { return Util::Color { red, this->g, this->b, this->a }; }
+    Util::Color with_green(uint8_t green) const { return Util::Color { this->r, green, this->b, this->a }; }
+    Util::Color with_blue(uint8_t blue) const { return Util::Color { this->r, this->g, blue, this->a }; }
+    Util::Color with_alpha(uint8_t alpha) const { return Util::Color { this->r, this->g, this->b, alpha }; }
+
     bool operator==(Color const&) const = default;
 };
 
