@@ -62,7 +62,13 @@ private:
 constexpr Util::Angle operator""_deg(long double v) {
     return Util::Angle::degrees(v);
 }
+constexpr Util::Angle operator""_deg(unsigned long long v) {
+    return Util::Angle::degrees(v);
+}
 
 constexpr Util::Angle operator""_rad(long double v) {
+    return Util::Angle::radians(v);
+}
+constexpr Util::Angle operator""_rad(unsigned long long v) {
     return Util::Angle::radians(v);
 }
