@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoordinateSystem.hpp"
 #include "Vector.hpp"
 #include <cassert>
 #include <cmath>
@@ -8,13 +9,14 @@
 #include <iostream>
 
 #ifdef ESSA_COMPILER_GCC
-#pragma GCC optimize("O3")
+#    pragma GCC optimize("O3")
 #endif
 
 namespace Util {
 
 template<class T, size_t Size>
-requires(Size > 0) struct Matrix {
+    requires(Size > 0)
+struct Matrix {
 
     constexpr Matrix() {
         for (size_t s = 0; s < Size; s++)
@@ -31,7 +33,8 @@ requires(Size > 0) struct Matrix {
     }
 
     template<class... T2>
-    constexpr Matrix(T2... data) requires(sizeof...(data) == Size * Size)
+    constexpr Matrix(T2... data)
+        requires(sizeof...(data) == Size * Size)
         : Matrix { std::initializer_list<T> { data... } } {
     }
 
@@ -119,15 +122,16 @@ Matrix<T, Size> operator*(Matrix<T, Size> const& left, Matrix<T, Size> const& ri
 }
 
 template<class T, size_t Size>
-requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::inverted() const {
+    requires(Size > 0)
+inline Matrix<T, Size> Matrix<T, Size>::inverted() const {
     // https://math.icalculator.info/4x4-matrix-inverse-calculator.html
     // A^-1 = 1 / det(A) × adj(A)
     return 1 / determinant() * adjoint();
 }
 
 template<class T, size_t Size>
-requires(Size > 0) Matrix<T, Size - 1>
-inline Matrix<T, Size>::minor(size_t row, size_t column) const {
+    requires(Size > 0)
+Matrix<T, Size - 1> inline Matrix<T, Size>::minor(size_t row, size_t column) const {
     Matrix<T, Size - 1> submatrix;
     size_t source_i = 0;
     for (size_t ii = 0; ii < Size - 1; ii++) {
@@ -146,7 +150,8 @@ inline Matrix<T, Size>::minor(size_t row, size_t column) const {
 }
 
 template<class T, size_t Size>
-requires(Size > 0) inline T Matrix<T, Size>::determinant() const {
+    requires(Size > 0)
+inline T Matrix<T, Size>::determinant() const {
     if constexpr (Size == 1)
         return m_data[0][0];
     if constexpr (Size == 2)
@@ -168,7 +173,8 @@ requires(Size > 0) inline T Matrix<T, Size>::determinant() const {
 }
 
 template<class T, size_t Size>
-requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::transposed() const {
+    requires(Size > 0)
+inline Matrix<T, Size> Matrix<T, Size>::transposed() const {
     Matrix result;
     for (size_t i = 0; i < Size; i++) {
         for (size_t j = 0; j < Size; j++) {
@@ -179,7 +185,8 @@ requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::transposed() const {
 }
 
 template<class T, size_t Size>
-requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::adjoint() const {
+    requires(Size > 0)
+inline Matrix<T, Size> Matrix<T, Size>::adjoint() const {
     Matrix cofactors;
 
     for (size_t i = 0; i < Size; i++) {
@@ -192,12 +199,12 @@ requires(Size > 0) inline Matrix<T, Size> Matrix<T, Size>::adjoint() const {
 }
 
 template<class T>
-inline Vector4<T> operator*(Matrix<T, 4> const& mat, Vector4<T> const& vec) {
-    Vector4<T> result;
-    result.x() = vec.x() * mat.element(0, 0) + vec.y() * mat.element(0, 1) + vec.z() * mat.element(0, 2) + vec.w() * mat.element(0, 3);
-    result.y() = vec.x() * mat.element(1, 0) + vec.y() * mat.element(1, 1) + vec.z() * mat.element(1, 2) + vec.w() * mat.element(1, 3);
-    result.z() = vec.x() * mat.element(2, 0) + vec.y() * mat.element(2, 1) + vec.z() * mat.element(2, 2) + vec.w() * mat.element(2, 3);
-    result.w() = vec.x() * mat.element(3, 0) + vec.y() * mat.element(3, 1) + vec.z() * mat.element(3, 2) + vec.w() * mat.element(3, 3);
+inline Cs::Point4<T> operator*(Matrix<T, 4> const& mat, Cs::Point4<T> const& vec) {
+    Cs::Point4<T> result;
+    result.set_x(vec.x() * mat.element(0, 0) + vec.y() * mat.element(0, 1) + vec.z() * mat.element(0, 2) + vec.w() * mat.element(0, 3));
+    result.set_y(vec.x() * mat.element(1, 0) + vec.y() * mat.element(1, 1) + vec.z() * mat.element(1, 2) + vec.w() * mat.element(1, 3));
+    result.set_z(vec.x() * mat.element(2, 0) + vec.y() * mat.element(2, 1) + vec.z() * mat.element(2, 2) + vec.w() * mat.element(2, 3));
+    result.set_w(vec.x() * mat.element(3, 0) + vec.y() * mat.element(3, 1) + vec.z() * mat.element(3, 2) + vec.w() * mat.element(3, 3));
     return result;
 }
 
