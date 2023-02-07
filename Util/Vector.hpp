@@ -4,6 +4,7 @@
 #include "Orientation.hpp"
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cmath>
 #include <fmt/core.h>
 #include <initializer_list>
@@ -31,6 +32,7 @@ public:
         std::copy(std::begin(c), std::end(c), components.begin());
         if constexpr (Components == 4 && sizeof...(packed_c) == 3)
             components[3] = 1;
+        assert_components_are_finite();
     }
 
     template<size_t OtherC, class OtherT, class... MoreT>
@@ -41,6 +43,7 @@ public:
         std::copy(std::begin(c), std::end(c), components.begin() + OtherC);
         if constexpr (Components == 4 && OtherC + sizeof...(MoreT) == 3)
             components[3] = 1;
+        assert_components_are_finite();
     }
 
     constexpr T& x()
@@ -118,6 +121,7 @@ public:
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = std::floor(components[s]);
         }
+        output.assert_components_are_finite();
         return output;
     }
 
@@ -126,6 +130,7 @@ public:
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = std::ceil(components[s]);
         }
+        output.assert_components_are_finite();
         return output;
     }
 
@@ -134,6 +139,7 @@ public:
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = std::round(components[s]);
         }
+        output.assert_components_are_finite();
         return output;
     }
 
@@ -148,6 +154,7 @@ public:
         for (size_t s = 0; s < Components; s++) {
             output.components[s] = normalized.components[s] * length;
         }
+        output.assert_components_are_finite();
         return output;
     }
 
@@ -155,6 +162,7 @@ public:
         Vector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] + b.components[s];
+        ab.assert_components_are_finite();
         return ab;
     }
 
@@ -166,6 +174,7 @@ public:
         Vector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] - b.components[s];
+        ab.assert_components_are_finite();
         return ab;
     }
 
@@ -177,6 +186,7 @@ public:
         Vector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] * x;
+        ab.assert_components_are_finite();
         return ab;
     }
 
@@ -188,6 +198,7 @@ public:
         Vector ab;
         for (size_t s = 0; s < Components; s++)
             ab.components[s] = components[s] / x;
+        ab.assert_components_are_finite();
         return ab;
     }
 
@@ -199,6 +210,7 @@ public:
         Vector ap;
         for (size_t s = 0; s < Components; s++)
             ap.components[s] = -components[s];
+        ap.assert_components_are_finite();
         return ap;
     }
 
@@ -318,6 +330,7 @@ public:
         result.x() = this->y() * a.z() - this->z() * a.y();
         result.y() = this->z() * a.x() - this->x() * a.z();
         result.z() = this->x() * a.y() - this->y() * a.x();
+        result.assert_components_are_finite();
         return result;
     }
 
@@ -336,6 +349,13 @@ public:
     }
 
     std::array<T, Components> components {};
+
+private:
+    void assert_components_are_finite() const {
+        for (auto c : components) {
+            assert(std::isfinite(c));
+        }
+    }
 };
 
 }
