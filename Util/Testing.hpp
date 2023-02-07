@@ -20,7 +20,8 @@ struct FormatIfFormattable {
 
 namespace fmt {
 template<class T>
-requires(is_formattable<T>::value) struct formatter<FormatIfFormattable<T>> : public formatter<T> {
+    requires(is_formattable<T>::value)
+struct formatter<FormatIfFormattable<T>> : public formatter<T> {
     template<typename FormatContext>
     constexpr auto format(FormatIfFormattable<T> const& p, FormatContext& ctx) {
         return formatter<T>::format(p.t, ctx);
@@ -58,6 +59,13 @@ ErrorOr<void, TestError> expect_equal(auto v1, auto v2, std::string_view expr1, 
     return {};
 }
 
+ErrorOr<void, TestError> expect_approx_equal(auto v1, auto v2, std::string_view expr1, std::string_view expr2, std::string_view file, int line) {
+    if (std::abs(v1 - v2) > 10e-6) {
+        return TestError { fmt::format("{} ~= {}", expr1, expr2), file, line, fmt::format("'{}' !~= '{}'", FormatIfFormattable { v1 }, FormatIfFormattable { v2 }) };
+    }
+    return {};
+}
+
 template<class T, class E>
 ErrorOr<void, TestError> expect_no_error(ErrorOr<T, E> value, std::string_view expr, std::string_view file, int line) {
     if (value.is_error()) {
@@ -79,6 +87,7 @@ constexpr bool Fail = false;
 #define FAIL() EXPECT(Fail)
 
 #define EXPECT_EQ(e1, e2) TRY(__TestSuite::expect_equal((e1), (e2), #e1, #e2, __FILE__, __LINE__))
+#define EXPECT_EQ_APPROX(e1, e2) TRY(__TestSuite::expect_approx_equal((e1), (e2), #e1, #e2, __FILE__, __LINE__))
 
 #define EXPECT_NO_ERROR(...) TRY(__TestSuite::expect_no_error((__VA_ARGS__), #__VA_ARGS__, __FILE__, __LINE__))
 
