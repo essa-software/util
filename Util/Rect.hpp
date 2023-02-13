@@ -41,7 +41,7 @@ public:
 
     template<class U>
     static Rect centered(Cs::Point2<U> center, Cs::Size2<U> size) {
-        return Rect { center - size / U { 2 }, size };
+        return Rect { center - size.to_vector() / U { 2 }, size };
     }
 
     Cs::Point2<T> position() const { return { left, top }; }
