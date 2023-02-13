@@ -1,7 +1,7 @@
 #pragma once
 
+#include "CoordinateSystem.hpp"
 #include "Rect.hpp"
-#include "Vector.hpp"
 #include <cmath>
 #include <random>
 
@@ -34,7 +34,7 @@ public:
 
     // Generate random vector [ℝ×ℝ] of length [length]
     template<class T>
-    Util::Vector2<T> next_vec2(float length) {
+    Util::Cs::Vector2<T> next_vec2(float length) {
         double angle = next_float<T>(0, 2 * M_PI);
         double x;
         double y;
@@ -42,9 +42,9 @@ public:
         return Util::Vector2<T> { x, y } * length;
     }
 
-    // Generate random vector [x ∈ ℝ, y ∈ ℝ], where x ∈ <rect_left; rect_right) and y ∈ <rect_top; rect_bottom).
+    // Generate random point [x ∈ ℝ, y ∈ ℝ], where x ∈ <rect_left; rect_right) and y ∈ <rect_top; rect_bottom).
     template<std::floating_point T>
-    Util::Vector2<T> next_vec2_in_rect(Util::Rect<T> rect) {
+    Util::Cs::Point2<T> next_point2_in_rect(Util::Rect<T> rect) {
         T x = next_float(rect.left, rect.left + rect.width);
         T y = next_float(rect.top, rect.top + rect.height);
         return { x, y };
@@ -75,14 +75,14 @@ T floating(T min, T max) {
 
 // Generate random vector [ℝ×ℝ] of length [length]
 template<class T>
-Util::Vector2<T> vector2(float length) {
+Util::Cs::Vector2<T> vector2(float length) {
     return default_engine().next_vec2<T>(length);
 }
 
 // Generate random vector [x ∈ ℝ, y ∈ ℝ], where x ∈ <rect_left; rect_right) and y ∈ <rect_top; rect_bottom).
 template<std::floating_point T>
-Util::Vector2<T> vector2_in_rect(Util::Rect<T> rect) {
-    return default_engine().next_vec2_in_rect<T>(rect);
+Util::Cs::Point2<T> point2_in_rect(Util::Rect<T> rect) {
+    return default_engine().next_point2_in_rect<T>(rect);
 }
 
 }
