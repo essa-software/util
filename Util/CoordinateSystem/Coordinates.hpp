@@ -26,7 +26,7 @@ public:
 
     template<class... T2>
     constexpr Coordinates(T2... packed_c)
-        requires(sizeof...(packed_c) == Components || (Components == 4 && sizeof...(packed_c) == 3))
+        requires(sizeof...(T2) == Components || (Components == 4 && sizeof...(T2) == 3))
     {
         auto c = std::initializer_list<T> { static_cast<T>(packed_c)... };
         std::copy(std::begin(c), std::end(c), m_components.begin());
