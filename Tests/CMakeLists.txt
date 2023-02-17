@@ -1,5 +1,6 @@
 essautil_add_test(Buffer LIBS essautil)
 essautil_add_test(Color LIBS essautil)
+essautil_add_test(ColorScale LIBS essautil)
 essautil_add_test(CoordinateSystem LIBS essautil)
 essautil_add_test(Error LIBS essautil)
 essautil_add_test(DynamicArray2D LIBS essautil)
