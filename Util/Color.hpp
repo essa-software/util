@@ -322,3 +322,18 @@ constexpr Color Color::to_grayscale(float saturation) const {
 }
 
 } // namespace Util
+
+template<>
+class fmt::formatter<Util::Color> : public fmt::formatter<std::string_view> {
+public:
+    template<typename FormatContext>
+    constexpr auto format(Util::Color const& v, FormatContext& ctx) const {
+        if (v.a == 255) {
+            fmt::format_to(ctx.out(), "rgb({}, {}, {})", v.r, v.g, v.b);
+        }
+        else {
+            fmt::format_to(ctx.out(), "rgba({}, {}, {}, {})", v.r, v.g, v.b, v.a / 255.0);
+        }
+        return ctx.out();
+    }
+};
