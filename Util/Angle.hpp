@@ -38,6 +38,10 @@ public:
         return Angle { m_value_in_radians - other.m_value_in_radians };
     }
 
+    constexpr Angle operator*(float n) const {
+        return Angle { m_value_in_radians * n };
+    }
+
     constexpr Angle& operator+=(Angle const& other) {
         return *this = *this + other;
     }
@@ -46,7 +50,12 @@ public:
         return *this = *this - other;
     }
 
-    friend std::ostream& operator<<(std::ostream& out, Angle alfa) {
+    constexpr Angle& operator*=(float n) {
+        return *this = *this * n;
+    }
+
+    friend std::ostream&
+    operator<<(std::ostream& out, Angle alfa) {
         return out << alfa.rad() << " [rad]";
     }
 
