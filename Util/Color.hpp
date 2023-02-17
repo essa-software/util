@@ -71,6 +71,8 @@ public:
     Util::Color with_alpha(uint8_t alpha) const { return Util::Color { this->r, this->g, this->b, alpha }; }
 
     bool operator==(Color const&) const = default;
+
+    static Color rgb_blend(Color const& l, Color const& r, float how_much_r);
 };
 
 struct HSV {
