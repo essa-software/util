@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <compare>
 #include <ostream>
 
 namespace Util {
@@ -53,6 +54,9 @@ public:
     constexpr Angle& operator*=(float n) {
         return *this = *this * n;
     }
+
+    constexpr std::partial_ordering operator<=>(Angle const& other) const { return m_value_in_radians <=> other.m_value_in_radians; }
+    constexpr bool operator==(Angle const& other) const = default;
 
     friend std::ostream&
     operator<<(std::ostream& out, Angle alfa) {
