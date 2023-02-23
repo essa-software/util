@@ -173,6 +173,18 @@ TEST_CASE(insert) {
     return {};
 }
 
+TEST_CASE(starts_with) {
+    UString test {"abcghi"};
+    EXPECT(test.starts_with("a"));
+    EXPECT(test.starts_with("abc"));
+    EXPECT(test.starts_with("abcghi"));
+    EXPECT(!test.starts_with("abcghij"));
+    EXPECT(!test.starts_with("def"));
+    EXPECT(!test.starts_with("abcdef"));
+
+    return {};
+}
+
 TEST_CASE(indent) {
     EXPECT_EQ(UString { "test" }.indent(), 0ull);
     EXPECT_EQ(UString { "    test" }.indent(), 4ull);

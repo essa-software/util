@@ -340,6 +340,18 @@ UString UString::insert(UString other, size_t where) const {
     return result;
 }
 
+bool UString::starts_with(UString other) const {
+    if (other.size() > size()) {
+        return false;
+    }
+    for (size_t s = 0; s < other.size(); s++) {
+        if (m_storage[s] != other.m_storage[s]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 [[nodiscard]] size_t UString::indent() const {
     if (is_empty())
         return 0;
