@@ -39,7 +39,7 @@ public:
         double x;
         double y;
         sincos(angle, &x, &y);
-        return Util::Vector2<T> { x, y } * length;
+        return Util::Cs::Vector2<T> { x, y } * length;
     }
 
     // Generate random point [x ∈ ℝ, y ∈ ℝ], where x ∈ <rect_left; rect_right) and y ∈ <rect_top; rect_bottom).
