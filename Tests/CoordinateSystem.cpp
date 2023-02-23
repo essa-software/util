@@ -85,6 +85,21 @@ TEST_CASE(with_length) {
     return {};
 }
 
+TEST_CASE(clamp_length) {
+    // This is mostly tested in normalized, so we don't need it here that much.
+    auto test = [](Cs::Vector3f v, float l, Cs::Vector3f n) -> ErrorOr<void, __TestSuite::TestError> {
+        EXPECT(v.clamp_length(l).is_approximately_equal(n));
+        return {};
+    };
+
+    TRY(test(Cs::Vector3f {}, 0, Cs::Vector3f {}));
+    TRY(test(Cs::Vector3f {}, 1, Cs::Vector3f {}));
+    TRY(test(Cs::Vector3f { 1, -3, 0 }, 0, Cs::Vector3f {}));
+    TRY(test(Cs::Vector3f { 1, -3, 0 }, 100, Cs::Vector3f { 1, -3, 0 }));
+    TRY(test(Cs::Vector3f { 10000, -30000, 0 }, 100, Cs::Vector3f { 31.62277660168, -94.86832980505, 0 }));
+    return {};
+}
+
 TEST_CASE(arithmetic) {
     Cs::Vector3f v1 { 5, 4, 2 };
     Cs::Vector3f v2 { -1, 4, 6 };

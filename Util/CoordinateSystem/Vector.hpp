@@ -94,6 +94,15 @@ public:
         return this->normalized() * length;
     }
 
+    // Return vector with length being at most `length`
+    constexpr Vector clamp_length(double length) const {
+        auto this_length = this->length();
+        if (this_length > length) {
+            return this->normalized() * length;
+        }
+        return *this;
+    }
+
     constexpr Vector operator+(Vector const& b) const {
         Vector ab;
         for (size_t s = 0; s < Super::Components; s++) {
