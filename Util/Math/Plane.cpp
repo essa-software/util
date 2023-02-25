@@ -34,16 +34,16 @@ Util::Vector3d Plane::point() const {
 
 Plane Plane::transformed(Util::Matrix4x4d const& matrix) const {
     // https://stackoverflow.com/questions/7685495/transforming-a-3d-plane-using-a-4x4-matrix
-    auto normal = Util::Cs::Point4d { Util::Cs::Point3d::from_deprecated_vector(this->normal()), 0 };
-    auto point = Util::Cs::Point4d { Util::Cs::Point3d::from_deprecated_vector(this->point()), 0 };
+    auto normal = Util::Cs::Point4d { Util::Cs::Point3d::from_deprecated_vector(this->normal()), 1 };
+    auto point = Util::Cs::Point4d { Util::Cs::Point3d::from_deprecated_vector(this->point()), 1 };
     // std::cout << normal << "," << point << std::endl;
 
-    auto transformed_point = (matrix * point).to_vector();
+    auto transformed_point = matrix * point;
     transformed_point /= transformed_point.w();
-    auto transformed_normal = (matrix.inverted().transposed() * normal).to_vector();
+    auto transformed_normal = matrix.inverted().transposed() * normal;
     transformed_normal /= transformed_normal.w();
 
-    double d = transformed_normal.dot(transformed_point);
+    double d = transformed_normal.to_vector().dot(transformed_point.to_vector());
     return Plane {
         transformed_normal.x(),
         transformed_normal.y(),
