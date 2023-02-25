@@ -37,16 +37,13 @@ public:
     }
 
     template<size_t OtherC, class OtherT, class... MoreT>
-        requires(OtherC + sizeof...(MoreT) == Components || (Components == 4 && OtherC + sizeof...(MoreT) == 3))
+        requires(OtherC + sizeof...(MoreT) == Components)
     constexpr explicit Coordinates(Coordinates<OtherC, OtherT, Derived> const& other, MoreT... more) {
         for (size_t s = 0; s < OtherC; s++) {
             m_components[s] = other.component(s);
         }
         auto c = std::initializer_list<T> { static_cast<T>(more)... };
         std::copy(std::begin(c), std::end(c), m_components.begin() + OtherC);
-        if constexpr (Components == 4 && OtherC + sizeof...(MoreT) == 3) {
-            m_components[3] = 1;
-        }
         assert_components_are_finite();
     }
 
