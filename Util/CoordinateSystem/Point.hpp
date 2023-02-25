@@ -86,6 +86,31 @@ public:
         return ab;
     }
 
+    constexpr Point operator*(double x) const {
+        Point ab;
+        for (size_t s = 0; s < Super::Components; s++) {
+            ab.set_component(s, this->component(s) * x);
+        }
+        return ab;
+    }
+
+    constexpr Point& operator*=(double x) {
+        return *this = *this * x;
+    }
+
+    constexpr Point operator/(double x) const {
+        assert(x != 0);
+        Point ab;
+        for (size_t s = 0; s < Super::Components; s++) {
+            ab.set_component(s, this->component(s) / x);
+        }
+        return ab;
+    }
+
+    constexpr Point& operator/=(double x) {
+        return *this = *this / x;
+    }
+
     //// Point2 ////
     template<size_t OtherC, class OtherT>
         requires(Super::Components == 2 && OtherC >= 2)
