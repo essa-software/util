@@ -383,7 +383,16 @@ void UString::reallocate(size_t size) {
 
 std::string UString::dump() const {
     std::ostringstream oss;
-    oss << "US[" << m_storage << " +" << m_size << "]";
+    oss << "US[" << m_storage << " +" << m_size << "] ";
+    for (auto cp : *this) {
+        oss << "U+" << std::hex << std::setfill('0') << std::setw(4) << cp << std::dec << " ";
+    }
+    oss << " (encoded to ";
+    auto encoded = Utf8::encode(span());
+    for (auto ch : encoded) {
+        oss << std::hex << ((uint16_t)ch & 0xff) << std::dec << " ";
+    }
+    oss << encoded << ")";
     return oss.str();
 }
 
