@@ -168,6 +168,8 @@ static bool decode(std::span<uint32_t> storage, std::string_view string, uint32_
 
 static std::string encode(std::span<uint32_t const> storage) {
     Buffer result;
+    // Some random heuristic to make less allocations
+    result.ensure_capacity(storage.size() * 1.1);
     for (auto codepoint : storage) {
         if (codepoint < 0x80) {
             result.append(codepoint);
