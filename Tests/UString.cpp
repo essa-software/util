@@ -104,6 +104,16 @@ TEST_CASE(utf8_invalid) {
     return {};
 }
 
+BENCHMARK(utf8) {
+    std::string big_string;
+    constexpr size_t BigStringSize = 500000;
+    big_string.resize(BigStringSize);
+    for (size_t s = 0; s < BigStringSize; s++) {
+        big_string[s] = s % 128;
+    }
+    (void)Util::UString { big_string }.encode();
+}
+
 TEST_CASE(concatenate) {
     UString str1 { "abc" };
     UString str2 { "ąęł" };
@@ -174,7 +184,7 @@ TEST_CASE(insert) {
 }
 
 TEST_CASE(starts_with) {
-    UString test {"abcghi"};
+    UString test { "abcghi" };
     EXPECT(test.starts_with("a"));
     EXPECT(test.starts_with("abc"));
     EXPECT(test.starts_with("abcghi"));
