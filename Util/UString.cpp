@@ -238,7 +238,8 @@ ErrorOr<UString, UString::DecodingErrorTag> UString::decode(std::span<uint8_t co
         return UString::DecodingError;
     }
     string.reallocate(*size);
-    assert(Utf8::decode({ string.m_storage, string.m_size }, data_sv, 0xfffd));
+    [[maybe_unused]] bool r = Utf8::decode({ string.m_storage, string.m_size }, data_sv, 0xfffd);
+    assert(r);
     return string;
 }
 
