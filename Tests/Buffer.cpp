@@ -107,6 +107,17 @@ TEST_CASE(append) {
     return {};
 }
 
+TEST_CASE(append_more) {
+    Buffer buffer {};
+    for (size_t s = 0; s < 1000; s++) {
+        buffer.append(s & 0xff);
+    }
+    for (size_t s = 0; s < 1000; s++) {
+        EXPECT_EQ(buffer[s], s & 0xff);
+    }
+    return {};
+}
+
 TEST_CASE(take_from_back) {
     Buffer buffer { 0x12, 0x34, 0x56, 0x78 };
     buffer.take_from_back(2);

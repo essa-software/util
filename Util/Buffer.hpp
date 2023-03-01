@@ -26,6 +26,7 @@ public:
     std::span<uint8_t> span() { return { m_data, m_size }; }
     std::span<uint8_t const> span() const { return { m_data, m_size }; }
     size_t size() const { return m_size; }
+    size_t capacity() const { return m_capacity; }
     auto begin() { return m_data; }
     auto begin() const { return m_data; }
     auto end() { return m_data + m_size; }
@@ -43,6 +44,8 @@ public:
     void insert(size_t position, std::initializer_list<uint8_t> bytes) {
         insert(position, std::span<uint8_t const> { bytes });
     }
+    void reallocate(size_t capacity);
+    void ensure_capacity(size_t capacity);
 
     UString decode_infallible(UString::Encoding = UString::Encoding::Utf8, uint32_t replacement = 0xfffd) const;
     ErrorOr<UString, UString::DecodingErrorTag> decode(UString::Encoding = UString::Encoding::Utf8) const;
@@ -58,6 +61,7 @@ private:
 
     uint8_t* m_data { nullptr };
     size_t m_size { 0 };
+    size_t m_capacity { 0 };
 };
 
 }

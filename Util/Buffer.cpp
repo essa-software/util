@@ -12,7 +12,6 @@ Buffer::~Buffer() {
 
 Buffer::Buffer(Buffer const& other) {
     resize_uninitialized(other.m_size);
-    m_size = other.m_size;
     std::copy(other.m_data, other.m_data + other.m_size, m_data);
 }
 
@@ -20,7 +19,6 @@ Buffer& Buffer::operator=(Buffer const& other) {
     if (this == &other)
         return *this;
     resize_uninitialized(other.m_size);
-    m_size = other.m_size;
     std::copy(other.m_data, other.m_data + other.m_size, m_data);
     return *this;
 }
@@ -65,7 +63,14 @@ void Buffer::clear() {
 }
 
 void Buffer::append(uint8_t byte) {
-    resize_uninitialized(m_size + 1);
+    if (m_size == 0) {
+        ensure_capacity(1);
+    }
+    else if (m_size + 1 > m_capacity) {
+        ensure_capacity(m_capacity * 2);
+    }
+    assert(m_capacity >= m_size + 1);
+    m_size++;
     m_data[m_size - 1] = byte;
 }
 
@@ -98,20 +103,33 @@ void Buffer::take_from_back(size_t s) {
 }
 
 void Buffer::resize_uninitialized(size_t size) {
-    auto old_storage = m_data;
-    if (size > 0) {
-        auto old_size = m_size;
+    reallocate(size);
+    m_size = size;
+}
 
-        m_data = new uint8_t[size];
+void Buffer::reallocate(size_t capacity) {
+
+    auto old_storage = m_data;
+    if (capacity > 0) {
+        auto old_capacity = m_capacity;
+
+        m_data = new uint8_t[capacity];
         if (old_storage) {
-            std::copy(old_storage, old_storage + std::min(size, old_size), m_data);
+            std::copy(old_storage, old_storage + std::min(capacity, old_capacity), m_data);
         }
     }
     else {
         m_data = nullptr;
     }
     delete[] old_storage;
-    m_size = size;
+    m_capacity = capacity;
+}
+
+void Buffer::ensure_capacity(size_t capacity) {
+    if (capacity <= m_capacity) {
+        return;
+    }
+    reallocate(capacity);
 }
 
 bool Buffer::operator==(Buffer const& other) const {
