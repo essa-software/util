@@ -149,7 +149,7 @@ public:
 
 private:
     void assert_components_are_finite() const {
-        for (auto c : m_components) {
+        for ([[maybe_unused]] auto c : m_components) {
             assert(std::isfinite(c));
         }
     }
