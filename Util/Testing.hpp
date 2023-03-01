@@ -126,12 +126,19 @@ int main(int, char** argv) {
         std::string test_name = (std::string_view { argv[0] }.starts_with("./") ? std::string { argv[0] }.substr(2) : argv[0]) + "/" + std::string { benchmark.first };
         std::cout << "\r\e[2K\e[33m . \e[m benchmark: " << test_name << std::flush;
         Util::Clock clock;
-        constexpr int RUNS = 1'000'000;
-        for (size_t s = 0; s < RUNS; s++) {
+        using namespace std::chrono_literals;
+        constexpr auto MaxRunTime = 10s;
+        constexpr size_t MaxRuns = 1000000;
+        size_t run_count = MaxRuns;
+        for (size_t s = 0; s < MaxRuns; s++) {
             benchmark.second();
+            if (clock.elapsed() > MaxRunTime) {
+                run_count = s + 1;
+                break;
+            }
         }
         auto time = clock.elapsed();
-        fmt::print("\r\e\2K• \e[1m{}\e[m finished in: {} ({} per test)\n", test_name, fmt::streamed(time), fmt::streamed(time / RUNS));
+        fmt::print("\r\e\2K• \e[1m{}\e[m: {} run(s) finished in: {} ({} per test)\n", test_name, run_count, fmt::streamed(time), fmt::streamed(time / run_count));
     }
     return failed ? 1 : 0;
 }
