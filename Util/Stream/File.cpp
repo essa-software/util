@@ -83,8 +83,8 @@ OsErrorOr<Buffer> ReadableFileStream::read_file(std::string const& name, std::op
     auto chunk = Buffer::uninitialized(4096);
     BufferedReader reader { stream };
     while (!stream.is_eof()) {
-        TRY(reader.read(chunk.span()));
-        result.append(chunk.span());
+        auto bytes_read = TRY(reader.read(chunk.span()));
+        result.append(chunk.span().subspan(0, bytes_read));
     }
     return result;
 }
