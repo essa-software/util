@@ -36,13 +36,13 @@ public:
         assert_components_are_finite();
     }
 
-    template<size_t OtherC, class OtherT, class... MoreT>
-        requires(OtherC + sizeof...(MoreT) == Components)
-    constexpr explicit Coordinates(Coordinates<OtherC, OtherT, Derived> const& other, MoreT... more) {
+    template<size_t OtherC, class... MoreT>
+        requires(OtherC + sizeof...(MoreT) == Components && (std::is_same_v<MoreT, T> && ...))
+    constexpr explicit Coordinates(Coordinates<OtherC, T, Derived> const& other, MoreT... more) {
         for (size_t s = 0; s < OtherC; s++) {
             m_components[s] = other.component(s);
         }
-        auto c = std::initializer_list<T> { static_cast<T>(more)... };
+        auto c = std::initializer_list<T> { more... };
         std::copy(std::begin(c), std::end(c), m_components.begin() + OtherC);
         assert_components_are_finite();
     }

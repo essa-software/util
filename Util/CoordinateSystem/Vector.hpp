@@ -127,7 +127,7 @@ public:
         return *this = *this - b;
     }
 
-    constexpr Vector operator*(double x) const {
+    constexpr Vector operator*(T x) const {
         Vector ab;
         for (size_t s = 0; s < Super::Components; s++) {
             ab.set_component(s, this->component(s) * x);
@@ -135,11 +135,11 @@ public:
         return ab;
     }
 
-    constexpr Vector& operator*=(double x) {
+    constexpr Vector& operator*=(T x) {
         return *this = *this * x;
     }
 
-    constexpr Vector operator/(double x) const {
+    constexpr Vector operator/(T x) const {
         assert(x != 0);
         Vector ab;
         for (size_t s = 0; s < Super::Components; s++) {
@@ -148,7 +148,7 @@ public:
         return ab;
     }
 
-    constexpr Vector& operator/=(double x) {
+    constexpr Vector& operator/=(T x) {
         return *this = *this / x;
     }
 
