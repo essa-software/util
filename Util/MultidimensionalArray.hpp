@@ -15,7 +15,7 @@ class MultidimensionalArray {
 public:
     static constexpr size_t Rank = sizeof...(Dimensions);
     using Type = T;
-    using Vector = Detail::Vector<Rank, size_t>;
+    using Vector = Detail::DeprecatedVector<Rank, size_t>;
 
     template<size_t Dim>
     static size_t dimension() {
