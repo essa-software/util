@@ -1,6 +1,5 @@
 #include "MemoryStream.hpp"
-#include "Util/Config.hpp"
-#include <asm-generic/errno-base.h>
+
 #include <cerrno>
 
 namespace Util {
