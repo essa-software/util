@@ -27,8 +27,8 @@ public:
         while (!is_eof()) {
             auto next = TRY(peek()).value();
             auto start = location();
-            if (isalpha(next)) {
-                auto string = TRY(consume_while(isalpha));
+            if (isalpha(next) || next == U'ą') {
+                auto string = TRY(consume_while([](uint32_t cp) { return isalpha(cp) || cp == U'ą'; }));
                 tokens.push_back(create_token(TestTokenType::Text, string, start));
             }
             else if (isdigit(next)) {
@@ -154,14 +154,10 @@ ParseErrorOr<AST::Array> TestParser::parse_array() {
 
 ParseErrorOr<int> TestParser::parse_number() {
     auto value = TRY(expect(TestTokenType::Number)).value();
-    try {
-        return value.parse<int>().map_error(
-            [](OsError&& err) {
-                return ParseError { .message = std::string { err.function }, .location = {} };
-            });
-    } catch (...) {
-        return error_in_already_read("Invalid number");
-    }
+    return value.parse<int>().map_error(
+        [](OsError&& err) {
+            return ParseError { .message = std::string { err.function }, .location = {} };
+        });
 }
 
 ParseErrorOr<UString> TestParser::parse_text() {
@@ -180,6 +176,7 @@ ErrorOr<void, __TestSuite::TestError> expect_success(std::string_view input, std
 
     if (parsed_expr.is_error()) {
         auto error = parsed_expr.release_error();
+        fmt::print(stderr, "{}\n", error.message);
         return __TestSuite::TestError { "success for " + std::string { input }, "GenericParser.cpp", __LINE__ };
     }
     else {
@@ -213,6 +210,7 @@ ErrorOr<void, __TestSuite::TestError> expect_error(std::string_view input, std::
 
 TEST_CASE(generic_parser) {
     TRY(expect_success("(1,2,4,  a  , b,  (other, array ), (more, (nested, arrays, (yay))  ) )", "(1, 2, 4, 'a', 'b', ('other', 'array'), ('more', ('nested', 'arrays', ('yay'))))"));
+    TRY(expect_success("(ąąąą)", "('ąąąą')"));
     TRY(expect_error("#", "Expected array, number or text, got '#'"));
     TRY(expect_error("(", "Unexpected EOF in expression"));
     return {};

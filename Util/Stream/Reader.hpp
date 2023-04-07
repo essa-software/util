@@ -112,36 +112,29 @@ public:
 
     SourceLocation location() { return m_location; }
 
-    OsErrorOr<std::optional<char>> consume() {
-        auto result = TRY(get());
-        if (!result)
-            return result;
-        if (*result == '\n') {
-            m_location.line++;
-            m_location.column = 0;
-        }
-        else {
-            m_location.column++;
-        }
-        m_location.offset++;
-        return result;
+    bool is_eof() const {
+        return BufferedReader::is_eof() && !m_peeked_codepoint;
     }
 
+    // Peek at single codepoint without removing it from stream.
+    OsErrorOr<std::optional<uint32_t>> peek();
+
+    // Consume a single codepoint.
+    OsErrorOr<std::optional<uint32_t>> consume();
+
     // Consumes delim but doesn't include in returned value.
-    OsErrorOr<UString> consume_until(char delim);
+    OsErrorOr<UString> consume_until(uint32_t delim);
 
     template<class Callback>
     OsErrorOr<UString> consume_while(Callback&& callback) {
-        Buffer result;
+        std::vector<uint32_t> result;
         auto c = TRY(peek());
         while (c && callback(*c)) {
-            result.append(*c);
+            result.push_back(*c);
             TRY(consume());
             c = TRY(peek());
         }
-        return result.decode(m_encoding).map_error([&](auto) {
-            return OsError { .error = 0, .function = "consume_while: Decoding failed" };
-        });
+        return UString { result };
     }
 
     OsErrorOr<UString> consume_line();
@@ -153,6 +146,9 @@ public:
     }
 
 private:
+    OsErrorOr<std::optional<uint32_t>> consume_impl();
+
+    std::optional<uint32_t> m_peeked_codepoint;
     SourceLocation m_location;
     UString::Encoding m_encoding {};
 };

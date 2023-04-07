@@ -88,7 +88,55 @@ OsErrorOr<Buffer> BinaryReader::read_until(uint8_t delim) {
     return result;
 }
 
-OsErrorOr<UString> TextReader::consume_until(char delim) {
+OsErrorOr<std::optional<uint32_t>> TextReader::consume() {
+    auto cp = TRY(consume_impl());
+    if (!cp) {
+        return cp;
+    }
+    if (*cp == '\n') {
+        m_location.line++;
+        m_location.column = 0;
+    }
+    else {
+        m_location.column++;
+    }
+    m_location.offset++;
+
+    return cp;
+}
+
+OsErrorOr<std::optional<uint32_t>> TextReader::consume_impl() {
+    if (m_peeked_codepoint) {
+        auto codepoint = *m_peeked_codepoint;
+        m_peeked_codepoint = {};
+        return codepoint;
+    }
+    std::vector<uint8_t> buffer;
+    while (true) {
+        auto c = TRY(get());
+        if (!c) {
+            return std::optional<uint32_t> {};
+        }
+        buffer.push_back(*c);
+
+        // Check if we can already decode the codepoint.
+        auto decoded = Util::UString::decode(buffer);
+        if (!decoded.is_error()) {
+            assert(decoded.value().size() == 1);
+            return decoded.release_value().at(0);
+        }
+    }
+}
+
+OsErrorOr<std::optional<uint32_t>> TextReader::peek() {
+    if (m_peeked_codepoint) {
+        return m_peeked_codepoint;
+    }
+    m_peeked_codepoint = TRY(consume_impl());
+    return m_peeked_codepoint;
+}
+
+OsErrorOr<UString> TextReader::consume_until(uint32_t delim) {
     Buffer result;
     while (true) {
         auto ch = TRY(consume());
