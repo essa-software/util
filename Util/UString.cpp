@@ -166,7 +166,7 @@ static bool decode(std::span<uint32_t> storage, std::string_view string, uint32_
     });
 }
 
-static std::string encode(std::span<uint32_t const> storage) {
+static Buffer encode(std::span<uint32_t const> storage) {
     Buffer result;
     // Some random heuristic to make less allocations
     result.ensure_capacity(storage.size() * 1.1);
@@ -205,7 +205,7 @@ static std::string encode(std::span<uint32_t const> storage) {
             result.append(0b1000'0000 | ((codepoint & 0b111111)));
         }
     }
-    return std::string { reinterpret_cast<char const*>(result.span().data()), result.size() };
+    return result;
 }
 
 }
@@ -245,14 +245,14 @@ ErrorOr<UString, UString::DecodingErrorTag> UString::decode(std::span<uint8_t co
     return string;
 }
 
-std::string UString::encode(Encoding encoding) const {
+Buffer UString::encode_buffer(Encoding encoding) const {
     switch (encoding) {
     case Encoding::ASCII: {
-        std::string str;
+        Buffer str;
         for (auto cp : span()) {
             if (cp > 0x7f)
                 continue;
-            str += static_cast<char>(cp);
+            str.append(cp);
         }
         return str;
     }
@@ -260,7 +260,12 @@ std::string UString::encode(Encoding encoding) const {
         return Utf8::encode(span());
     }
     }
-    return "";
+    return Buffer();
+}
+
+std::string UString::encode(Encoding e) const {
+    Buffer encoded = encode_buffer(e);
+    return std::string { reinterpret_cast<char const*>(encoded.span().data()), encoded.size() };
 }
 
 uint32_t UString::at(size_t p) const {
@@ -395,7 +400,7 @@ std::string UString::dump() const {
     for (auto ch : encoded) {
         oss << std::hex << ((uint16_t)ch & 0xff) << std::dec << " ";
     }
-    oss << encoded << ")";
+    oss << encode() << ")";
     return oss.str();
 }
 

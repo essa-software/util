@@ -12,6 +12,8 @@
 
 namespace Util {
 
+class Buffer;
+
 // A string that properly supports Unicode. It stores data as UTF-32
 // internally, like SFML strings. This string is NOT null-terminated
 // (because why is should be, you have size and this is sufficient
@@ -63,6 +65,7 @@ public:
     }
 
     [[nodiscard]] std::string encode(Encoding = Encoding::Utf8) const;
+    [[nodiscard]] Buffer encode_buffer(Encoding = Encoding::Utf8) const;
 
     [[nodiscard]] uint32_t at(size_t) const;
     [[nodiscard]] size_t size() const { return m_size; }
