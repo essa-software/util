@@ -50,6 +50,8 @@ public:
         return { x, y };
     }
 
+    Random& std_random() { return m_std_random; }
+
 private:
     Random m_std_random;
 };
